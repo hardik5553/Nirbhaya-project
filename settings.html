@@ -4,14 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Track Location | NIRBHAYA</title>
+    <title>System Settings | NIRBHAYA</title>
 
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap"
         rel="stylesheet">
 
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
@@ -96,7 +98,7 @@
             color: #ff3864;
         }
 
-        /* SOS Button */
+        /* SOS */
         .sos-wrapper {
             margin-top: auto;
             display: flex;
@@ -159,6 +161,7 @@
             gap: 12px;
         }
 
+        /* Custom Logo Image Styles */
         .app-logo {
             height: 48px;
             width: 48px;
@@ -287,7 +290,7 @@
         }
 
         /* =========================
-           CONTENT & MAP SECTION
+           CONTENT & SETTINGS
         ========================= */
         .content {
             padding: 35px;
@@ -308,88 +311,142 @@
             margin-top: 5px;
         }
 
-        .map-section {
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 1050px;
+        }
+
+        .settings-card {
             background: white;
-            border-radius: 18px;
-            padding: 25px;
+            border-radius: 17px;
+            padding: 20px;
             box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
-            max-width: 950px;
         }
 
-        .map-section h2 {
-            font-family: Poppins, sans-serif;
-            font-size: 20px;
-            margin-bottom: 15px;
-            color: #1e293b;
-        }
-
-        /* Destination Search Bar Styling */
-        .destination-search-box {
+        .card-heading {
             display: flex;
+            align-items: center;
             gap: 10px;
-            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 15px;
         }
 
-        .destination-search-box input {
-            flex: 1;
-            padding: 10px 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
+        .card-heading .icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .destination-search-box input:focus {
-            border-color: #2563eb;
+        .card-heading h3 {
+            font-size: 15px;
         }
 
-        .destination-search-box button {
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
+        .row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            font-size: 13px;
+            border-bottom: 1px solid #f1f5f9;
         }
 
-        .destination-search-box button:hover {
-            background: #1d4ed8;
+        .row:last-child {
+            border-bottom: none;
         }
 
-        #locationBox {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #e2e8f0;
-        }
-
-        #locationBox p {
-            margin: 6px 0;
-            font-size: 14px;
+        .row-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             color: #334155;
             font-weight: 600;
         }
 
-        #locationBox span {
-            color: #ef3340;
-            font-weight: 700;
+        .row-left i {
+            color: #64748b;
+            width: 18px;
         }
 
-        .map-container {
-            width: 100%;
-            height: 450px;
-            border-radius: 12px;
-            overflow: hidden;
+        /* Form Inputs for Settings */
+        .setting-input {
+            width: 55%;
+            padding: 8px 10px;
             border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
         }
 
-        .map-container iframe {
+        .setting-input:focus {
+            border-color: #2563eb;
+        }
+
+        .setting-input[readonly] {
+            background-color: #f1f5f9;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        /* DP Upload Styling */
+        .dp-preview-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .dp-preview {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #cbd5e1;
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            width: 38px;
+            height: 20px;
+            border-radius: 20px;
+            background: #10b981;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .toggle::after {
+            content: "";
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            position: absolute;
+            right: 2px;
+            top: 2px;
+        }
+
+        .card-btn {
             width: 100%;
-            height: 100%;
-            border: none;
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #2563eb;
+            border-radius: 8px;
+            background: white;
+            color: #2563eb;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .card-btn:hover {
+            background: #2563eb;
+            color: white;
         }
 
         /* SOS Countdown Overlay Styling */
@@ -427,6 +484,12 @@
             font-size: 12px;
         }
 
+        @media(max-width: 900px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media(max-width: 750px) {
             .sidebar {
                 width: 70px;
@@ -451,60 +514,57 @@
             .content {
                 padding: 20px;
             }
-
-            .destination-search-box {
-                flex-direction: column;
-            }
         }
     </style>
 </head>
 
 <body>
 
+    <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="brand">
-            <a href="../security.html" title="Security Center">
+            <a href="security.html" title="Go to Security Center">
                 <i class="fa-solid fa-shield-halved" style="color: #ef476f; font-size: 26px;"></i>
             </a>
         </div>
 
         <nav class="menu">
-            <a href="../indexsih.html">
+            <a href="indexsih.html">
                 <i class="fa-solid fa-border-all"></i>
                 <span>Dashboard</span>
             </a>
 
-            <a href="track-location.html" class="active">
+            <a href="pages/track-location.html">
                 <i class="fa-solid fa-location-dot"></i>
                 <span>Location</span>
             </a>
 
-            <a href="../alerts.html">
+            <a href="alerts.html">
                 <i class="fa-solid fa-bell"></i>
                 <span>Alerts</span>
             </a>
 
-            <a href="../watch.html">
+            <a href="watch.html">
                 <i class="fa-solid fa-clock"></i>
                 <span>Watch</span>
             </a>
 
-            <a href="../security.html">
+            <a href="security.html">
                 <i class="fa-solid fa-shield-halved"></i>
                 <span>Security</span>
             </a>
 
-            <a href="../contacts.html">
+            <a href="contacts.html">
                 <i class="fa-solid fa-users"></i>
                 <span>Contacts</span>
             </a>
 
-            <a href="../history.html">
+            <a href="history.html">
                 <i class="fa-solid fa-clock-rotate-left"></i>
                 <span>History</span>
             </a>
 
-            <a href="../settings.html">
+            <a href="settings.html" class="active">
                 <i class="fa-solid fa-gear"></i>
                 <span>Settings</span>
             </a>
@@ -516,11 +576,14 @@
         </div>
     </aside>
 
+    <!-- MAIN CONTAINER -->
     <main class="main">
 
+        <!-- TOPBAR -->
         <header class="topbar">
             <div class="logo-area">
-                <img src="../assets/images/nir2.jpeg" alt="NIRBHAYA Logo" class="app-logo"
+                <!-- Custom Logo Image -->
+                <img src="assets/images/nir2.jpeg" alt="NIRBHAYA Logo" class="app-logo"
                     onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100'">
                 <div>
                     <h2><span>NIR</span> BHAYA</h2>
@@ -529,14 +592,15 @@
             </div>
 
             <div class="top-right">
-                <div class="notification" onclick="location.href='../alerts.html'">
+                <div class="notification" onclick="location.href='alerts.html'">
                     <i class="fa-solid fa-bell"></i>
                     <span class="badge">3</span>
                 </div>
 
+                <!-- User Profile with Interactive Dropdown Menu -->
                 <div class="user-dropdown-container" id="userDropdownToggle">
                     <div class="user">
-                        <img id="topbarUserImg" src="../aqw.jpeg" alt="Profile"
+                        <img id="topbarUserImg" src="aqw.jpeg" alt="Profile"
                             onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'">
                         <strong id="topbarUserName">Hi, User</strong>
                         <i class="fa-solid fa-chevron-down" style="font-size: 11px;"></i>
@@ -551,11 +615,11 @@
                             onclick="alert('User Details: Primary User | Status: Verified')">
                             <i class="fa-solid fa-user"></i> User Details
                         </a>
-                        <a href="../settings.html" class="dropdown-item">
+                        <a href="settings.html" class="dropdown-item">
                             <i class="fa-solid fa-gear"></i> Account Settings
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="../login.html" class="dropdown-item" style="color: #ef3340;">
+                        <a href="login.html" class="dropdown-item" style="color: #ef3340;">
                             <i class="fa-solid fa-right-from-bracket"></i> Logout
                         </a>
                     </div>
@@ -563,42 +627,153 @@
             </div>
         </header>
 
+        <!-- CONTENT -->
         <section class="content">
             <div class="page-title">
-                <h1>Track Location & Route</h1>
-                <p>Real-time GPS coordinate mapping and destination safety monitoring</p>
+                <h1>System & Account Settings</h1>
+                <p>Configure device telemetry, user profile details, and safety preferences</p>
             </div>
 
-            <div class="map-section" id="mapSection">
-                <h2>Live GPS Coordinates & Navigation</h2>
+            <div class="settings-grid">
 
-                <!-- Destination Search Bar -->
-                <div class="destination-search-box">
-                    <input type="text" id="destinationInput"
-                        placeholder="🔍 Search destination (e.g., Central Station, Delhi, Kanpur)...">
-                    <button onclick="searchDestinationRoute()">Search & Route 🚀</button>
+                <!-- 1. User Profile & DP Details Card -->
+                <div class="settings-card">
+                    <div class="card-heading">
+                        <div class="icon">
+                            <i class="fa-solid fa-user-pen"></i>
+                        </div>
+                        <h3>User Profile Details</h3>
+                    </div>
+
+                    <div class="row">
+                        <div class="row-left">
+                            <i class="fa-solid fa-image"></i> Profile Picture
+                        </div>
+                        <div class="dp-preview-container">
+                            <img id="dpPreview" src="aqw.jpeg" alt="DP" class="dp-preview"
+                                onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'">
+                            <input type="file" id="dpUploadInput" accept="image/*" style="font-size: 12px;"
+                                onchange="previewImage(event)">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="row-left">
+                            <i class="fa-solid fa-fingerprint"></i> Unique ID
+                        </div>
+                        <input type="text" class="setting-input" value="NB-USR-88421" readonly
+                            title="Unique ID cannot be edited">
+                    </div>
+
+                    <div class="row">
+                        <div class="row-left">
+                            <i class="fa-solid fa-user"></i> Full Name
+                        </div>
+                        <input type="text" class="setting-input" id="userNameInput" value="Akrati">
+                    </div>
+
+                    <div class="row">
+                        <div class="row-left">
+                            <i class="fa-solid fa-phone"></i> Phone Number
+                        </div>
+                        <input type="text" class="setting-input" id="userPhoneInput" value="+91 91234 56789">
+                    </div>
+
+                    <div class="row">
+                        <div class="row-left">
+                            <i class="fa-solid fa-location-dot"></i> Address
+                        </div>
+                        <input type="text" class="setting-input" id="userAddressInput" value="Kanpur, Uttar Pradesh">
+                    </div>
+
+                    <button class="card-btn" onclick="saveProfileDetails()">
+                        Save Profile Details
+                    </button>
                 </div>
 
-                <div id="locationBox">
-                    <p>Status: <span id="status">Requesting GPS location permission...</span></p>
-                    <p>Latitude: <span id="latitude">--</span></p>
-                    <p>Longitude: <span id="longitude">--</span></p>
-                    <p>Route Status: <span id="routeStatusText" style="color: #2563eb;">Live GPS Tracking Active</span>
-                    </p>
+                <!-- 2. Security & Change Password Card (Optimized) -->
+                <div class="settings-card">
+                    <div class="card-heading">
+                        <div class="icon" style="background: #f3e8ff; color: #7c3aed;">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <h3>Change Password</h3>
+                    </div>
+
+                    <div class="row">
+                        <div class="row-left">
+                            <i class="fa-solid fa-key"></i> Old Password
+                        </div>
+                        <input type="password" class="setting-input" id="oldPwd" placeholder="Current password">
+                    </div>
+
+                    <div class="row">
+                        <div class="row-left">
+                            <i class="fa-solid fa-lock"></i> New Password
+                        </div>
+                        <input type="password" class="setting-input" id="newPwd"
+                            placeholder="New password (min 6 chars)">
+                    </div>
+
+                    <div class="row">
+                        <div class="row-left">
+                            <i class="fa-solid fa-check-double"></i> Confirm Password
+                        </div>
+                        <input type="password" class="setting-input" id="confirmPwd" placeholder="Confirm new password">
+                    </div>
+
+                    <button class="card-btn" style="border-color: #7c3aed; color: #7c3aed;" onclick="updatePassword()">
+                        Update Password
+                    </button>
                 </div>
 
-                <div class="map-container">
-                    <iframe id="locationMap" src="" loading="lazy"></iframe>
+                <!-- 3. General Safety Preferences Card -->
+                <div class="settings-card" style="grid-column: span 2;">
+                    <div class="card-heading">
+                        <div class="icon" style="background: #ecfdf5; color: #10b981;">
+                            <i class="fa-solid fa-sliders"></i>
+                        </div>
+                        <h3>General Safety Preferences</h3>
+                    </div>
+
+                    <div class="row">
+                        <div class="row-left">
+                            <i class="fa-solid fa-bell"></i> Push Notifications
+                        </div>
+                        <div class="toggle" onclick="toggleSwitch(this)"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="row-left">
+                            <i class="fa-solid fa-location-crosshairs"></i> High Accuracy GPS Telemetry
+                        </div>
+                        <div class="toggle" onclick="toggleSwitch(this)"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="row-left">
+                            <i class="fa-solid fa-volume-high"></i> Emergency Alarm Siren Sound
+                        </div>
+                        <div class="toggle" onclick="toggleSwitch(this)"></div>
+                    </div>
+
+                    <button class="card-btn green-btn" style="border-color: #10b981; color: #10b981;"
+                        onclick="saveGeneralPreferences()">
+                        Save Preferences
+                    </button>
                 </div>
+
             </div>
         </section>
 
+        <!-- FOOTER -->
         <footer>
             🛡️ NIR BHAYA © 2026 | Protection. Prevention. Peace of Mind.
         </footer>
 
     </main>
 
+    <!-- SOS COUNTDOWN OVERLAY SCREEN -->
     <div id="sosCountdownOverlay">
         <h2>🚨 SOS EMERGENCY ACTIVATED 🚨</h2>
         <p>Dispatching coordinates and custom SMS to emergency contacts in:</p>
@@ -611,17 +786,18 @@
         </button>
     </div>
 
-    <!-- GEOLOCATION, EXACT PIN MAPPING & ROUTING SCRIPT -->
+    <!-- Script for Dynamic Profile Synchronization & SOS Engine -->
     <script>
-        let currentLat = 26.4499;
-        let currentLon = 80.3319;
-
-        window.addEventListener("DOMContentLoaded", () => {
+        // Load saved active user profile data on page load
+        window.addEventListener('DOMContentLoaded', () => {
             const savedName = localStorage.getItem('nirbhaya_username');
             const savedDp = localStorage.getItem('nirbhaya_userdp');
             const savedEmail = localStorage.getItem('nirbhaya_user_email') || localStorage.getItem('nirbhaya_current_user_email');
 
             if (savedName) {
+                const userNameInput = document.getElementById('userNameInput');
+                if (userNameInput) userNameInput.value = savedName;
+
                 const topbarNameEl = document.getElementById('topbarUserName');
                 const dropdownNameEl = document.getElementById('dropdownUserName');
                 if (topbarNameEl) topbarNameEl.textContent = `Hi, ${savedName}`;
@@ -634,69 +810,15 @@
             }
 
             const topbarImg = document.getElementById('topbarUserImg');
+            const dpPreview = document.getElementById('dpPreview');
             if (savedDp && savedDp.trim() !== "") {
                 if (topbarImg) topbarImg.src = savedDp;
+                if (dpPreview) dpPreview.src = savedDp;
             } else {
-                if (topbarImg) topbarImg.src = '../aqw.jpeg';
-            }
-
-            // Real-time Geolocation Mapping with exact pinpointing
-            const latSpan = document.getElementById("latitude");
-            const lonSpan = document.getElementById("longitude");
-            const statusSpan = document.getElementById("status");
-            const mapIframe = document.getElementById("locationMap");
-
-            if ("geolocation" in navigator) {
-                navigator.geolocation.watchPosition(
-                    (position) => {
-                        currentLat = position.coords.latitude;
-                        currentLon = position.coords.longitude;
-
-                        latSpan.textContent = currentLat.toFixed(4);
-                        lonSpan.textContent = currentLon.toFixed(4);
-                        statusSpan.textContent = "Live GPS tracking active!";
-                        statusSpan.style.color = "#16a34a";
-
-                        // Accurate Google Maps Pin formatting with marker query
-                        mapIframe.src = `https://maps.google.com/maps?q=${currentLat},${currentLon}&hl=en&z=16&output=embed`;
-                    },
-                    (error) => {
-                        statusSpan.textContent = "Location access denied or unavailable. Using fallback location (Kanpur).";
-                        statusSpan.style.color = "#ef3340";
-
-                        latSpan.textContent = currentLat;
-                        lonSpan.textContent = currentLon;
-
-                        mapIframe.src = `https://maps.google.com/maps?q=${currentLat},${currentLon}&hl=en&z=16&output=embed`;
-                    },
-                    { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 }
-                );
-            } else {
-                statusSpan.textContent = "Geolocation is not supported by your browser.";
-                statusSpan.style.color = "#ef3340";
-                mapIframe.src = `https://maps.google.com/maps?q=${currentLat},${currentLon}&hl=en&z=16&output=embed`;
+                if (topbarImg) topbarImg.src = 'aqw.jpeg';
+                if (dpPreview) dpPreview.src = 'aqw.jpeg';
             }
         });
-
-        // Destination Search & Google Maps Routing Feature
-        function searchDestinationRoute() {
-            const destinationQuery = document.getElementById('destinationInput').value.trim();
-            const routeStatus = document.getElementById('routeStatusText');
-            const mapIframe = document.getElementById('locationMap');
-
-            if (!destinationQuery) {
-                alert("⚠️ Please enter a destination to search.");
-                return;
-            }
-
-            routeStatus.textContent = `Navigating towards: ${destinationQuery} (Safe Route Verified)`;
-            routeStatus.style.color = "#16a34a";
-
-            alert(`🧭 Route Calculated Successfully!\n- Destination: ${destinationQuery}\n- AI Guardian: Safe corridor selected.\n- Updating map to display destination route...`);
-
-            // Update map iframe to search and display destination accurately
-            mapIframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(destinationQuery)}&hl=en&z=14&output=embed`;
-        }
 
         // User Profile Dropdown Toggle Script
         const dropdownToggle = document.getElementById('userDropdownToggle');
@@ -744,6 +866,94 @@
             }
             document.getElementById('sosCountdownOverlay').style.display = 'none';
             alert("🛡️ SOS Alert successfully cancelled.");
+        }
+
+        // Toggle Switch Styling Interaction
+        function toggleSwitch(element) {
+            if (element.style.background === "rgb(203, 213, 225)") {
+                element.style.background = "#10b981";
+            } else {
+                element.style.background = "#cbd5e1";
+            }
+        }
+
+        // Preview uploaded profile picture
+        let tempDpBase64 = "";
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    tempDpBase64 = e.target.result;
+                    document.getElementById('dpPreview').src = tempDpBase64;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Save Profile Details & Sync across pages via localStorage
+        function saveProfileDetails() {
+            const name = document.getElementById('userNameInput').value.trim();
+            const phone = document.getElementById('userPhoneInput').value.trim();
+            const address = document.getElementById('userAddressInput').value.trim();
+
+            if (!name || !phone || !address) {
+                alert("⚠️ Please fill out all profile fields before saving.");
+                return;
+            }
+
+            // Save to LocalStorage
+            localStorage.setItem('nirbhaya_username', name);
+            if (tempDpBase64) {
+                localStorage.setItem('nirbhaya_userdp', tempDpBase64);
+            }
+
+            // Update topbar immediately on settings page
+            document.getElementById('topbarUserName').textContent = `Hi, ${name}`;
+            document.getElementById('dropdownUserName').textContent = name;
+            if (tempDpBase64) {
+                document.getElementById('topbarUserImg').src = tempDpBase64;
+            }
+
+            alert(`✅ Profile Updated Successfully!\n\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\n\nChanges are now reflected across all pages.`);
+        }
+
+        // Optimized & Secured Update Password Logic
+        function updatePassword() {
+            const oldPwd = document.getElementById('oldPwd').value.trim();
+            const newPwd = document.getElementById('newPwd').value.trim();
+            const confirmPwd = document.getElementById('confirmPwd').value.trim();
+
+            if (!oldPwd || !newPwd || !confirmPwd) {
+                alert("⚠️ Error: Please fill in all the password fields.");
+                return;
+            }
+
+            if (newPwd.length < 6) {
+                alert("⚠️ Error: New password must be at least 6 characters long.");
+                return;
+            }
+
+            if (newPwd !== confirmPwd) {
+                alert("❌ Error: New password and confirm password do not match!");
+                return;
+            }
+
+            if (oldPwd === newPwd) {
+                alert("⚠️ Notice: New password cannot be the same as your old password.");
+                return;
+            }
+
+            alert("🔒 Success: Password changed successfully! Please use your new password for future logins.");
+
+            document.getElementById('oldPwd').value = "";
+            document.getElementById('newPwd').value = "";
+            document.getElementById('confirmPwd').value = "";
+        }
+
+        // Save General Safety Preferences Logic
+        function saveGeneralPreferences() {
+            alert("⚙️ General Safety Preferences Saved Successfully!");
         }
     </script>
 

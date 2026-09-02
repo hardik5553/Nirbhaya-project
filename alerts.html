@@ -4,14 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Track Location | NIRBHAYA</title>
+    <title>Alerts Center | NIRBHAYA</title>
 
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap"
         rel="stylesheet">
 
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
@@ -96,7 +98,7 @@
             color: #ff3864;
         }
 
-        /* SOS Button */
+        /* SOS */
         .sos-wrapper {
             margin-top: auto;
             display: flex;
@@ -159,6 +161,7 @@
             gap: 12px;
         }
 
+        /* Custom Logo Image Styles */
         .app-logo {
             height: 48px;
             width: 48px;
@@ -287,7 +290,7 @@
         }
 
         /* =========================
-           CONTENT & MAP SECTION
+           CONTENT & ALERTS CARDS
         ========================= */
         .content {
             padding: 35px;
@@ -308,88 +311,79 @@
             margin-top: 5px;
         }
 
-        .map-section {
-            background: white;
-            border-radius: 18px;
-            padding: 25px;
-            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+        .alerts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
             max-width: 950px;
         }
 
-        .map-section h2 {
-            font-family: Poppins, sans-serif;
-            font-size: 20px;
-            margin-bottom: 15px;
-            color: #1e293b;
-        }
-
-        /* Destination Search Bar Styling */
-        .destination-search-box {
+        .alert-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px 25px;
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+            border-left: 6px solid #10b981;
+            transition: 0.3s;
         }
 
-        .destination-search-box input {
-            flex: 1;
-            padding: 10px 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
+        .alert-card.danger {
+            border-left-color: #ef3340;
+            background: #fff5f5;
         }
 
-        .destination-search-box input:focus {
-            border-color: #2563eb;
+        .alert-card.warning {
+            border-left-color: #f59e0b;
+            background: #fffbeb;
         }
 
-        .destination-search-box button {
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
+        .alert-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
         }
 
-        .destination-search-box button:hover {
-            background: #1d4ed8;
+        .alert-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #475569;
         }
 
-        #locationBox {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #e2e8f0;
-        }
-
-        #locationBox p {
-            margin: 6px 0;
-            font-size: 14px;
-            color: #334155;
-            font-weight: 600;
-        }
-
-        #locationBox span {
+        .alert-card.danger .alert-icon {
+            background: #fee2e2;
             color: #ef3340;
+        }
+
+        .alert-card.warning .alert-icon {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .alert-info h3 {
+            font-size: 16px;
             font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 3px;
         }
 
-        .map-container {
-            width: 100%;
-            height: 450px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #cbd5e1;
+        .alert-info p {
+            font-size: 13px;
+            color: #64748b;
         }
 
-        .map-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        .alert-time {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 600;
         }
 
         /* SOS Countdown Overlay Styling */
@@ -452,8 +446,10 @@
                 padding: 20px;
             }
 
-            .destination-search-box {
+            .alert-card {
                 flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
             }
         }
     </style>
@@ -461,50 +457,53 @@
 
 <body>
 
+    <!-- SIDEBAR -->
     <aside class="sidebar">
+        <!-- Left top Shield Icon linked to security.html -->
         <div class="brand">
-            <a href="../security.html" title="Security Center">
+            <a href="security.html" title="Go to Security Center">
                 <i class="fa-solid fa-shield-halved" style="color: #ef476f; font-size: 26px;"></i>
             </a>
         </div>
 
         <nav class="menu">
-            <a href="../indexsih.html">
+            <a href="indexsih.html">
                 <i class="fa-solid fa-border-all"></i>
                 <span>Dashboard</span>
             </a>
 
-            <a href="track-location.html" class="active">
+            <!-- Location icon linked to track-location page -->
+            <a href="pages/track-location.html">
                 <i class="fa-solid fa-location-dot"></i>
                 <span>Location</span>
             </a>
 
-            <a href="../alerts.html">
+            <a href="alerts.html" class="active">
                 <i class="fa-solid fa-bell"></i>
                 <span>Alerts</span>
             </a>
 
-            <a href="../watch.html">
+            <a href="watch.html">
                 <i class="fa-solid fa-clock"></i>
                 <span>Watch</span>
             </a>
 
-            <a href="../security.html">
+            <a href="security.html">
                 <i class="fa-solid fa-shield-halved"></i>
                 <span>Security</span>
             </a>
 
-            <a href="../contacts.html">
+            <a href="contacts.html">
                 <i class="fa-solid fa-users"></i>
                 <span>Contacts</span>
             </a>
 
-            <a href="../history.html">
+            <a href="history.html">
                 <i class="fa-solid fa-clock-rotate-left"></i>
                 <span>History</span>
             </a>
 
-            <a href="../settings.html">
+            <a href="settings.html">
                 <i class="fa-solid fa-gear"></i>
                 <span>Settings</span>
             </a>
@@ -516,11 +515,14 @@
         </div>
     </aside>
 
+    <!-- MAIN CONTAINER -->
     <main class="main">
 
+        <!-- TOPBAR -->
         <header class="topbar">
             <div class="logo-area">
-                <img src="../assets/images/nir2.jpeg" alt="NIRBHAYA Logo" class="app-logo"
+                <!-- Custom Logo Image -->
+                <img src="assets/images/nir2.jpeg" alt="NIRBHAYA Logo" class="app-logo"
                     onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100'">
                 <div>
                     <h2><span>NIR</span> BHAYA</h2>
@@ -529,33 +531,34 @@
             </div>
 
             <div class="top-right">
-                <div class="notification" onclick="location.href='../alerts.html'">
+                <div class="notification" onclick="location.href='alerts.html'">
                     <i class="fa-solid fa-bell"></i>
                     <span class="badge">3</span>
                 </div>
 
+                <!-- User Profile with Interactive Dropdown Menu -->
                 <div class="user-dropdown-container" id="userDropdownToggle">
                     <div class="user">
-                        <img id="topbarUserImg" src="../aqw.jpeg" alt="Profile"
+                        <img id="topbarUserImg" src="aqw.jpeg" alt="Profile"
                             onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'">
-                        <strong id="topbarUserName">Hi, User</strong>
+                        <strong id="topbarUserName">Hi, Akrati</strong>
                         <i class="fa-solid fa-chevron-down" style="font-size: 11px;"></i>
                     </div>
 
                     <div class="dropdown-menu" id="userDropdownMenu">
                         <div class="dropdown-header">
-                            <strong id="dropdownUserName">User</strong>
-                            <small id="dropdownUserEmail">user@example.com</small>
+                            <strong id="dropdownUserName">Akrati</strong>
+                            <small>akrati@example.com</small>
                         </div>
                         <a href="#" class="dropdown-item"
-                            onclick="alert('User Details: Primary User | Status: Verified')">
+                            onclick="alert('User Details: Akrati | Role: Primary User | Status: Verified')">
                             <i class="fa-solid fa-user"></i> User Details
                         </a>
-                        <a href="../settings.html" class="dropdown-item">
+                        <a href="settings.html" class="dropdown-item">
                             <i class="fa-solid fa-gear"></i> Account Settings
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="../login.html" class="dropdown-item" style="color: #ef3340;">
+                        <a href="login.html" class="dropdown-item" style="color: #ef3340;">
                             <i class="fa-solid fa-right-from-bracket"></i> Logout
                         </a>
                     </div>
@@ -563,42 +566,86 @@
             </div>
         </header>
 
+        <!-- CONTENT -->
         <section class="content">
             <div class="page-title">
-                <h1>Track Location & Route</h1>
-                <p>Real-time GPS coordinate mapping and destination safety monitoring</p>
+                <h1>Women Safety System Alerts</h1>
+                <p>Real-time threat notifications, emergency logs, and automated safety warnings</p>
             </div>
 
-            <div class="map-section" id="mapSection">
-                <h2>Live GPS Coordinates & Navigation</h2>
+            <div class="alerts-container">
 
-                <!-- Destination Search Bar -->
-                <div class="destination-search-box">
-                    <input type="text" id="destinationInput"
-                        placeholder="🔍 Search destination (e.g., Central Station, Delhi, Kanpur)...">
-                    <button onclick="searchDestinationRoute()">Search & Route 🚀</button>
+                <!-- Alert Item 1 -->
+                <div class="alert-card danger">
+                    <div class="alert-left">
+                        <div class="alert-icon">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div class="alert-info">
+                            <h3>SOS Emergency Triggered</h3>
+                            <p>Emergency distress signal was activated from your AI Smart Wristband. Trusted contacts
+                                notified.</p>
+                        </div>
+                    </div>
+                    <div class="alert-time">2 mins ago</div>
                 </div>
 
-                <div id="locationBox">
-                    <p>Status: <span id="status">Requesting GPS location permission...</span></p>
-                    <p>Latitude: <span id="latitude">--</span></p>
-                    <p>Longitude: <span id="longitude">--</span></p>
-                    <p>Route Status: <span id="routeStatusText" style="color: #2563eb;">Live GPS Tracking Active</span>
-                    </p>
+                <!-- Alert Item 2 -->
+                <div class="alert-card warning">
+                    <div class="alert-left">
+                        <div class="alert-icon">
+                            <i class="fa-solid fa-map-location-dot"></i>
+                        </div>
+                        <div class="alert-info">
+                            <h3>Entered Marked Danger Zone</h3>
+                            <p>AI Geofence detection warns that you have entered a high-risk area (Civil Lines Sector
+                                4).</p>
+                        </div>
+                    </div>
+                    <div class="alert-time">15 mins ago</div>
                 </div>
 
-                <div class="map-container">
-                    <iframe id="locationMap" src="" loading="lazy"></iframe>
+                <!-- Alert Item 3 -->
+                <div class="alert-card">
+                    <div class="alert-left">
+                        <div class="alert-icon">
+                            <i class="fa-solid fa-battery-quarter"></i>
+                        </div>
+                        <div class="alert-info">
+                            <h3>Low Watch Battery Warning</h3>
+                            <p>Your safety band battery is at 15%. Please connect to power to ensure uninterrupted
+                                protection.</p>
+                        </div>
+                    </div>
+                    <div class="alert-time">1 hour ago</div>
                 </div>
+
+                <!-- Alert Item 4 -->
+                <div class="alert-card">
+                    <div class="alert-left">
+                        <div class="alert-icon">
+                            <i class="fa-solid fa-route"></i>
+                        </div>
+                        <div class="alert-info">
+                            <h3>Safe Route Deviation Alert</h3>
+                            <p>You deviated from your usual safe commuting path. AI guardian is monitoring your route.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="alert-time">3 hours ago</div>
+                </div>
+
             </div>
         </section>
 
+        <!-- FOOTER -->
         <footer>
             🛡️ NIR BHAYA © 2026 | Protection. Prevention. Peace of Mind.
         </footer>
 
     </main>
 
+    <!-- SOS COUNTDOWN OVERLAY SCREEN -->
     <div id="sosCountdownOverlay">
         <h2>🚨 SOS EMERGENCY ACTIVATED 🚨</h2>
         <p>Dispatching coordinates and custom SMS to emergency contacts in:</p>
@@ -611,92 +658,19 @@
         </button>
     </div>
 
-    <!-- GEOLOCATION, EXACT PIN MAPPING & ROUTING SCRIPT -->
     <script>
-        let currentLat = 26.4499;
-        let currentLon = 80.3319;
-
-        window.addEventListener("DOMContentLoaded", () => {
+        // Sync Profile Data from Settings
+        window.addEventListener('DOMContentLoaded', () => {
             const savedName = localStorage.getItem('nirbhaya_username');
             const savedDp = localStorage.getItem('nirbhaya_userdp');
-            const savedEmail = localStorage.getItem('nirbhaya_user_email') || localStorage.getItem('nirbhaya_current_user_email');
-
             if (savedName) {
-                const topbarNameEl = document.getElementById('topbarUserName');
-                const dropdownNameEl = document.getElementById('dropdownUserName');
-                if (topbarNameEl) topbarNameEl.textContent = `Hi, ${savedName}`;
-                if (dropdownNameEl) dropdownNameEl.textContent = savedName;
+                document.getElementById('topbarUserName').textContent = `Hi, ${savedName}`;
+                document.getElementById('dropdownUserName').textContent = savedName;
             }
-
-            if (savedEmail) {
-                const dropdownEmailEl = document.getElementById('dropdownUserEmail');
-                if (dropdownEmailEl) dropdownEmailEl.textContent = savedEmail;
-            }
-
-            const topbarImg = document.getElementById('topbarUserImg');
-            if (savedDp && savedDp.trim() !== "") {
-                if (topbarImg) topbarImg.src = savedDp;
-            } else {
-                if (topbarImg) topbarImg.src = '../aqw.jpeg';
-            }
-
-            // Real-time Geolocation Mapping with exact pinpointing
-            const latSpan = document.getElementById("latitude");
-            const lonSpan = document.getElementById("longitude");
-            const statusSpan = document.getElementById("status");
-            const mapIframe = document.getElementById("locationMap");
-
-            if ("geolocation" in navigator) {
-                navigator.geolocation.watchPosition(
-                    (position) => {
-                        currentLat = position.coords.latitude;
-                        currentLon = position.coords.longitude;
-
-                        latSpan.textContent = currentLat.toFixed(4);
-                        lonSpan.textContent = currentLon.toFixed(4);
-                        statusSpan.textContent = "Live GPS tracking active!";
-                        statusSpan.style.color = "#16a34a";
-
-                        // Accurate Google Maps Pin formatting with marker query
-                        mapIframe.src = `https://maps.google.com/maps?q=${currentLat},${currentLon}&hl=en&z=16&output=embed`;
-                    },
-                    (error) => {
-                        statusSpan.textContent = "Location access denied or unavailable. Using fallback location (Kanpur).";
-                        statusSpan.style.color = "#ef3340";
-
-                        latSpan.textContent = currentLat;
-                        lonSpan.textContent = currentLon;
-
-                        mapIframe.src = `https://maps.google.com/maps?q=${currentLat},${currentLon}&hl=en&z=16&output=embed`;
-                    },
-                    { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 }
-                );
-            } else {
-                statusSpan.textContent = "Geolocation is not supported by your browser.";
-                statusSpan.style.color = "#ef3340";
-                mapIframe.src = `https://maps.google.com/maps?q=${currentLat},${currentLon}&hl=en&z=16&output=embed`;
+            if (savedDp) {
+                document.getElementById('topbarUserImg').src = savedDp;
             }
         });
-
-        // Destination Search & Google Maps Routing Feature
-        function searchDestinationRoute() {
-            const destinationQuery = document.getElementById('destinationInput').value.trim();
-            const routeStatus = document.getElementById('routeStatusText');
-            const mapIframe = document.getElementById('locationMap');
-
-            if (!destinationQuery) {
-                alert("⚠️ Please enter a destination to search.");
-                return;
-            }
-
-            routeStatus.textContent = `Navigating towards: ${destinationQuery} (Safe Route Verified)`;
-            routeStatus.style.color = "#16a34a";
-
-            alert(`🧭 Route Calculated Successfully!\n- Destination: ${destinationQuery}\n- AI Guardian: Safe corridor selected.\n- Updating map to display destination route...`);
-
-            // Update map iframe to search and display destination accurately
-            mapIframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(destinationQuery)}&hl=en&z=14&output=embed`;
-        }
 
         // User Profile Dropdown Toggle Script
         const dropdownToggle = document.getElementById('userDropdownToggle');

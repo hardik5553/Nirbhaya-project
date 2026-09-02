@@ -4,14 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Track Location | NIRBHAYA</title>
+    <title>Emergency Contacts | NIRBHAYA</title>
 
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap"
         rel="stylesheet">
 
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
@@ -96,7 +98,7 @@
             color: #ff3864;
         }
 
-        /* SOS Button */
+        /* SOS */
         .sos-wrapper {
             margin-top: auto;
             display: flex;
@@ -159,6 +161,7 @@
             gap: 12px;
         }
 
+        /* Custom Logo Image Styles */
         .app-logo {
             height: 48px;
             width: 48px;
@@ -287,7 +290,7 @@
         }
 
         /* =========================
-           CONTENT & MAP SECTION
+           CONTENT & CONTACTS GRID
         ========================= */
         .content {
             padding: 35px;
@@ -308,88 +311,201 @@
             margin-top: 5px;
         }
 
-        .map-section {
-            background: white;
-            border-radius: 18px;
-            padding: 25px;
-            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
             max-width: 950px;
         }
 
-        .map-section h2 {
-            font-family: Poppins, sans-serif;
-            font-size: 20px;
+        .contact-card {
+            background: white;
+            border-radius: 17px;
+            padding: 20px;
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-heading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e2e8f0;
             margin-bottom: 15px;
+        }
+
+        .card-heading .icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-heading h3 {
+            font-size: 15px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .contact-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-info strong {
+            font-size: 13px;
             color: #1e293b;
         }
 
-        /* Destination Search Bar Styling */
-        .destination-search-box {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+        .contact-info small {
+            display: block;
+            color: #64748b;
+            margin-top: 2px;
         }
 
-        .destination-search-box input {
-            flex: 1;
-            padding: 10px 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .destination-search-box input:focus {
-            border-color: #2563eb;
-        }
-
-        .destination-search-box button {
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
+        .verified {
+            background: #dcfce7;
+            color: #16a34a;
+            border-radius: 15px;
+            padding: 4px 8px;
+            font-size: 10px;
             font-weight: 600;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
             cursor: pointer;
+            font-size: 14px;
+            padding: 5px;
+            border-radius: 4px;
             transition: 0.2s;
         }
 
-        .destination-search-box button:hover {
-            background: #1d4ed8;
+        .edit-btn {
+            color: #2563eb;
         }
 
-        #locationBox {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #e2e8f0;
+        .edit-btn:hover {
+            background: #eff6ff;
         }
 
-        #locationBox p {
-            margin: 6px 0;
-            font-size: 14px;
-            color: #334155;
-            font-weight: 600;
-        }
-
-        #locationBox span {
+        .delete-btn {
             color: #ef3340;
-            font-weight: 700;
         }
 
-        .map-container {
+        .delete-btn:hover {
+            background: #fee2e2;
+        }
+
+        .card-btn {
             width: 100%;
-            height: 450px;
-            border-radius: 12px;
-            overflow: hidden;
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #2563eb;
+            border-radius: 8px;
+            background: white;
+            color: #2563eb;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .card-btn:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            color: #1e293b;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: #0f172a;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 15px;
             border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
         }
 
-        .map-container iframe {
-            width: 100%;
-            height: 100%;
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-actions button {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
             border: none;
+        }
+
+        .btn-cancel {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .btn-save {
+            background: #2563eb;
+            color: white;
         }
 
         /* SOS Countdown Overlay Styling */
@@ -427,6 +543,12 @@
             font-size: 12px;
         }
 
+        @media(max-width: 800px) {
+            .contacts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media(max-width: 750px) {
             .sidebar {
                 width: 70px;
@@ -451,60 +573,65 @@
             .content {
                 padding: 20px;
             }
-
-            .destination-search-box {
-                flex-direction: column;
-            }
         }
     </style>
 </head>
 
 <body>
 
+    <!-- SIDEBAR -->
     <aside class="sidebar">
+        <!-- Shield Icon linked to security.html -->
         <div class="brand">
-            <a href="../security.html" title="Security Center">
+            <a href="security.html" title="Go to Security Center">
                 <i class="fa-solid fa-shield-halved" style="color: #ef476f; font-size: 26px;"></i>
             </a>
         </div>
 
         <nav class="menu">
-            <a href="../indexsih.html">
+            <a href="indexsih.html">
                 <i class="fa-solid fa-border-all"></i>
                 <span>Dashboard</span>
             </a>
 
-            <a href="track-location.html" class="active">
+            <!-- Location page link -->
+            <a href="pages/track-location.html">
                 <i class="fa-solid fa-location-dot"></i>
                 <span>Location</span>
             </a>
 
-            <a href="../alerts.html">
+            <!-- Alerts page link -->
+            <a href="alerts.html">
                 <i class="fa-solid fa-bell"></i>
                 <span>Alerts</span>
             </a>
 
-            <a href="../watch.html">
+            <!-- Watch page link -->
+            <a href="watch.html">
                 <i class="fa-solid fa-clock"></i>
                 <span>Watch</span>
             </a>
 
-            <a href="../security.html">
+            <!-- Security page link -->
+            <a href="security.html">
                 <i class="fa-solid fa-shield-halved"></i>
                 <span>Security</span>
             </a>
 
-            <a href="../contacts.html">
+            <!-- Contacts page active link -->
+            <a href="contacts.html" class="active">
                 <i class="fa-solid fa-users"></i>
                 <span>Contacts</span>
             </a>
 
-            <a href="../history.html">
+            <!-- History page link -->
+            <a href="history.html">
                 <i class="fa-solid fa-clock-rotate-left"></i>
                 <span>History</span>
             </a>
 
-            <a href="../settings.html">
+            <!-- Settings page link -->
+            <a href="settings.html">
                 <i class="fa-solid fa-gear"></i>
                 <span>Settings</span>
             </a>
@@ -516,11 +643,14 @@
         </div>
     </aside>
 
+    <!-- MAIN CONTAINER -->
     <main class="main">
 
+        <!-- TOPBAR -->
         <header class="topbar">
             <div class="logo-area">
-                <img src="../assets/images/nir2.jpeg" alt="NIRBHAYA Logo" class="app-logo"
+                <!-- Custom Logo Image -->
+                <img src="assets/images/nir2.jpeg" alt="NIRBHAYA Logo" class="app-logo"
                     onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100'">
                 <div>
                     <h2><span>NIR</span> BHAYA</h2>
@@ -529,14 +659,15 @@
             </div>
 
             <div class="top-right">
-                <div class="notification" onclick="location.href='../alerts.html'">
+                <div class="notification" onclick="location.href='alerts.html'">
                     <i class="fa-solid fa-bell"></i>
                     <span class="badge">3</span>
                 </div>
 
+                <!-- User Profile with Interactive Dropdown Menu -->
                 <div class="user-dropdown-container" id="userDropdownToggle">
                     <div class="user">
-                        <img id="topbarUserImg" src="../aqw.jpeg" alt="Profile"
+                        <img id="topbarUserImg" src="aqw.jpeg" alt="Profile"
                             onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'">
                         <strong id="topbarUserName">Hi, User</strong>
                         <i class="fa-solid fa-chevron-down" style="font-size: 11px;"></i>
@@ -551,11 +682,11 @@
                             onclick="alert('User Details: Primary User | Status: Verified')">
                             <i class="fa-solid fa-user"></i> User Details
                         </a>
-                        <a href="../settings.html" class="dropdown-item">
+                        <a href="settings.html" class="dropdown-item">
                             <i class="fa-solid fa-gear"></i> Account Settings
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="../login.html" class="dropdown-item" style="color: #ef3340;">
+                        <a href="login.html" class="dropdown-item" style="color: #ef3340;">
                             <i class="fa-solid fa-right-from-bracket"></i> Logout
                         </a>
                     </div>
@@ -563,42 +694,117 @@
             </div>
         </header>
 
+        <!-- CONTENT -->
         <section class="content">
             <div class="page-title">
-                <h1>Track Location & Route</h1>
-                <p>Real-time GPS coordinate mapping and destination safety monitoring</p>
+                <h1>Emergency Network & Contacts</h1>
+                <p>Manage your trusted emergency guardians and automated SOS dispatch list</p>
             </div>
 
-            <div class="map-section" id="mapSection">
-                <h2>Live GPS Coordinates & Navigation</h2>
+            <div class="contacts-grid">
 
-                <!-- Destination Search Bar -->
-                <div class="destination-search-box">
-                    <input type="text" id="destinationInput"
-                        placeholder="🔍 Search destination (e.g., Central Station, Delhi, Kanpur)...">
-                    <button onclick="searchDestinationRoute()">Search & Route 🚀</button>
+                <!-- Trusted Contacts Card -->
+                <div class="contact-card">
+                    <div>
+                        <div class="card-heading">
+                            <div class="icon">
+                                <i class="fa-solid fa-user-group"></i>
+                            </div>
+                            <h3>Primary Guardians</h3>
+                        </div>
+
+                        <div id="contactsListContainer">
+                            <div class="contact-item" id="contact-mom">
+                                <div class="contact-avatar">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+                                <div class="contact-info">
+                                    <strong>Mom</strong>
+                                    <small>+91 98765 43210 • Emergency Contact</small>
+                                </div>
+                                <div class="action-btns">
+                                    <button class="action-btn edit-btn"
+                                        onclick="openEditModal('Mom', '+91 98765 43210', 'contact-mom')" title="Edit"><i
+                                            class="fa-solid fa-pen"></i></button>
+                                    <button class="action-btn delete-btn" onclick="deleteContact('contact-mom')"
+                                        title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="contact-item" id="contact-dad">
+                                <div class="contact-avatar">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+                                <div class="contact-info">
+                                    <strong>Dad</strong>
+                                    <small>+91 91234 56789 • Emergency Contact</small>
+                                </div>
+                                <div class="action-btns">
+                                    <button class="action-btn edit-btn"
+                                        onclick="openEditModal('Dad', '+91 91234 56789', 'contact-dad')" title="Edit"><i
+                                            class="fa-solid fa-pen"></i></button>
+                                    <button class="action-btn delete-btn" onclick="deleteContact('contact-dad')"
+                                        title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="card-btn" onclick="openAddModal()">
+                        + Add Trusted Contact
+                    </button>
                 </div>
 
-                <div id="locationBox">
-                    <p>Status: <span id="status">Requesting GPS location permission...</span></p>
-                    <p>Latitude: <span id="latitude">--</span></p>
-                    <p>Longitude: <span id="longitude">--</span></p>
-                    <p>Route Status: <span id="routeStatusText" style="color: #2563eb;">Live GPS Tracking Active</span>
-                    </p>
+                <!-- Authorities & Response Card -->
+                <div class="contact-card">
+                    <div>
+                        <div class="card-heading">
+                            <div class="icon" style="background: #fee2e2; color: #ef3340;">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <h3>Emergency Services</h3>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-avatar" style="background: #fee2e2; color: #ef3340;">
+                                <i class="fa-solid fa-phone-volume"></i>
+                            </div>
+                            <div class="contact-info">
+                                <strong>Women Helpline (National)</strong>
+                                <small>1091 • Direct SOS Dispatch</small>
+                            </div>
+                            <span class="verified" style="background: #fee2e2; color: #ef3340;">Active</span>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-avatar" style="background: #fee2e2; color: #ef3340;">
+                                <i class="fa-solid fa-building-shield"></i>
+                            </div>
+                            <div class="contact-info">
+                                <strong>Local Police Control Room</strong>
+                                <small>112 • Nearest Station Response</small>
+                            </div>
+                            <span class="verified" style="background: #fee2e2; color: #ef3340;">Active</span>
+                        </div>
+                    </div>
+
+                    <button class="card-btn" style="border-color: #ef3340; color: #ef3340;"
+                        onclick="alert('Emergency response integration active.')">
+                        Test Response Line
+                    </button>
                 </div>
 
-                <div class="map-container">
-                    <iframe id="locationMap" src="" loading="lazy"></iframe>
-                </div>
             </div>
         </section>
 
+        <!-- FOOTER -->
         <footer>
             🛡️ NIR BHAYA © 2026 | Protection. Prevention. Peace of Mind.
         </footer>
 
     </main>
 
+    <!-- SOS COUNTDOWN OVERLAY SCREEN -->
     <div id="sosCountdownOverlay">
         <h2>🚨 SOS EMERGENCY ACTIVATED 🚨</h2>
         <p>Dispatching coordinates and custom SMS to emergency contacts in:</p>
@@ -611,12 +817,25 @@
         </button>
     </div>
 
-    <!-- GEOLOCATION, EXACT PIN MAPPING & ROUTING SCRIPT -->
-    <script>
-        let currentLat = 26.4499;
-        let currentLon = 80.3319;
+    <!-- Add/Edit Contact Modal -->
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Add Guardian</h3>
+            <input type="hidden" id="editContactId">
+            <label style="font-size: 12px; color: #64748b;">Guardian Name</label>
+            <input type="text" id="modalNameInput" class="modal-input" placeholder="e.g. Sister / Brother">
+            <label style="font-size: 12px; color: #64748b;">Phone Number</label>
+            <input type="text" id="modalPhoneInput" class="modal-input" placeholder="e.g. +91 99999 88888">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-save" onclick="saveContact()">Save Contact</button>
+            </div>
+        </div>
+    </div>
 
-        window.addEventListener("DOMContentLoaded", () => {
+    <script>
+        // Sync Profile Data & Active Logged-in User Details from localStorage
+        window.addEventListener('DOMContentLoaded', () => {
             const savedName = localStorage.getItem('nirbhaya_username');
             const savedDp = localStorage.getItem('nirbhaya_userdp');
             const savedEmail = localStorage.getItem('nirbhaya_user_email') || localStorage.getItem('nirbhaya_current_user_email');
@@ -637,68 +856,11 @@
             if (savedDp && savedDp.trim() !== "") {
                 if (topbarImg) topbarImg.src = savedDp;
             } else {
-                if (topbarImg) topbarImg.src = '../aqw.jpeg';
-            }
-
-            // Real-time Geolocation Mapping with exact pinpointing
-            const latSpan = document.getElementById("latitude");
-            const lonSpan = document.getElementById("longitude");
-            const statusSpan = document.getElementById("status");
-            const mapIframe = document.getElementById("locationMap");
-
-            if ("geolocation" in navigator) {
-                navigator.geolocation.watchPosition(
-                    (position) => {
-                        currentLat = position.coords.latitude;
-                        currentLon = position.coords.longitude;
-
-                        latSpan.textContent = currentLat.toFixed(4);
-                        lonSpan.textContent = currentLon.toFixed(4);
-                        statusSpan.textContent = "Live GPS tracking active!";
-                        statusSpan.style.color = "#16a34a";
-
-                        // Accurate Google Maps Pin formatting with marker query
-                        mapIframe.src = `https://maps.google.com/maps?q=${currentLat},${currentLon}&hl=en&z=16&output=embed`;
-                    },
-                    (error) => {
-                        statusSpan.textContent = "Location access denied or unavailable. Using fallback location (Kanpur).";
-                        statusSpan.style.color = "#ef3340";
-
-                        latSpan.textContent = currentLat;
-                        lonSpan.textContent = currentLon;
-
-                        mapIframe.src = `https://maps.google.com/maps?q=${currentLat},${currentLon}&hl=en&z=16&output=embed`;
-                    },
-                    { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 }
-                );
-            } else {
-                statusSpan.textContent = "Geolocation is not supported by your browser.";
-                statusSpan.style.color = "#ef3340";
-                mapIframe.src = `https://maps.google.com/maps?q=${currentLat},${currentLon}&hl=en&z=16&output=embed`;
+                if (topbarImg) topbarImg.src = 'aqw.jpeg';
             }
         });
 
-        // Destination Search & Google Maps Routing Feature
-        function searchDestinationRoute() {
-            const destinationQuery = document.getElementById('destinationInput').value.trim();
-            const routeStatus = document.getElementById('routeStatusText');
-            const mapIframe = document.getElementById('locationMap');
-
-            if (!destinationQuery) {
-                alert("⚠️ Please enter a destination to search.");
-                return;
-            }
-
-            routeStatus.textContent = `Navigating towards: ${destinationQuery} (Safe Route Verified)`;
-            routeStatus.style.color = "#16a34a";
-
-            alert(`🧭 Route Calculated Successfully!\n- Destination: ${destinationQuery}\n- AI Guardian: Safe corridor selected.\n- Updating map to display destination route...`);
-
-            // Update map iframe to search and display destination accurately
-            mapIframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(destinationQuery)}&hl=en&z=14&output=embed`;
-        }
-
-        // User Profile Dropdown Toggle Script
+        // User Profile Dropdown Toggle
         const dropdownToggle = document.getElementById('userDropdownToggle');
         const dropdownMenu = document.getElementById('userDropdownMenu');
 
@@ -744,6 +906,85 @@
             }
             document.getElementById('sosCountdownOverlay').style.display = 'none';
             alert("🛡️ SOS Alert successfully cancelled.");
+        }
+
+        // Contact Delete Logic
+        function deleteContact(contactId) {
+            if (confirm("Are you sure you want to remove this contact from your emergency network?")) {
+                const element = document.getElementById(contactId);
+                if (element) {
+                    element.remove();
+                }
+            }
+        }
+
+        // Modal Controls
+        let isEditing = false;
+        let currentEditId = null;
+
+        function openAddModal() {
+            isEditing = false;
+            document.getElementById('modalTitle').textContent = "Add Trusted Contact";
+            document.getElementById('modalNameInput').value = "";
+            document.getElementById('modalPhoneInput').value = "";
+            document.getElementById('contactModal').style.display = 'flex';
+        }
+
+        function openEditModal(name, phone, contactId) {
+            isEditing = true;
+            currentEditId = contactId;
+            document.getElementById('modalTitle').textContent = "Edit Guardian Details";
+            document.getElementById('modalNameInput').value = name;
+            document.getElementById('modalPhoneInput').value = phone;
+            document.getElementById('contactModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('contactModal').style.display = 'none';
+        }
+
+        function saveContact() {
+            const name = document.getElementById('modalNameInput').value.trim();
+            const phone = document.getElementById('modalPhoneInput').value.trim();
+
+            if (!name || !phone) {
+                alert("Please fill in both fields.");
+                return;
+            }
+
+            if (isEditing && currentEditId) {
+                const contactEl = document.getElementById(currentEditId);
+                if (contactEl) {
+                    contactEl.querySelector('.contact-info strong').textContent = name;
+                    contactEl.querySelector('.contact-info small').textContent = `${phone} • Emergency Contact`;
+
+                    const editBtn = contactEl.querySelector('.edit-btn');
+                    editBtn.setAttribute('onclick', `openEditModal('${name}', '${phone}', '${currentEditId}')`);
+                }
+            } else {
+                const uniqueId = 'contact-' + Date.now();
+                const container = document.getElementById('contactsListContainer');
+
+                const newDiv = document.createElement('div');
+                newDiv.className = 'contact-item';
+                newDiv.id = uniqueId;
+                newDiv.innerHTML = `
+                    <div class="contact-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div class="contact-info">
+                        <strong>${name}</strong>
+                        <small>${phone} • Emergency Contact</small>
+                    </div>
+                    <div class="action-btns">
+                        <button class="action-btn edit-btn" onclick="openEditModal('${name}', '${phone}', '${uniqueId}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                        <button class="action-btn delete-btn" onclick="deleteContact('${uniqueId}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+                container.appendChild(newDiv);
+            }
+
+            closeModal();
         }
     </script>
 

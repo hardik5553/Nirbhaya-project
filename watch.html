@@ -4,14 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Track Location | NIRBHAYA</title>
+    <title>AI Watch Hub | NIRBHAYA</title>
 
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap"
         rel="stylesheet">
 
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
@@ -96,7 +98,7 @@
             color: #ff3864;
         }
 
-        /* SOS Button */
+        /* SOS */
         .sos-wrapper {
             margin-top: auto;
             display: flex;
@@ -287,7 +289,7 @@
         }
 
         /* =========================
-           CONTENT & MAP SECTION
+           CONTENT & CARDS GRID
         ========================= */
         .content {
             padding: 35px;
@@ -308,88 +310,127 @@
             margin-top: 5px;
         }
 
-        .map-section {
+        .watch-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 25px;
+        }
+
+        .watch-card {
             background: white;
             border-radius: 18px;
             padding: 25px;
             box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
-            max-width: 950px;
         }
 
-        .map-section h2 {
-            font-family: Poppins, sans-serif;
-            font-size: 20px;
-            margin-bottom: 15px;
-            color: #1e293b;
-        }
-
-        /* Destination Search Bar Styling */
-        .destination-search-box {
+        .watch-display-box {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .destination-search-box input {
-            flex: 1;
-            padding: 10px 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .destination-search-box input:focus {
-            border-color: #2563eb;
-        }
-
-        .destination-search-box button {
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .destination-search-box button:hover {
-            background: #1d4ed8;
-        }
-
-        #locationBox {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 250px;
             background: #f8fafc;
-            padding: 15px;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            position: relative;
+        }
+
+        .watch-mockup {
+            width: 90px;
+            height: 115px;
+            background: #111827;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #10b981;
+            font-size: 32px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 12px;
+        }
+
+        /* Watch Models Selection Grid */
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .model-item {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
             border-radius: 12px;
-            margin-bottom: 20px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .model-item:hover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .model-item.connected {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .model-item i {
+            font-size: 20px;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .model-item.connected i {
+            color: #10b981;
+        }
+
+        .model-item h4 {
+            font-size: 13px;
+            color: #1e293b;
+            margin-bottom: 2px;
+        }
+
+        .model-item small {
+            font-size: 10px;
+            color: #64748b;
+        }
+
+        .telemetry-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .telemetry-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: #f8fafc;
+            border-radius: 10px;
             border: 1px solid #e2e8f0;
         }
 
-        #locationBox p {
-            margin: 6px 0;
-            font-size: 14px;
-            color: #334155;
+        .telemetry-item span {
             font-weight: 600;
+            color: #475569;
+            font-size: 14px;
         }
 
-        #locationBox span {
-            color: #ef3340;
-            font-weight: 700;
+        .telemetry-item strong {
+            color: #1e293b;
+            font-size: 15px;
         }
 
-        .map-container {
-            width: 100%;
-            height: 450px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #cbd5e1;
+        .status-ok {
+            color: #10b981 !important;
         }
 
-        .map-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        .status-off {
+            color: #ef3340 !important;
         }
 
         /* SOS Countdown Overlay Styling */
@@ -427,6 +468,12 @@
             font-size: 12px;
         }
 
+        @media(max-width: 900px) {
+            .watch-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media(max-width: 750px) {
             .sidebar {
                 width: 70px;
@@ -452,8 +499,8 @@
                 padding: 20px;
             }
 
-            .destination-search-box {
-                flex-direction: column;
+            .models-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -461,50 +508,53 @@
 
 <body>
 
+    <!-- SIDEBAR -->
     <aside class="sidebar">
+        <!-- Shield Icon linked to Security Center -->
         <div class="brand">
-            <a href="../security.html" title="Security Center">
+            <a href="security.html" title="Go to Security Center">
                 <i class="fa-solid fa-shield-halved" style="color: #ef476f; font-size: 26px;"></i>
             </a>
         </div>
 
         <nav class="menu">
-            <a href="../indexsih.html">
+            <a href="indexsih.html">
                 <i class="fa-solid fa-border-all"></i>
                 <span>Dashboard</span>
             </a>
 
-            <a href="track-location.html" class="active">
+            <!-- Location link correctly connected to pages/track-location.html -->
+            <a href="pages/track-location.html">
                 <i class="fa-solid fa-location-dot"></i>
                 <span>Location</span>
             </a>
 
-            <a href="../alerts.html">
+            <a href="alerts.html">
                 <i class="fa-solid fa-bell"></i>
                 <span>Alerts</span>
             </a>
 
-            <a href="../watch.html">
+            <a href="watch.html" class="active">
                 <i class="fa-solid fa-clock"></i>
                 <span>Watch</span>
             </a>
 
-            <a href="../security.html">
+            <a href="security.html">
                 <i class="fa-solid fa-shield-halved"></i>
                 <span>Security</span>
             </a>
 
-            <a href="../contacts.html">
+            <a href="contacts.html">
                 <i class="fa-solid fa-users"></i>
                 <span>Contacts</span>
             </a>
 
-            <a href="../history.html">
+            <a href="history.html">
                 <i class="fa-solid fa-clock-rotate-left"></i>
                 <span>History</span>
             </a>
 
-            <a href="../settings.html">
+            <a href="settings.html">
                 <i class="fa-solid fa-gear"></i>
                 <span>Settings</span>
             </a>
@@ -516,11 +566,14 @@
         </div>
     </aside>
 
+    <!-- MAIN CONTAINER -->
     <main class="main">
 
+        <!-- TOPBAR -->
         <header class="topbar">
             <div class="logo-area">
-                <img src="../assets/images/nir2.jpeg" alt="NIRBHAYA Logo" class="app-logo"
+                <!-- Custom Logo Image -->
+                <img src="assets/images/nir2.jpeg" alt="NIRBHAYA Logo" class="app-logo"
                     onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100'">
                 <div>
                     <h2><span>NIR</span> BHAYA</h2>
@@ -529,14 +582,15 @@
             </div>
 
             <div class="top-right">
-                <div class="notification" onclick="location.href='../alerts.html'">
+                <div class="notification" onclick="location.href='alerts.html'">
                     <i class="fa-solid fa-bell"></i>
                     <span class="badge">3</span>
                 </div>
 
+                <!-- User Profile with Interactive Dropdown Menu -->
                 <div class="user-dropdown-container" id="userDropdownToggle">
                     <div class="user">
-                        <img id="topbarUserImg" src="../aqw.jpeg" alt="Profile"
+                        <img id="topbarUserImg" src="aqw.jpeg" alt="Profile"
                             onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'">
                         <strong id="topbarUserName">Hi, User</strong>
                         <i class="fa-solid fa-chevron-down" style="font-size: 11px;"></i>
@@ -551,11 +605,11 @@
                             onclick="alert('User Details: Primary User | Status: Verified')">
                             <i class="fa-solid fa-user"></i> User Details
                         </a>
-                        <a href="../settings.html" class="dropdown-item">
+                        <a href="settings.html" class="dropdown-item">
                             <i class="fa-solid fa-gear"></i> Account Settings
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="../login.html" class="dropdown-item" style="color: #ef3340;">
+                        <a href="login.html" class="dropdown-item" style="color: #ef3340;">
                             <i class="fa-solid fa-right-from-bracket"></i> Logout
                         </a>
                     </div>
@@ -563,42 +617,116 @@
             </div>
         </header>
 
+        <!-- CONTENT -->
         <section class="content">
             <div class="page-title">
-                <h1>Track Location & Route</h1>
-                <p>Real-time GPS coordinate mapping and destination safety monitoring</p>
+                <h1>AI Smart Watch Hub</h1>
+                <p>Select and pair your wearable telemetry model, biometric health status, and hardware info</p>
             </div>
 
-            <div class="map-section" id="mapSection">
-                <h2>Live GPS Coordinates & Navigation</h2>
+            <div class="watch-grid">
 
-                <!-- Destination Search Bar -->
-                <div class="destination-search-box">
-                    <input type="text" id="destinationInput"
-                        placeholder="🔍 Search destination (e.g., Central Station, Delhi, Kanpur)...">
-                    <button onclick="searchDestinationRoute()">Search & Route 🚀</button>
+                <!-- Left Column: Watch Mockup Preview & Models Selection -->
+                <div class="watch-card">
+                    <h2 style="font-size: 18px; margin-bottom: 15px; color: #1e293b;">Paired Device Status</h2>
+                    <div class="watch-display-box">
+                        <div class="watch-mockup" id="mockupIconBox">
+                            <i class="fa-solid fa-clock" id="mockupLockIcon"></i>
+                        </div>
+                        <strong id="displayWatchName" style="color: #1e293b; font-size: 16px;">No Watch
+                            Connected</strong>
+                        <p id="displayWatchStatus"
+                            style="color: #ef3340; font-size: 13px; margin-top: 5px; font-weight: 600;">● Click a model
+                            below to connect</p>
+                    </div>
+
+                    <h3 style="font-size: 14px; margin-top: 20px; margin-bottom: 10px; color: #475569;">Available Watch
+                        Models (Click to Connect/Disconnect):</h3>
+
+                    <!-- 6 Dummy Smart Watch Models Grid -->
+                    <div class="models-grid">
+                        <div class="model-item" id="model-0" onclick="selectWatch(0, 'AI Guardian Pro', 'AIG-WS-4587')">
+                            <i class="fa-solid fa-watch-smart"></i>
+                            <h4>Guardian Pro</h4>
+                            <small>ID: 4587</small>
+                        </div>
+                        <div class="model-item" id="model-1"
+                            onclick="selectWatch(1, 'Apex Shield Band', 'APX-SB-9912')">
+                            <i class="fa-solid fa-stopwatch"></i>
+                            <h4>Apex Shield</h4>
+                            <small>ID: 9912</small>
+                        </div>
+                        <div class="model-item" id="model-2"
+                            onclick="selectWatch(2, 'Sentinel Elite V2', 'SNT-EL-3340')">
+                            <i class="fa-solid fa-clock"></i>
+                            <h4>Sentinel Elite</h4>
+                            <small>ID: 3340</small>
+                        </div>
+                        <div class="model-item" id="model-3"
+                            onclick="selectWatch(3, 'Nirbhaya SafeBand X', 'NBX-SF-7781')">
+                            <i class="fa-solid fa-shield-heart"></i>
+                            <h4>SafeBand X</h4>
+                            <small>ID: 7781</small>
+                        </div>
+                        <div class="model-item" id="model-4"
+                            onclick="selectWatch(4, 'Titanium LifeGuard', 'TLG-LG-1029')">
+                            <i class="fa-solid fa-heart-pulse"></i>
+                            <h4>LifeGuard</h4>
+                            <small>ID: 1029</small>
+                        </div>
+                        <div class="model-item" id="model-5"
+                            onclick="selectWatch(5, 'CyberWrist Ultra', 'CWU-WR-5564')">
+                            <i class="fa-solid fa-microchip"></i>
+                            <h4>CyberWrist Ultra</h4>
+                            <small>ID: 5564</small>
+                        </div>
+                    </div>
                 </div>
 
-                <div id="locationBox">
-                    <p>Status: <span id="status">Requesting GPS location permission...</span></p>
-                    <p>Latitude: <span id="latitude">--</span></p>
-                    <p>Longitude: <span id="longitude">--</span></p>
-                    <p>Route Status: <span id="routeStatusText" style="color: #2563eb;">Live GPS Tracking Active</span>
-                    </p>
+                <!-- Right Column: Watch Telemetry Details -->
+                <div class="watch-card">
+                    <h2 style="font-size: 18px; margin-bottom: 20px; color: #1e293b;">Device & Biometric Diagnostics
+                    </h2>
+
+                    <div class="telemetry-list">
+                        <div class="telemetry-item">
+                            <span>Device ID / Serial</span>
+                            <strong id="telemetryId">--</strong>
+                        </div>
+                        <div class="telemetry-item">
+                            <span>Hardware Status</span>
+                            <strong id="telemetryHardware" class="status-off">Disconnected</strong>
+                        </div>
+                        <div class="telemetry-item">
+                            <span>Current Heart Rate</span>
+                            <strong id="telemetryHeartRate" style="color: #64748b;">-- BPM</strong>
+                        </div>
+                        <div class="telemetry-item">
+                            <span>Battery Percentage</span>
+                            <strong id="telemetryBattery" style="color: #64748b;">--</strong>
+                        </div>
+                        <div class="telemetry-item">
+                            <span>Firmware Version</span>
+                            <strong id="telemetryFirmware">v2.4.1-secure</strong>
+                        </div>
+                        <div class="telemetry-item">
+                            <span>Last Synchronization</span>
+                            <strong id="telemetrySync">Never</strong>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="map-container">
-                    <iframe id="locationMap" src="" loading="lazy"></iframe>
-                </div>
             </div>
         </section>
 
+        <!-- FOOTER -->
         <footer>
             🛡️ NIR BHAYA © 2026 | Protection. Prevention. Peace of Mind.
         </footer>
 
     </main>
 
+    <!-- SOS COUNTDOWN OVERLAY SCREEN -->
     <div id="sosCountdownOverlay">
         <h2>🚨 SOS EMERGENCY ACTIVATED 🚨</h2>
         <p>Dispatching coordinates and custom SMS to emergency contacts in:</p>
@@ -611,12 +739,10 @@
         </button>
     </div>
 
-    <!-- GEOLOCATION, EXACT PIN MAPPING & ROUTING SCRIPT -->
+    <!-- Script for Dynamic Watch Selection & Connection Toggle -->
     <script>
-        let currentLat = 26.4499;
-        let currentLon = 80.3319;
-
-        window.addEventListener("DOMContentLoaded", () => {
+        // Sync Profile Data & Active Logged-in User Details from localStorage
+        window.addEventListener('DOMContentLoaded', () => {
             const savedName = localStorage.getItem('nirbhaya_username');
             const savedDp = localStorage.getItem('nirbhaya_userdp');
             const savedEmail = localStorage.getItem('nirbhaya_user_email') || localStorage.getItem('nirbhaya_current_user_email');
@@ -636,67 +762,13 @@
             const topbarImg = document.getElementById('topbarUserImg');
             if (savedDp && savedDp.trim() !== "") {
                 if (topbarImg) topbarImg.src = savedDp;
+                const dpPreview = document.getElementById('dpPreview');
+                if (dpPreview) dpPreview.src = savedDp;
             } else {
-                if (topbarImg) topbarImg.src = '../aqw.jpeg';
-            }
-
-            // Real-time Geolocation Mapping with exact pinpointing
-            const latSpan = document.getElementById("latitude");
-            const lonSpan = document.getElementById("longitude");
-            const statusSpan = document.getElementById("status");
-            const mapIframe = document.getElementById("locationMap");
-
-            if ("geolocation" in navigator) {
-                navigator.geolocation.watchPosition(
-                    (position) => {
-                        currentLat = position.coords.latitude;
-                        currentLon = position.coords.longitude;
-
-                        latSpan.textContent = currentLat.toFixed(4);
-                        lonSpan.textContent = currentLon.toFixed(4);
-                        statusSpan.textContent = "Live GPS tracking active!";
-                        statusSpan.style.color = "#16a34a";
-
-                        // Accurate Google Maps Pin formatting with marker query
-                        mapIframe.src = `https://maps.google.com/maps?q=${currentLat},${currentLon}&hl=en&z=16&output=embed`;
-                    },
-                    (error) => {
-                        statusSpan.textContent = "Location access denied or unavailable. Using fallback location (Kanpur).";
-                        statusSpan.style.color = "#ef3340";
-
-                        latSpan.textContent = currentLat;
-                        lonSpan.textContent = currentLon;
-
-                        mapIframe.src = `https://maps.google.com/maps?q=${currentLat},${currentLon}&hl=en&z=16&output=embed`;
-                    },
-                    { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 }
-                );
-            } else {
-                statusSpan.textContent = "Geolocation is not supported by your browser.";
-                statusSpan.style.color = "#ef3340";
-                mapIframe.src = `https://maps.google.com/maps?q=${currentLat},${currentLon}&hl=en&z=16&output=embed`;
+                // Fallback to sample image if user has not uploaded custom DP
+                if (topbarImg) topbarImg.src = 'aqw.jpeg';
             }
         });
-
-        // Destination Search & Google Maps Routing Feature
-        function searchDestinationRoute() {
-            const destinationQuery = document.getElementById('destinationInput').value.trim();
-            const routeStatus = document.getElementById('routeStatusText');
-            const mapIframe = document.getElementById('locationMap');
-
-            if (!destinationQuery) {
-                alert("⚠️ Please enter a destination to search.");
-                return;
-            }
-
-            routeStatus.textContent = `Navigating towards: ${destinationQuery} (Safe Route Verified)`;
-            routeStatus.style.color = "#16a34a";
-
-            alert(`🧭 Route Calculated Successfully!\n- Destination: ${destinationQuery}\n- AI Guardian: Safe corridor selected.\n- Updating map to display destination route...`);
-
-            // Update map iframe to search and display destination accurately
-            mapIframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(destinationQuery)}&hl=en&z=14&output=embed`;
-        }
 
         // User Profile Dropdown Toggle Script
         const dropdownToggle = document.getElementById('userDropdownToggle');
@@ -744,6 +816,54 @@
             }
             document.getElementById('sosCountdownOverlay').style.display = 'none';
             alert("🛡️ SOS Alert successfully cancelled.");
+        }
+
+        // Watch Pairing & Disconnection Logic
+        let activeWatchIndex = null;
+
+        function selectWatch(index, watchName, watchId) {
+            const itemElement = document.getElementById(`model-${index}`);
+
+            if (activeWatchIndex === index) {
+                activeWatchIndex = null;
+                itemElement.classList.remove('connected');
+
+                document.getElementById('displayWatchName').textContent = "No Watch Connected";
+                document.getElementById('displayWatchStatus').textContent = "● Click a model below to connect";
+                document.getElementById('displayWatchStatus').style.color = "#ef3340";
+                document.getElementById('mockupLockIcon').className = "fa-solid fa-clock";
+
+                document.getElementById('telemetryId').textContent = "--";
+                document.getElementById('telemetryHardware').textContent = "Disconnected";
+                document.getElementById('telemetryHardware').className = "status-off";
+                document.getElementById('telemetryHeartRate').textContent = "-- BPM";
+                document.getElementById('telemetryHeartRate').style.color = "#64748b";
+                document.getElementById('telemetryBattery').textContent = "--";
+                document.getElementById('telemetryBattery').style.color = "#64748b";
+                document.getElementById('telemetrySync').textContent = "Never";
+                return;
+            }
+
+            if (activeWatchIndex !== null) {
+                document.getElementById(`model-${activeWatchIndex}`).classList.remove('connected');
+            }
+
+            activeWatchIndex = index;
+            itemElement.classList.add('connected');
+
+            document.getElementById('displayWatchName').textContent = watchName;
+            document.getElementById('displayWatchStatus').textContent = "● Secure & Active";
+            document.getElementById('displayWatchStatus').style.color = "#10b981";
+            document.getElementById('mockupLockIcon').className = "fa-solid fa-lock";
+
+            document.getElementById('telemetryId').textContent = watchId;
+            document.getElementById('telemetryHardware').textContent = "Optimal Function";
+            document.getElementById('telemetryHardware').className = "status-ok";
+            document.getElementById('telemetryHeartRate').textContent = "78 BPM";
+            document.getElementById('telemetryHeartRate').style.color = "#ef3340";
+            document.getElementById('telemetryBattery').textContent = "87%";
+            document.getElementById('telemetryBattery').style.color = "#10b981";
+            document.getElementById('telemetrySync').textContent = "Just now";
         }
     </script>
 
