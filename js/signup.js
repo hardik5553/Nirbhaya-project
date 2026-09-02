@@ -31,5 +31,5 @@ document.getElementById('signupForm').addEventListener('submit', function (e) {
     alert('Account created successfully! Please login.');
 
     // Redirect to login page
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
 });

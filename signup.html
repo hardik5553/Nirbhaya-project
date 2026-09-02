@@ -438,7 +438,7 @@
                 <!-- Login -->
                 <p class="login-text">
                     Already have an account?
-                    <a href="login.html">Login</a>
+                    <a href="index.html">Login</a>
                 </p>
 
             </form>
@@ -551,7 +551,7 @@
             const existingUser = users.find(u => u.email.toLowerCase() === email);
             if (existingUser) {
                 alert("⚠️ An account with this email already exists! Please log in instead.");
-                window.location.href = "login.html";
+                window.location.href = "index.html";
                 return;
             }
 
@@ -569,7 +569,7 @@
             localStorage.setItem('nirbhaya_signup_users', JSON.stringify(users));
 
             alert(`✅ Account Created Successfully for ${name}!\n\nPlease log in using your credentials.`);
-            window.location.href = "login.html"; // Redirects to login page after signup
+            window.location.href = "index.html"; // Redirects to login page after signup
         }
 
         function openTermsModal(event) {
