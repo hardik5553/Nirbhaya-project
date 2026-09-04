@@ -1,4 +1,4 @@
-<!DOCTYPE html>>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -7,7 +7,6 @@
     
     <title>Dashboard | NIRBHAYA</title>
 
-    <link rel="stylesheet" >
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -465,14 +464,14 @@
                         <div class="user-profile">
                             <img id="topbarUserImg" src="aqw.jpeg" alt="User DP"
                                 onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'">
-                            <span id="topbarUserName">Hi, Akrati</span>
+                            <span id="topbarUserName">Hi, User</span>
                             <i class="fa-solid fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i>
                         </div>
 
                         <div class="dropdown-menu" id="userDropdownMenu">
                             <div class="dropdown-header">
-                                <strong id="dropdownUserName">Akrati</strong>
-                                <small id="dropdownUserEmail">akrati@example.com</small>
+                                <strong id="dropdownUserName">User</strong>
+                                <small id="dropdownUserEmail">user@example.com</small>
                             </div>
                             <a href="#" class="dropdown-item"
                                 onclick="alert('User Details: Primary User | Status: Verified')">
@@ -482,7 +481,7 @@
                                 <i class="fa-solid fa-gear"></i> Account Settings
                             </a>
                             <div class="dropdown-divider"></div>
-                            <a href="login.html" class="dropdown-item" style="color: #ef3340;">
+                            <a href="login.html" class="dropdown-item" style="color: #ef3340;" onclick="handleLogout(event)">
                                 <i class="fa-solid fa-right-from-bracket"></i> Logout
                             </a>
                         </div>
@@ -693,7 +692,7 @@
         <p>Dispatching coordinates and custom SMS to emergency contacts in:</p>
         <div id="sosTimerDisplay">15</div>
         <p style="font-size: 14px; max-width: 400px; opacity: 0.9; margin-bottom: 30px;">Voice command or manual trigger
-            detected. Click cancel if this is a false alarm.</p>
+            detected. Click cancel or say <strong>"SAFE"</strong> if this is a false alarm.</p>
         <button onclick="cancelSOS()"
             style="background: white; color: #e11d48; border: none; padding: 16px 45px; border-radius: 40px; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.3); transition: 0.2s;">
             ❌ CANCEL SOS
@@ -702,31 +701,55 @@
 
     <!-- Script Section -->
     <script>
+        // Session validation to protect dashboard without false redirects
+        const activeUserEmail = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
+        if (!activeUserEmail) {
+            window.location.href = "login.html";
+        }
+
         // Sync Profile Data & Active Logged-in User Details from localStorage
         window.addEventListener('DOMContentLoaded', () => {
             const savedName = localStorage.getItem('nirbhaya_username');
             const savedDp = localStorage.getItem('nirbhaya_userdp');
             const savedEmail = localStorage.getItem('nirbhaya_user_email') || localStorage.getItem('nirbhaya_current_user_email');
 
-            if (savedName) {
-                const topbarNameEl = document.getElementById('topbarUserName');
-                const dropdownNameEl = document.getElementById('dropdownUserName');
+            const topbarNameEl = document.getElementById('topbarUserName');
+            const dropdownNameEl = document.getElementById('dropdownUserName');
+            const dropdownEmailEl = document.getElementById('dropdownUserEmail');
+            const topbarImg = document.getElementById('topbarUserImg');
+
+            if (savedName && savedName.trim() !== "") {
                 if (topbarNameEl) topbarNameEl.textContent = `Hi, ${savedName}`;
                 if (dropdownNameEl) dropdownNameEl.textContent = savedName;
+            } else {
+                if (topbarNameEl) topbarNameEl.textContent = "Hi, User";
+                if (dropdownNameEl) dropdownNameEl.textContent = "User";
             }
 
-            if (savedEmail) {
-                const dropdownEmailEl = document.getElementById('dropdownUserEmail');
+            if (savedEmail && savedEmail.trim() !== "") {
                 if (dropdownEmailEl) dropdownEmailEl.textContent = savedEmail;
             }
 
-            const topbarImg = document.getElementById('topbarUserImg');
             if (savedDp && savedDp.trim() !== "") {
                 if (topbarImg) topbarImg.src = savedDp;
             } else {
                 if (topbarImg) topbarImg.src = 'aqw.jpeg';
             }
+
+            // Immediately request mic permission on dashboard load
+            requestMicrophoneAndInitVoiceSOS();
         });
+
+        // Logout handler to cleanly terminate current session
+        function handleLogout(event) {
+            if (event) event.preventDefault();
+            localStorage.removeItem('nirbhaya_current_user_email');
+            localStorage.removeItem('nirbhaya_username');
+            localStorage.removeItem('nirbhaya_user_email');
+            localStorage.removeItem('nirbhaya_userdp');
+            localStorage.removeItem('nirbhaya_userphone');
+            window.location.href = "login.html";
+        }
 
         /* =========================
            USER DROPDOWN TOGGLE SCRIPT
@@ -772,11 +795,17 @@
         // 2. Strict 15-Sec SOS Countdown & Cancel Engine
         let sosInterval = null;
         let countdownValue = 15;
+        let isSOSActive = false;
 
         function triggerSOSCountdown() {
+            if (isSOSActive) return; // Prevent double trigger
+
+            isSOSActive = true;
             countdownValue = 15;
             document.getElementById('sosTimerDisplay').textContent = countdownValue;
             document.getElementById('sosCountdownOverlay').style.display = 'flex';
+
+            if (sosInterval) clearInterval(sosInterval);
 
             sosInterval = setInterval(() => {
                 countdownValue--;
@@ -784,6 +813,7 @@
 
                 if (countdownValue <= 0) {
                     clearInterval(sosInterval);
+                    isSOSActive = false;
                     document.getElementById('sosCountdownOverlay').style.display = 'none';
 
                     const customMsg = localStorage.getItem('nirbhaya_sos_sms') || "Emergency SOS Triggered!";
@@ -795,13 +825,37 @@
         function cancelSOS() {
             if (sosInterval) {
                 clearInterval(sosInterval);
+                sosInterval = null;
             }
+            isSOSActive = false;
             document.getElementById('sosCountdownOverlay').style.display = 'none';
-            alert("🛡️ SOS Alert successfully cancelled.");
+            alert("🛡️ SOS Alert successfully deactivated!");
         }
 
-        // 3. Hands-Free Voice Command Listener for SOS (Keywords: HELP, BACHAO, SAFE)
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        // 3. Microphone Permission Prompt & Continuous Hands-Free Voice Listener
+        function requestMicrophoneAndInitVoiceSOS() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then((stream) => {
+                        console.log("🎤 Microphone access granted by user.");
+                        startContinuousVoiceRecognition();
+                    })
+                    .catch((err) => {
+                        console.warn("⚠️ Microphone permission denied or prompt dismissed:", err);
+                        // Still attempt Web Speech API initialization in case permissions are already granted
+                        startContinuousVoiceRecognition();
+                    });
+            } else {
+                startContinuousVoiceRecognition();
+            }
+        }
+
+        function startContinuousVoiceRecognition() {
+            if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+                console.warn("Speech recognition is not supported in this browser.");
+                return;
+            }
+
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             const recognition = new SpeechRecognition();
             recognition.continuous = true;
@@ -809,26 +863,30 @@
             recognition.lang = 'en-IN';
 
             recognition.onresult = function (event) {
-                let transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
-                console.log("Voice heard:", transcript);
+                const results = event.results;
+                const transcript = results[results.length - 1][0].transcript.toLowerCase().trim();
+                console.log("🎙️ Voice Heard:", transcript);
 
+                // Check for distress keywords
                 if (transcript.includes("help") || transcript.includes("bachao") || transcript.includes("emergency")) {
-                    triggerSOSCountdown();
-                } else if (transcript.includes("safe")) {
-                    cancelSOS();
-                    document.getElementById('zoneBadgeStatus').textContent = "Safe Zone";
-                    document.getElementById('zoneBadgeStatus').className = "status-badge badge-safe";
-                    document.getElementById('riskScoreText').textContent = "Low Risk (12%)";
-                    document.getElementById('routeCheckText').textContent = "Safe Path Recommended";
-                    document.getElementById('routeCheckText').style.color = "#10b981";
+                    if (!isSOSActive) {
+                        triggerSOSCountdown();
+                    }
+                } 
+                // Check for safety keyword during countdown
+                else if (transcript.includes("safe") || transcript.includes("cancel")) {
+                    if (isSOSActive) {
+                        cancelSOS();
+                    }
                 }
             };
 
             recognition.onerror = function (event) {
-                console.log("Speech recognition error", event.error);
+                console.log("Speech recognition error:", event.error);
             };
 
             recognition.onend = function () {
+                // Ensure the voice listener restarts continuously in the background
                 try {
                     recognition.start();
                 } catch (e) { }
@@ -836,9 +894,9 @@
 
             try {
                 recognition.start();
-                console.log("Microphone voice recognition active for HELP / BACHAO / SAFE");
+                console.log("Voice SOS listener successfully initiated for 'help', 'bachao', and 'safe'.");
             } catch (e) {
-                console.log("Voice listener already active or blocked");
+                console.log("Voice listener already active.");
             }
         }
     </script>
