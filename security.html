@@ -1178,14 +1178,14 @@
                     <div class="user">
                         <img id="topbarUserImg" src="aqw.jpeg" alt="Profile"
                             onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'">
-                        <strong id="topbarUserName">Hi, Akrati</strong>
+                        <strong id="topbarUserName">Hi, User</strong>
                         <i class="fa-solid fa-chevron-down" style="font-size: 11px;"></i>
                     </div>
 
                     <div class="dropdown-menu" id="userDropdownMenu">
                         <div class="dropdown-header">
-                            <strong id="dropdownUserName">Akrati</strong>
-                            <small id="dropdownUserEmail">akrati@example.com</small>
+                            <strong id="dropdownUserName">User</strong>
+                            <small id="dropdownUserEmail">user@example.com</small>
                         </div>
                         <a href="#" class="dropdown-item"
                             onclick="alert('User Details: Primary User | Status: Verified')">
@@ -1195,7 +1195,7 @@
                             <i class="fa-solid fa-gear"></i> Account Settings
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="login.html" class="dropdown-item" style="color: #ef3340;">
+                        <a href="login.html" class="dropdown-item" style="color: #ef3340;" onclick="handleLogout(event)">
                             <i class="fa-solid fa-right-from-bracket"></i> Logout
                         </a>
                     </div>
@@ -1974,26 +1974,30 @@
 
     <script>
 
-        // Load saved user profile data from settings page (Name, DP & Email synchronization)
+        // Load saved user profile data from localStorage (Name, DP & Email synchronization)
         window.addEventListener('DOMContentLoaded', () => {
             const savedName = localStorage.getItem('nirbhaya_username');
             const savedDp = localStorage.getItem('nirbhaya_userdp');
             const savedEmail = localStorage.getItem('nirbhaya_user_email') || localStorage.getItem('nirbhaya_current_user_email');
             const savedSms = localStorage.getItem('nirbhaya_sos_sms');
 
-            if (savedName) {
-                const topbarUserName = document.getElementById('topbarUserName');
-                const dropdownUserName = document.getElementById('dropdownUserName');
+            const topbarUserName = document.getElementById('topbarUserName');
+            const dropdownUserName = document.getElementById('dropdownUserName');
+            const dropdownUserEmail = document.getElementById('dropdownUserEmail');
+            const topbarUserImg = document.getElementById('topbarUserImg');
+
+            if (savedName && savedName.trim() !== "") {
                 if (topbarUserName) topbarUserName.textContent = `Hi, ${savedName}`;
                 if (dropdownUserName) dropdownUserName.textContent = savedName;
+            } else {
+                if (topbarUserName) topbarUserName.textContent = "Hi, User";
+                if (dropdownUserName) dropdownUserName.textContent = "User";
             }
 
-            if (savedEmail) {
-                const dropdownUserEmail = document.getElementById('dropdownUserEmail');
+            if (savedEmail && savedEmail.trim() !== "") {
                 if (dropdownUserEmail) dropdownUserEmail.textContent = savedEmail;
             }
 
-            const topbarUserImg = document.getElementById('topbarUserImg');
             if (savedDp && savedDp.trim() !== "") {
                 if (topbarUserImg) topbarUserImg.src = savedDp;
             } else {
@@ -2005,6 +2009,17 @@
                 if (sosSmsMessage) sosSmsMessage.value = savedSms;
             }
         });
+
+        // Logout logic
+        function handleLogout(event) {
+            if (event) event.preventDefault();
+            localStorage.removeItem('nirbhaya_current_user_email');
+            localStorage.removeItem('nirbhaya_username');
+            localStorage.removeItem('nirbhaya_user_email');
+            localStorage.removeItem('nirbhaya_userdp');
+            localStorage.removeItem('nirbhaya_userphone');
+            window.location.href = "login.html";
+        }
 
         // Save Custom SOS SMS message to localStorage
         function saveSosSmsMessage() {
@@ -2068,7 +2083,7 @@
 
 
         /* =========================
-           HACKATHON FEATURE: BLUETOOTH MESH ALERT TOGGLE
+           BLUETOOTH MESH ALERT TOGGLE
         ========================= */
         let isMeshActive = false;
         function toggleBluetoothMesh() {
@@ -2121,7 +2136,7 @@
 
 
         /* =========================
-           HACKATHON FEATURE: STEALTH PANIC PIN TRIGGER
+           STEALTH PANIC PIN TRIGGER
         ========================= */
         function triggerStealthPanic() {
             let pin = prompt("🔐 Enter your 4-digit Stealth Panic PIN to trigger silent distress signal:");
@@ -2134,7 +2149,7 @@
 
 
         /* =========================
-           HACKATHON FEATURE: POLICE DIGITAL DISPATCH SIMULATOR
+           POLICE DIGITAL DISPATCH SIMULATOR
         ========================= */
         function simulatePoliceDispatch() {
             const dispatchStatus = document.getElementById('policeDispatchStatus');
@@ -2229,7 +2244,7 @@
 
 
         /* =========================
-           STRICT 15-SEC SOS COUNTDOWN & CANCEL ENGINE
+           15-SEC SOS COUNTDOWN & CANCEL ENGINE
         ========================= */
         let sosInterval = null;
         let countdownValue = 15;

@@ -8,6 +8,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const _supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     const loginBtn = document.getElementById("loginBtn");
+    const emailField = document.getElementById("email");
+    const passwordField = document.getElementById("password");
+
+    // Keyboard Enter Key Navigation
+    if (emailField && passwordField) {
+        emailField.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                passwordField.focus();
+            }
+        });
+
+        passwordField.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                if (loginBtn) loginBtn.click();
+            }
+        });
+    }
 
     if (!loginBtn) {
         return;
@@ -22,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Check if fields are empty
         if (!emailInput || !passwordInput) {
-            alert("Please enter both email and password.");
+            alert("⚠️ Please enter both email and password.");
             return;
         }
 
@@ -43,12 +62,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (error) {
                 console.error("Supabase error:", error.message);
-                alert("Something went wrong with the database connection.");
+                alert("❌ Something went wrong with the database connection.");
                 return;
             }
 
             if (!users || users.length === 0) {
-                alert("No account found with this email. Please Sign Up first.");
+                alert("❌ No account found with this email. Please Sign Up first.");
                 return;
             }
 
@@ -56,12 +75,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Check if password matches
             if (foundUser.password !== passwordInput) {
-                alert("Incorrect password! Please try again.");
+                alert("❌ Incorrect password! Please try again.");
                 return;
             }
 
+            // Extract display name prioritizing fullName from Supabase table
+            const displayName = foundUser.fullName || foundUser.name || "User";
+
             // Login successful
-            alert("✅ Login Successful!");
+            alert(`✅ Welcome back, ${displayName}!\n\nLogin Successful.`);
 
             // Save logged-in user information
             localStorage.setItem(
@@ -71,13 +93,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
             localStorage.setItem(
                 "nirbhaya_username",
-                foundUser.name || "User"
+                displayName
             );
 
             localStorage.setItem(
                 "nirbhaya_user_email",
                 foundUser.email
             );
+
+            if (foundUser.phone) {
+                localStorage.setItem("nirbhaya_userphone", foundUser.phone);
+            }
 
             // Save profile picture if available
             if (foundUser.dp && foundUser.dp.trim() !== "") {
@@ -89,12 +115,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 localStorage.removeItem("nirbhaya_userdp");
             }
 
-            // ⭐ OPEN DASHBOARD AFTER LOGIN
-            window.location.href = "dashboard.html";
+            // Open Dashboard / Security page after login
+            window.location.href = "../security.html";
 
         } catch (err) {
             console.error("Unexpected error during login:", err);
-            alert("An unexpected error occurred. Please try again.");
+            alert("❌ An unexpected error occurred. Please try again.");
         }
     });
 });

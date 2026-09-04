@@ -379,17 +379,21 @@
                 }
 
                 const foundUser = users[0];
+                const displayName = foundUser.fullName || foundUser.name || 'User';
 
                 // Set current active session user parameters (Isolated profiles)
                 localStorage.setItem('nirbhaya_current_user_email', foundUser.email);
-                localStorage.setItem('nirbhaya_username', foundUser.name || 'User');
+                localStorage.setItem('nirbhaya_username', displayName);
+                if (foundUser.phone) {
+                    localStorage.setItem('nirbhaya_userphone', foundUser.phone);
+                }
                 if (foundUser.dp) {
                     localStorage.setItem('nirbhaya_userdp', foundUser.dp);
                 } else {
                     localStorage.removeItem('nirbhaya_userdp');
                 }
 
-                alert(`✅ Welcome back, ${foundUser.name || 'User'}!\n\nLogin Successful. Redirecting to Dashboard...`);
+                alert(`✅ Welcome back, ${displayName}!\n\nLogin Successful. Redirecting to Dashboard...`);
                 window.location.href = "../security.html";
 
             } catch (err) {
@@ -457,8 +461,13 @@
 
                     if (!error && users && users.length > 0) {
                         const foundUser = users[0];
+                        const displayName = foundUser.fullName || foundUser.name || 'User';
+
                         localStorage.setItem('nirbhaya_current_user_email', foundUser.email);
-                        localStorage.setItem('nirbhaya_username', foundUser.name || 'User');
+                        localStorage.setItem('nirbhaya_username', displayName);
+                        if (foundUser.phone) {
+                            localStorage.setItem('nirbhaya_userphone', foundUser.phone);
+                        }
                         if (foundUser.dp) {
                             localStorage.setItem('nirbhaya_userdp', foundUser.dp);
                         }
@@ -479,7 +488,7 @@
             }
         }
 
-        // --- NEW KEYBOARD NAVIGATION LOGIC ---
+        // --- KEYBOARD NAVIGATION LOGIC ---
         
         const emailField = document.getElementById('email');
         const passField = document.getElementById('password');
@@ -505,7 +514,7 @@
             });
         }
 
-        // Optional bonus: Allow pressing Enter to verify CAPTCHA inside the modal
+        // Allow pressing Enter to verify CAPTCHA inside the modal
         if (modalInputField) {
             modalInputField.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
