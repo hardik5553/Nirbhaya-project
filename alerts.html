@@ -15,6 +15,7 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         * {
@@ -467,7 +468,7 @@
         </div>
 
         <nav class="menu">
-            <a href="index.html">
+            <a href="dashboard.html">
                 <i class="fa-solid fa-border-all"></i>
                 <span>Dashboard</span>
             </a>
@@ -541,24 +542,24 @@
                     <div class="user">
                         <img id="topbarUserImg" src="aqw.jpeg" alt="Profile"
                             onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'">
-                        <strong id="topbarUserName">Hi, Akrati</strong>
+                        <strong id="topbarUserName">Hi, User</strong>
                         <i class="fa-solid fa-chevron-down" style="font-size: 11px;"></i>
                     </div>
 
                     <div class="dropdown-menu" id="userDropdownMenu">
                         <div class="dropdown-header">
-                            <strong id="dropdownUserName">Akrati</strong>
-                            <small>akrati@example.com</small>
+                            <strong id="dropdownUserName">User</strong>
+                            <small id="dropdownUserEmail">user@example.com</small>
                         </div>
                         <a href="#" class="dropdown-item"
-                            onclick="alert('User Details: Akrati | Role: Primary User | Status: Verified')">
+                            onclick="alert('User Details: Primary User | Status: Verified')">
                             <i class="fa-solid fa-user"></i> User Details
                         </a>
                         <a href="settings.html" class="dropdown-item">
                             <i class="fa-solid fa-gear"></i> Account Settings
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="login.html" class="dropdown-item" style="color: #ef3340;">
+                        <a href="login.html" class="dropdown-item" style="color: #ef3340;" onclick="handleLogout(event)">
                             <i class="fa-solid fa-right-from-bracket"></i> Logout
                         </a>
                     </div>
@@ -659,33 +660,63 @@
     </div>
 
     <script>
-        // Sync Profile Data from Settings
+        // Sync Profile Data & Active Logged-in User Details from localStorage
         window.addEventListener('DOMContentLoaded', () => {
             const savedName = localStorage.getItem('nirbhaya_username');
             const savedDp = localStorage.getItem('nirbhaya_userdp');
-            if (savedName) {
-                document.getElementById('topbarUserName').textContent = `Hi, ${savedName}`;
-                document.getElementById('dropdownUserName').textContent = savedName;
+            const savedEmail = localStorage.getItem('nirbhaya_user_email') || localStorage.getItem('nirbhaya_current_user_email');
+
+            const topbarNameEl = document.getElementById('topbarUserName');
+            const dropdownNameEl = document.getElementById('dropdownUserName');
+            const dropdownEmailEl = document.getElementById('dropdownUserEmail');
+            const topbarImg = document.getElementById('topbarUserImg');
+
+            if (savedName && savedName.trim() !== "") {
+                if (topbarNameEl) topbarNameEl.textContent = `Hi, ${savedName}`;
+                if (dropdownNameEl) dropdownNameEl.textContent = savedName;
+            } else {
+                if (topbarNameEl) topbarNameEl.textContent = "Hi, User";
+                if (dropdownNameEl) dropdownNameEl.textContent = "User";
             }
-            if (savedDp) {
-                document.getElementById('topbarUserImg').src = savedDp;
+
+            if (savedEmail && savedEmail.trim() !== "") {
+                if (dropdownEmailEl) dropdownEmailEl.textContent = savedEmail;
+            }
+
+            if (savedDp && savedDp.trim() !== "") {
+                if (topbarImg) topbarImg.src = savedDp;
+            } else {
+                if (topbarImg) topbarImg.src = 'aqw.jpeg';
             }
         });
+
+        // Logout logic
+        function handleLogout(event) {
+            if (event) event.preventDefault();
+            localStorage.removeItem('nirbhaya_current_user_email');
+            localStorage.removeItem('nirbhaya_username');
+            localStorage.removeItem('nirbhaya_user_email');
+            localStorage.removeItem('nirbhaya_userdp');
+            localStorage.removeItem('nirbhaya_userphone');
+            window.location.href = "login.html";
+        }
 
         // User Profile Dropdown Toggle Script
         const dropdownToggle = document.getElementById('userDropdownToggle');
         const dropdownMenu = document.getElementById('userDropdownMenu');
 
-        dropdownToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            dropdownMenu.classList.toggle('show');
-        });
+        if (dropdownToggle && dropdownMenu) {
+            dropdownToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('show');
+            });
 
-        window.addEventListener('click', () => {
-            if (dropdownMenu.classList.contains('show')) {
-                dropdownMenu.classList.remove('show');
-            }
-        });
+            window.addEventListener('click', () => {
+                if (dropdownMenu.classList.contains('show')) {
+                    dropdownMenu.classList.remove('show');
+                }
+            });
+        }
 
         /* =========================
            STRICT 15-SEC SOS COUNTDOWN & CANCEL ENGINE

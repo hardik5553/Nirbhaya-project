@@ -531,7 +531,7 @@
         </div>
 
         <nav class="menu">
-            <a href="index.html">
+            <a href="dashboard.html">
                 <i class="fa-solid fa-border-all"></i>
                 <span>Dashboard</span>
             </a>
@@ -621,7 +621,7 @@
                             <i class="fa-solid fa-gear"></i> Account Settings
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="login.html" class="dropdown-item" style="color: #ef3340;">
+                        <a href="login.html" class="dropdown-item" style="color: #ef3340;" onclick="handleLogout(event)">
                             <i class="fa-solid fa-right-from-bracket"></i> Logout
                         </a>
                     </div>
@@ -671,14 +671,14 @@
                         <div class="row-left">
                             <i class="fa-solid fa-user"></i> Full Name
                         </div>
-                        <input type="text" class="setting-input" id="userNameInput" value="Akrati">
+                        <input type="text" class="setting-input" id="userNameInput" placeholder="Enter Full Name">
                     </div>
 
                     <div class="row">
                         <div class="row-left">
                             <i class="fa-solid fa-phone"></i> Phone Number
                         </div>
-                        <input type="text" class="setting-input" id="userPhoneInput" value="+91 91234 56789">
+                        <input type="text" class="setting-input" id="userPhoneInput" placeholder="Enter Phone Number">
                     </div>
 
                     <div class="row">
@@ -693,7 +693,7 @@
                     </button>
                 </div>
 
-                <!-- 2. Security & Change Password Card (Optimized) -->
+                <!-- 2. Security & Change Password Card -->
                 <div class="settings-card">
                     <div class="card-heading">
                         <div class="icon" style="background: #f3e8ff; color: #7c3aed;">
@@ -795,6 +795,7 @@
             const savedName = localStorage.getItem('nirbhaya_username');
             const savedDp = localStorage.getItem('nirbhaya_userdp');
             const savedEmail = localStorage.getItem('nirbhaya_user_email') || localStorage.getItem('nirbhaya_current_user_email');
+            const savedPhone = localStorage.getItem('nirbhaya_userphone');
 
             if (savedName) {
                 const userNameInput = document.getElementById('userNameInput');
@@ -804,6 +805,11 @@
                 const dropdownNameEl = document.getElementById('dropdownUserName');
                 if (topbarNameEl) topbarNameEl.textContent = `Hi, ${savedName}`;
                 if (dropdownNameEl) dropdownNameEl.textContent = savedName;
+            }
+
+            if (savedPhone) {
+                const userPhoneInput = document.getElementById('userPhoneInput');
+                if (userPhoneInput) userPhoneInput.value = savedPhone;
             }
 
             if (savedEmail) {
@@ -822,20 +828,33 @@
             }
         });
 
+        // Logout handler
+        function handleLogout(event) {
+            if (event) event.preventDefault();
+            localStorage.removeItem('nirbhaya_current_user_email');
+            localStorage.removeItem('nirbhaya_username');
+            localStorage.removeItem('nirbhaya_user_email');
+            localStorage.removeItem('nirbhaya_userdp');
+            localStorage.removeItem('nirbhaya_userphone');
+            window.location.href = "login.html";
+        }
+
         // User Profile Dropdown Toggle Script
         const dropdownToggle = document.getElementById('userDropdownToggle');
         const dropdownMenu = document.getElementById('userDropdownMenu');
 
-        dropdownToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            dropdownMenu.classList.toggle('show');
-        });
+        if (dropdownToggle && dropdownMenu) {
+            dropdownToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('show');
+            });
 
-        window.addEventListener('click', () => {
-            if (dropdownMenu.classList.contains('show')) {
-                dropdownMenu.classList.remove('show');
-            }
-        });
+            window.addEventListener('click', () => {
+                if (dropdownMenu.classList.contains('show')) {
+                    dropdownMenu.classList.remove('show');
+                }
+            });
+        }
 
         /* =========================
            STRICT 15-SEC SOS COUNTDOWN & CANCEL ENGINE
@@ -906,6 +925,7 @@
 
             // Save to LocalStorage
             localStorage.setItem('nirbhaya_username', name);
+            localStorage.setItem('nirbhaya_userphone', phone);
             if (tempDpBase64) {
                 localStorage.setItem('nirbhaya_userdp', tempDpBase64);
             }
@@ -920,7 +940,7 @@
             alert(`✅ Profile Updated Successfully!\n\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\n\nChanges are now reflected across all pages.`);
         }
 
-        // Optimized & Secured Update Password Logic
+        // Update Password Logic
         function updatePassword() {
             const oldPwd = document.getElementById('oldPwd').value.trim();
             const newPwd = document.getElementById('newPwd').value.trim();

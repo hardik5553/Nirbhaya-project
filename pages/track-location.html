@@ -13,6 +13,7 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         * {
@@ -378,12 +379,30 @@
             font-weight: 700;
         }
 
+        .detect-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: 0.2s;
+        }
+
+        .detect-btn:hover {
+            background: #059669;
+        }
+
         .map-container {
             width: 100%;
             height: 450px;
             border-radius: 12px;
             overflow: hidden;
             border: 1px solid #cbd5e1;
+            background: #f1f5f9;
         }
 
         .map-container iframe {
@@ -469,7 +488,7 @@
         </div>
 
         <nav class="menu">
-            <a href="../index.html">
+            <a href="../dashboard.html">
                 <i class="fa-solid fa-border-all"></i>
                 <span>Dashboard</span>
             </a>
@@ -555,7 +574,7 @@
                             <i class="fa-solid fa-gear"></i> Account Settings
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="../login.html" class="dropdown-item" style="color: #ef3340;">
+                        <a href="../login.html" class="dropdown-item" style="color: #ef3340;" onclick="handleLogout(event)">
                             <i class="fa-solid fa-right-from-bracket"></i> Logout
                         </a>
                     </div>
@@ -575,16 +594,16 @@
                 <!-- Destination Search Bar -->
                 <div class="destination-search-box">
                     <input type="text" id="destinationInput"
-                        placeholder="🔍 Search destination (e.g., Central Station, Delhi, Kanpur)...">
+                        placeholder="🔍 Search destination (e.g., Central Station, Delhi, Mumbai)...">
                     <button onclick="searchDestinationRoute()">Search & Route 🚀</button>
                 </div>
 
                 <div id="locationBox">
                     <p>Status: <span id="status">Requesting GPS location permission...</span></p>
-                    <p>Latitude: <span id="latitude">--</span></p>
-                    <p>Longitude: <span id="longitude">--</span></p>
-                    <p>Route Status: <span id="routeStatusText" style="color: #2563eb;">Live GPS Tracking Active</span>
-                    </p>
+                    <p>Latitude: <span id="latitude">Waiting for GPS...</span></p>
+                    <p>Longitude: <span id="longitude">Waiting for GPS...</span></p>
+                    <p>Route Status: <span id="routeStatusText" style="color: #2563eb;">Live GPS Tracking Initializing</span></p>
+                    <button class="detect-btn" onclick="startStrictLiveLocation()"><i class="fa-solid fa-location-crosshairs"></i> Refresh / Detect My GPS</button>
                 </div>
 
                 <div class="map-container">
@@ -611,10 +630,9 @@
         </button>
     </div>
 
-    <!-- GEOLOCATION, EXACT PIN MAPPING & ROUTING SCRIPT -->
+    <!-- GEOLOCATION & EXACT PIN MAPPING SCRIPT -->
     <script>
-        let currentLat = 26.4499;
-        let currentLon = 80.3319;
+        let watchId = null;
 
         window.addEventListener("DOMContentLoaded", () => {
             const savedName = localStorage.getItem('nirbhaya_username');
@@ -640,43 +658,80 @@
                 if (topbarImg) topbarImg.src = '../aqw.jpeg';
             }
 
-            // Real-time Geolocation Mapping with exact pinpointing
+            // Immediately request and track accurate live location
+            startStrictLiveLocation();
+        });
+
+        // Strict Live Location Detection Engine
+        function startStrictLiveLocation() {
             const latSpan = document.getElementById("latitude");
             const lonSpan = document.getElementById("longitude");
             const statusSpan = document.getElementById("status");
             const mapIframe = document.getElementById("locationMap");
 
-            if ("geolocation" in navigator) {
-                navigator.geolocation.watchPosition(
-                    (position) => {
-                        currentLat = position.coords.latitude;
-                        currentLon = position.coords.longitude;
-
-                        latSpan.textContent = currentLat.toFixed(4);
-                        lonSpan.textContent = currentLon.toFixed(4);
-                        statusSpan.textContent = "Live GPS tracking active!";
-                        statusSpan.style.color = "#16a34a";
-
-                        // Accurate Google Maps Pin formatting with marker query
-                        mapIframe.src = `https://maps.google.com/maps?q=${currentLat},${currentLon}&hl=en&z=16&output=embed`;
-                    },
-                    (error) => {
-                        statusSpan.textContent = "Location access denied or unavailable. Using fallback location (Kanpur).";
-                        statusSpan.style.color = "#ef3340";
-
-                        latSpan.textContent = currentLat;
-                        lonSpan.textContent = currentLon;
-
-                        mapIframe.src = `https://maps.google.com/maps?q=${currentLat},${currentLon}&hl=en&z=16&output=embed`;
-                    },
-                    { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 }
-                );
-            } else {
-                statusSpan.textContent = "Geolocation is not supported by your browser.";
+            if (!("geolocation" in navigator)) {
+                statusSpan.textContent = "❌ Geolocation is not supported by your browser.";
                 statusSpan.style.color = "#ef3340";
-                mapIframe.src = `https://maps.google.com/maps?q=${currentLat},${currentLon}&hl=en&z=16&output=embed`;
+                return;
             }
-        });
+
+            statusSpan.textContent = "Requesting live GPS permissions...";
+            statusSpan.style.color = "#f59e0b";
+
+            // Success Callback
+            const handleSuccess = (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                latSpan.textContent = lat.toFixed(5);
+                latSpan.style.color = "#16a34a";
+                lonSpan.textContent = lon.toFixed(5);
+                lonSpan.style.color = "#16a34a";
+
+                statusSpan.textContent = "✅ Real-time GPS Location Locked!";
+                statusSpan.style.color = "#16a34a";
+
+                mapIframe.src = `https://maps.google.com/maps?q=${lat},${lon}&hl=en&z=17&output=embed`;
+            };
+
+            // Error Callback with Adaptive Fallback (GPS satellite -> Network cell/Wi-Fi)
+            const handleError = (error) => {
+                console.warn("High accuracy geolocation timed out or failed, falling back to standard network triangulation:", error.message);
+                
+                // Retry with standard accuracy (avoids browser timeout on laptops/Wi-Fi)
+                navigator.geolocation.getCurrentPosition(
+                    handleSuccess,
+                    (finalErr) => {
+                        let errorMsg = "❌ Location permission denied. Please allow location access in your browser address bar.";
+                        if (finalErr.code === finalErr.POSITION_UNAVAILABLE) {
+                            errorMsg = "❌ GPS signal unavailable. Please ensure device location is turned ON.";
+                        } else if (finalErr.code === finalErr.TIMEOUT) {
+                            errorMsg = "❌ Location request timed out. Click 'Refresh / Detect My GPS' above.";
+                        }
+                        statusSpan.textContent = errorMsg;
+                        statusSpan.style.color = "#ef3340";
+                        latSpan.textContent = "--";
+                        lonSpan.textContent = "--";
+                    },
+                    { enableHighAccuracy: false, timeout: 15000, maximumAge: 0 }
+                );
+            };
+
+            // 1. Initial Quick Fetch (High Accuracy)
+            navigator.geolocation.getCurrentPosition(handleSuccess, handleError, {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            });
+
+            // 2. Continuous Watch Position for real movement tracking
+            if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+            watchId = navigator.geolocation.watchPosition(handleSuccess, (e) => console.log("Watch tracking update:", e.message), {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 1000
+            });
+        }
 
         // Destination Search & Google Maps Routing Feature
         function searchDestinationRoute() {
@@ -694,24 +749,36 @@
 
             alert(`🧭 Route Calculated Successfully!\n- Destination: ${destinationQuery}\n- AI Guardian: Safe corridor selected.\n- Updating map to display destination route...`);
 
-            // Update map iframe to search and display destination accurately
             mapIframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(destinationQuery)}&hl=en&z=14&output=embed`;
+        }
+
+        // Logout logic
+        function handleLogout(event) {
+            if (event) event.preventDefault();
+            localStorage.removeItem('nirbhaya_current_user_email');
+            localStorage.removeItem('nirbhaya_username');
+            localStorage.removeItem('nirbhaya_user_email');
+            localStorage.removeItem('nirbhaya_userdp');
+            localStorage.removeItem('nirbhaya_userphone');
+            window.location.href = "../login.html";
         }
 
         // User Profile Dropdown Toggle Script
         const dropdownToggle = document.getElementById('userDropdownToggle');
         const dropdownMenu = document.getElementById('userDropdownMenu');
 
-        dropdownToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            dropdownMenu.classList.toggle('show');
-        });
+        if (dropdownToggle && dropdownMenu) {
+            dropdownToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('show');
+            });
 
-        window.addEventListener('click', () => {
-            if (dropdownMenu.classList.contains('show')) {
-                dropdownMenu.classList.remove('show');
-            }
-        });
+            window.addEventListener('click', () => {
+                if (dropdownMenu.classList.contains('show')) {
+                    dropdownMenu.classList.remove('show');
+                }
+            });
+        }
 
         /* =========================
            STRICT 15-SEC SOS COUNTDOWN & CANCEL ENGINE

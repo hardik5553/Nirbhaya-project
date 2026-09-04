@@ -701,12 +701,6 @@
 
     <!-- Script Section -->
     <script>
-        // Session validation to protect dashboard without false redirects
-        const activeUserEmail = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
-        if (!activeUserEmail) {
-            window.location.href = "login.html";
-        }
-
         // Sync Profile Data & Active Logged-in User Details from localStorage
         window.addEventListener('DOMContentLoaded', () => {
             const savedName = localStorage.getItem('nirbhaya_username');
@@ -736,7 +730,7 @@
                 if (topbarImg) topbarImg.src = 'aqw.jpeg';
             }
 
-            // Immediately request mic permission on dashboard load
+            // Request microphone access and initiate speech listener on load
             requestMicrophoneAndInitVoiceSOS();
         });
 
@@ -842,7 +836,6 @@
                     })
                     .catch((err) => {
                         console.warn("⚠️ Microphone permission denied or prompt dismissed:", err);
-                        // Still attempt Web Speech API initialization in case permissions are already granted
                         startContinuousVoiceRecognition();
                     });
             } else {
@@ -886,7 +879,6 @@
             };
 
             recognition.onend = function () {
-                // Ensure the voice listener restarts continuously in the background
                 try {
                     recognition.start();
                 } catch (e) { }

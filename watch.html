@@ -520,7 +520,7 @@
         </div>
 
         <nav class="menu">
-            <a href="index.html">
+            <a href="dashboard.html">
                 <i class="fa-solid fa-border-all"></i>
                 <span>Dashboard</span>
             </a>
@@ -611,7 +611,7 @@
                             <i class="fa-solid fa-gear"></i> Account Settings
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="login.html" class="dropdown-item" style="color: #ef3340;">
+                        <a href="login.html" class="dropdown-item" style="color: #ef3340;" onclick="handleLogout(event)">
                             <i class="fa-solid fa-right-from-bracket"></i> Logout
                         </a>
                     </div>
@@ -635,15 +635,12 @@
                         <div class="watch-mockup" id="mockupIconBox">
                             <i class="fa-solid fa-clock" id="mockupLockIcon"></i>
                         </div>
-                        <strong id="displayWatchName" style="color: #1e293b; font-size: 16px;">No Watch
-                            Connected</strong>
+                        <strong id="displayWatchName" style="color: #1e293b; font-size: 16px;">No Watch Connected</strong>
                         <p id="displayWatchStatus"
-                            style="color: #ef3340; font-size: 13px; margin-top: 5px; font-weight: 600;">● Click a model
-                            below to connect</p>
+                            style="color: #ef3340; font-size: 13px; margin-top: 5px; font-weight: 600;">● Click a model below to connect</p>
                     </div>
 
-                    <h3 style="font-size: 14px; margin-top: 20px; margin-bottom: 10px; color: #475569;">Available Watch
-                        Models (Click to Connect/Disconnect):</h3>
+                    <h3 style="font-size: 14px; margin-top: 20px; margin-bottom: 10px; color: #475569;">Available Watch Models (Click to Connect/Disconnect):</h3>
 
                     <!-- 6 Dummy Smart Watch Models Grid -->
                     <div class="models-grid">
@@ -687,8 +684,7 @@
 
                 <!-- Right Column: Watch Telemetry Details -->
                 <div class="watch-card">
-                    <h2 style="font-size: 18px; margin-bottom: 20px; color: #1e293b;">Device & Biometric Diagnostics
-                    </h2>
+                    <h2 style="font-size: 18px; margin-bottom: 20px; color: #1e293b;">Device & Biometric Diagnostics</h2>
 
                     <div class="telemetry-list">
                         <div class="telemetry-item">
@@ -749,43 +745,57 @@
             const savedDp = localStorage.getItem('nirbhaya_userdp');
             const savedEmail = localStorage.getItem('nirbhaya_user_email') || localStorage.getItem('nirbhaya_current_user_email');
 
-            if (savedName) {
-                const topbarNameEl = document.getElementById('topbarUserName');
-                const dropdownNameEl = document.getElementById('dropdownUserName');
+            const topbarNameEl = document.getElementById('topbarUserName');
+            const dropdownNameEl = document.getElementById('dropdownUserName');
+            const dropdownEmailEl = document.getElementById('dropdownUserEmail');
+            const topbarImg = document.getElementById('topbarUserImg');
+
+            if (savedName && savedName.trim() !== "") {
                 if (topbarNameEl) topbarNameEl.textContent = `Hi, ${savedName}`;
                 if (dropdownNameEl) dropdownNameEl.textContent = savedName;
+            } else {
+                if (topbarNameEl) topbarNameEl.textContent = "Hi, User";
+                if (dropdownNameEl) dropdownNameEl.textContent = "User";
             }
 
-            if (savedEmail) {
-                const dropdownEmailEl = document.getElementById('dropdownUserEmail');
+            if (savedEmail && savedEmail.trim() !== "") {
                 if (dropdownEmailEl) dropdownEmailEl.textContent = savedEmail;
             }
 
-            const topbarImg = document.getElementById('topbarUserImg');
             if (savedDp && savedDp.trim() !== "") {
                 if (topbarImg) topbarImg.src = savedDp;
-                const dpPreview = document.getElementById('dpPreview');
-                if (dpPreview) dpPreview.src = savedDp;
             } else {
-                // Fallback to sample image if user has not uploaded custom DP
                 if (topbarImg) topbarImg.src = 'aqw.jpeg';
             }
         });
+
+        // Logout logic
+        function handleLogout(event) {
+            if (event) event.preventDefault();
+            localStorage.removeItem('nirbhaya_current_user_email');
+            localStorage.removeItem('nirbhaya_username');
+            localStorage.removeItem('nirbhaya_user_email');
+            localStorage.removeItem('nirbhaya_userdp');
+            localStorage.removeItem('nirbhaya_userphone');
+            window.location.href = "login.html";
+        }
 
         // User Profile Dropdown Toggle Script
         const dropdownToggle = document.getElementById('userDropdownToggle');
         const dropdownMenu = document.getElementById('userDropdownMenu');
 
-        dropdownToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            dropdownMenu.classList.toggle('show');
-        });
+        if (dropdownToggle && dropdownMenu) {
+            dropdownToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('show');
+            });
 
-        window.addEventListener('click', () => {
-            if (dropdownMenu.classList.contains('show')) {
-                dropdownMenu.classList.remove('show');
-            }
-        });
+            window.addEventListener('click', () => {
+                if (dropdownMenu.classList.contains('show')) {
+                    dropdownMenu.classList.remove('show');
+                }
+            });
+        }
 
         /* =========================
            STRICT 15-SEC SOS COUNTDOWN & CANCEL ENGINE
