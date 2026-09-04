@@ -114,8 +114,8 @@
 
         /* Custom Logo Image Styles */
         .app-logo {
-            height: 42px;
-            width: 42px;
+            height: 44px;
+            width: 44px;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid white;
@@ -447,8 +447,9 @@
             <header class="topbar">
 
                 <div class="brand-logo-area">
-                    <img src="assets/images/logo.png" alt="NIRBHAYA Logo" class="app-logo"
-                        onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100'">
+                    <!-- Brand logo image set to nir2.jpeg -->
+                    <img src="assets/images/nir2.jpeg" alt="NIRBHAYA Logo" class="app-logo"
+                        onerror="this.src='nir2.jpeg'">
                     <div class="brand-title">
                         <span class="nir-text">NIR</span><span class="bhaya-text">BHAYA</span>
                     </div>
@@ -638,42 +639,17 @@
                                 Emergency Network
                             </span>
 
-                            <a href="security.html"
-                                style="font-size: 0.8rem; color: #e11d48; text-decoration: none; font-weight: 700;">
+                            <!-- Manage link correctly directed to contacts.html -->
+                            <a href="contacts.html"
+                                style="font-size: 0.8rem; color: #e11d48; text-decoration: none; font-weight: 700; cursor: pointer;">
                                 Manage
                             </a>
 
                         </div>
 
-                        <div style="display: flex; gap: 15px; margin-top: 10px;">
-
-                            <div
-                                style="background: #f8fafc; padding: 10px 15px; border-radius: 8px; flex: 1; border: 1px solid #e2e8f0;">
-
-                                <small style="color: #64748b;">
-                                    Mom
-                                </small>
-
-                                <div style="font-weight: 700; font-size: 0.9rem;">
-                                    +91 98765...
-                                </div>
-
-                            </div>
-
-
-                            <div
-                                style="background: #f8fafc; padding: 10px 15px; border-radius: 8px; flex: 1; border: 1px solid #e2e8f0;">
-
-                                <small style="color: #64748b;">
-                                    Dad
-                                </small>
-
-                                <div style="font-weight: 700; font-size: 0.9rem;">
-                                    +91 91234...
-                                </div>
-
-                            </div>
-
+                        <!-- Dynamic Official Contacts Container -->
+                        <div id="dashboardContactsContainer" style="display: flex; gap: 15px; margin-top: 10px;">
+                            <!-- Populated dynamically via localStorage or empty fallback -->
                         </div>
 
                     </div>
@@ -730,9 +706,34 @@
                 if (topbarImg) topbarImg.src = 'aqw.jpeg';
             }
 
+            // Render saved emergency contacts dynamically
+            renderEmergencyNetwork();
+
             // Request microphone access and initiate speech listener on load
             requestMicrophoneAndInitVoiceSOS();
         });
+
+        // Dynamic Emergency Network Loader
+        function renderEmergencyNetwork() {
+            const container = document.getElementById('dashboardContactsContainer');
+            const storedContacts = JSON.parse(localStorage.getItem('nirbhaya_trusted_contacts')) || [];
+
+            if (storedContacts.length === 0) {
+                container.innerHTML = `
+                    <div style="background: #f8fafc; padding: 12px 15px; border-radius: 8px; width: 100%; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-size: 0.85rem; color: #64748b;">No emergency contacts added yet.</span>
+                        <a href="contacts.html" style="font-size: 0.8rem; color: #2563eb; font-weight: 600; text-decoration: none;">+ Add Now</a>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = storedContacts.slice(0, 2).map(c => `
+                    <div style="background: #f8fafc; padding: 10px 15px; border-radius: 8px; flex: 1; border: 1px solid #e2e8f0;">
+                        <small style="color: #64748b; font-size: 0.75rem;">${c.name}</small>
+                        <div style="font-weight: 700; font-size: 0.9rem; color: #1e293b;">${c.phone}</div>
+                    </div>
+                `).join('');
+            }
+        }
 
         // Logout handler to cleanly terminate current session
         function handleLogout(event) {

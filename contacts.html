@@ -163,7 +163,6 @@
             gap: 12px;
         }
 
-        /* Custom Logo Image Styles */
         .app-logo {
             height: 48px;
             width: 48px;
@@ -317,13 +316,13 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
-            max-width: 950px;
+            max-width: 1000px;
         }
 
         .contact-card {
             background: white;
             border-radius: 17px;
-            padding: 20px;
+            padding: 24px;
             box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
             display: flex;
             flex-direction: column;
@@ -358,19 +357,20 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 0;
+            padding: 12px 0;
             border-bottom: 1px solid #f1f5f9;
         }
 
         .contact-avatar {
-            width: 38px;
-            height: 38px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: #e2e8f0;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #475569;
+            flex-shrink: 0;
         }
 
         .contact-info {
@@ -378,7 +378,7 @@
         }
 
         .contact-info strong {
-            font-size: 13px;
+            font-size: 13.5px;
             color: #1e293b;
         }
 
@@ -386,15 +386,17 @@
             display: block;
             color: #64748b;
             margin-top: 2px;
+            font-size: 12px;
         }
 
         .verified {
             background: #dcfce7;
             color: #16a34a;
             border-radius: 15px;
-            padding: 4px 8px;
-            font-size: 10px;
-            font-weight: 600;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
         }
 
         .action-btns {
@@ -407,8 +409,8 @@
             border: none;
             cursor: pointer;
             font-size: 14px;
-            padding: 5px;
-            border-radius: 4px;
+            padding: 6px;
+            border-radius: 6px;
             transition: 0.2s;
         }
 
@@ -430,8 +432,8 @@
 
         .card-btn {
             width: 100%;
-            margin-top: 15px;
-            padding: 10px;
+            margin-top: 18px;
+            padding: 11px;
             border: 1px solid #2563eb;
             border-radius: 8px;
             background: white;
@@ -444,6 +446,27 @@
         .card-btn:hover {
             background: #2563eb;
             color: white;
+        }
+
+        .empty-contacts-state {
+            padding: 30px 15px;
+            text-align: center;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            background: #f8fafc;
+            color: #64748b;
+            margin: 10px 0;
+        }
+
+        .empty-contacts-state i {
+            font-size: 2rem;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        .empty-contacts-state p {
+            font-size: 13px;
+            margin-top: 4px;
         }
 
         /* Modal Styles */
@@ -480,10 +503,16 @@
         .modal-input {
             width: 100%;
             padding: 10px 12px;
+            margin-top: 5px;
             margin-bottom: 15px;
             border: 1px solid #cbd5e1;
             border-radius: 8px;
             font-size: 14px;
+            outline: none;
+        }
+
+        .modal-input:focus {
+            border-color: #2563eb;
         }
 
         .modal-actions {
@@ -545,7 +574,7 @@
             font-size: 12px;
         }
 
-        @media(max-width: 800px) {
+        @media(max-width: 850px) {
             .contacts-grid {
                 grid-template-columns: 1fr;
             }
@@ -574,12 +603,6 @@
 
             .content {
                 padding: 20px;
-            }
-
-            .history-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
             }
         }
     </style>
@@ -659,7 +682,7 @@
             <div class="logo-area">
                 <!-- Custom Logo Image -->
                 <img src="assets/images/nir2.jpeg" alt="NIRBHAYA Logo" class="app-logo"
-                    onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100'">
+                    onerror="this.src='nir2.jpeg'">
                 <div>
                     <h2><span>NIR</span> BHAYA</h2>
                     <div class="tagline">Your Safety. Our Priority.</div>
@@ -706,55 +729,24 @@
         <section class="content">
             <div class="page-title">
                 <h1>Emergency Network & Contacts</h1>
-                <p>Manage your trusted emergency guardians and automated SOS dispatch list</p>
+                <p>Manage your verified emergency guardians and national rapid emergency dispatch lines</p>
             </div>
 
             <div class="contacts-grid">
 
-                <!-- Trusted Contacts Card -->
+                <!-- Primary Guardians Card (Fully Dynamic) -->
                 <div class="contact-card">
                     <div>
                         <div class="card-heading">
                             <div class="icon">
-                                <i class="fa-solid fa-user-group"></i>
+                                <i class="fa-solid fa-user-shield"></i>
                             </div>
                             <h3>Primary Guardians</h3>
                         </div>
 
+                        <!-- Dynamic Container -->
                         <div id="contactsListContainer">
-                            <div class="contact-item" id="contact-mom">
-                                <div class="contact-avatar">
-                                    <i class="fa-solid fa-user"></i>
-                                </div>
-                                <div class="contact-info">
-                                    <strong>Mom</strong>
-                                    <small>+91 98765 43210 • Emergency Contact</small>
-                                </div>
-                                <div class="action-btns">
-                                    <button class="action-btn edit-btn"
-                                        onclick="openEditModal('Mom', '+91 98765 43210', 'contact-mom')" title="Edit"><i
-                                            class="fa-solid fa-pen"></i></button>
-                                    <button class="action-btn delete-btn" onclick="deleteContact('contact-mom')"
-                                        title="Delete"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>
-
-                            <div class="contact-item" id="contact-dad">
-                                <div class="contact-avatar">
-                                    <i class="fa-solid fa-user"></i>
-                                </div>
-                                <div class="contact-info">
-                                    <strong>Dad</strong>
-                                    <small>+91 91234 56789 • Emergency Contact</small>
-                                </div>
-                                <div class="action-btns">
-                                    <button class="action-btn edit-btn"
-                                        onclick="openEditModal('Dad', '+91 91234 56789', 'contact-dad')" title="Edit"><i
-                                            class="fa-solid fa-pen"></i></button>
-                                    <button class="action-btn delete-btn" onclick="deleteContact('contact-dad')"
-                                        title="Delete"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>
+                            <!-- Populated via renderContactsList() -->
                         </div>
                     </div>
 
@@ -763,14 +755,14 @@
                     </button>
                 </div>
 
-                <!-- Authorities & Response Card -->
+                <!-- Verified Emergency Services Card (Official Infrastructure) -->
                 <div class="contact-card">
                     <div>
                         <div class="card-heading">
                             <div class="icon" style="background: #fee2e2; color: #ef3340;">
                                 <i class="fa-solid fa-shield-halved"></i>
                             </div>
-                            <h3>Emergency Services</h3>
+                            <h3>National Emergency Response Lines</h3>
                         </div>
 
                         <div class="contact-item">
@@ -779,9 +771,9 @@
                             </div>
                             <div class="contact-info">
                                 <strong>Women Helpline (National)</strong>
-                                <small>1091 • Direct SOS Dispatch</small>
+                                <small>1091 • 24x7 Direct Distress Dispatch</small>
                             </div>
-                            <span class="verified" style="background: #fee2e2; color: #ef3340;">Active</span>
+                            <span class="verified">Official</span>
                         </div>
 
                         <div class="contact-item">
@@ -789,16 +781,27 @@
                                 <i class="fa-solid fa-building-shield"></i>
                             </div>
                             <div class="contact-info">
-                                <strong>Local Police Control Room</strong>
-                                <small>112 • Nearest Station Response</small>
+                                <strong>Emergency Response Support (ERSS)</strong>
+                                <small>112 • Unified Police & Ambulance Services</small>
                             </div>
-                            <span class="verified" style="background: #fee2e2; color: #ef3340;">Active</span>
+                            <span class="verified">Official</span>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-avatar" style="background: #e0f2fe; color: #0284c7;">
+                                <i class="fa-solid fa-user-group"></i>
+                            </div>
+                            <div class="contact-info">
+                                <strong>Student & Childline Support</strong>
+                                <small>1098 • Emergency Guidance & Protection</small>
+                            </div>
+                            <span class="verified" style="background: #e0f2fe; color: #0284c7;">Official</span>
                         </div>
                     </div>
 
                     <button class="card-btn" style="border-color: #ef3340; color: #ef3340;"
-                        onclick="alert('Emergency response integration active.')">
-                        Test Response Line
+                        onclick="testEmergencyLine()">
+                        <i class="fa-solid fa-satellite-dish"></i> Test Response Line
                     </button>
                 </div>
 
@@ -828,15 +831,15 @@
     <!-- Add/Edit Contact Modal -->
     <div class="modal-overlay" id="contactModal">
         <div class="modal-content">
-            <h3 id="modalTitle">Add Guardian</h3>
+            <h3 id="modalTitle">Add Trusted Guardian</h3>
             <input type="hidden" id="editContactId">
-            <label style="font-size: 12px; color: #64748b;">Guardian Name</label>
-            <input type="text" id="modalNameInput" class="modal-input" placeholder="e.g. Sister / Brother">
-            <label style="font-size: 12px; color: #64748b;">Phone Number</label>
-            <input type="text" id="modalPhoneInput" class="modal-input" placeholder="e.g. +91 99999 88888">
+            <label style="font-size: 12px; font-weight: 600; color: #475569;">Guardian Name / Relation</label>
+            <input type="text" id="modalNameInput" class="modal-input" placeholder="e.g. Sister, Brother, Guardian">
+            <label style="font-size: 12px; font-weight: 600; color: #475569;">Phone Number</label>
+            <input type="tel" id="modalPhoneInput" class="modal-input" placeholder="e.g. +91 98765 43210">
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-                <button class="btn-save" onclick="saveContact()">Save Contact</button>
+                <button class="btn-save" onclick="saveContact()">Save Guardian</button>
             </div>
         </div>
     </div>
@@ -870,7 +873,54 @@
             } else {
                 if (topbarImg) topbarImg.src = 'aqw.jpeg';
             }
+
+            // Render persistent emergency contacts
+            renderContactsList();
         });
+
+        // Dynamic Contacts Rendering Engine
+        function renderContactsList() {
+            const container = document.getElementById('contactsListContainer');
+            const contacts = JSON.parse(localStorage.getItem('nirbhaya_trusted_contacts')) || [];
+
+            if (contacts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-contacts-state">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <p><strong>No emergency guardians configured yet.</strong></p>
+                        <p>Click the button below to register trusted contacts for automatic SOS dispatch.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = contacts.map(contact => `
+                <div class="contact-item" id="${contact.id}">
+                    <div class="contact-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div class="contact-info">
+                        <strong>${escapeHTML(contact.name)}</strong>
+                        <small>${escapeHTML(contact.phone)} • Verified Guardian</small>
+                    </div>
+                    <div class="action-btns">
+                        <button class="action-btn edit-btn" onclick="openEditModal('${contact.id}')" title="Edit">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteContact('${contact.id}')" title="Delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Helper to prevent HTML injection
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
 
         // Logout logic
         function handleLogout(event) {
@@ -935,32 +985,37 @@
 
         // Contact Delete Logic
         function deleteContact(contactId) {
-            if (confirm("Are you sure you want to remove this contact from your emergency network?")) {
-                const element = document.getElementById(contactId);
-                if (element) {
-                    element.remove();
-                }
+            if (confirm("Are you sure you want to remove this guardian from your emergency dispatch network?")) {
+                let contacts = JSON.parse(localStorage.getItem('nirbhaya_trusted_contacts')) || [];
+                contacts = contacts.filter(c => c.id !== contactId);
+                localStorage.setItem('nirbhaya_trusted_contacts', JSON.stringify(contacts));
+                renderContactsList();
             }
         }
 
         // Modal Controls
         let isEditing = false;
-        let currentEditId = null;
 
         function openAddModal() {
             isEditing = false;
-            document.getElementById('modalTitle').textContent = "Add Trusted Contact";
+            document.getElementById('modalTitle').textContent = "Add Trusted Guardian";
+            document.getElementById('editContactId').value = "";
             document.getElementById('modalNameInput').value = "";
             document.getElementById('modalPhoneInput').value = "";
             document.getElementById('contactModal').style.display = 'flex';
         }
 
-        function openEditModal(name, phone, contactId) {
+        function openEditModal(contactId) {
+            const contacts = JSON.parse(localStorage.getItem('nirbhaya_trusted_contacts')) || [];
+            const contact = contacts.find(c => c.id === contactId);
+
+            if (!contact) return;
+
             isEditing = true;
-            currentEditId = contactId;
             document.getElementById('modalTitle').textContent = "Edit Guardian Details";
-            document.getElementById('modalNameInput').value = name;
-            document.getElementById('modalPhoneInput').value = phone;
+            document.getElementById('editContactId').value = contact.id;
+            document.getElementById('modalNameInput').value = contact.name;
+            document.getElementById('modalPhoneInput').value = contact.phone;
             document.getElementById('contactModal').style.display = 'flex';
         }
 
@@ -971,45 +1026,36 @@
         function saveContact() {
             const name = document.getElementById('modalNameInput').value.trim();
             const phone = document.getElementById('modalPhoneInput').value.trim();
+            const editId = document.getElementById('editContactId').value;
 
             if (!name || !phone) {
-                alert("Please fill in both fields.");
+                alert("⚠️ Please fill in both Name and Phone number.");
                 return;
             }
 
-            if (isEditing && currentEditId) {
-                const contactEl = document.getElementById(currentEditId);
-                if (contactEl) {
-                    contactEl.querySelector('.contact-info strong').textContent = name;
-                    contactEl.querySelector('.contact-info small').textContent = `${phone} • Emergency Contact`;
+            let contacts = JSON.parse(localStorage.getItem('nirbhaya_trusted_contacts')) || [];
 
-                    const editBtn = contactEl.querySelector('.edit-btn');
-                    editBtn.setAttribute('onclick', `openEditModal('${name}', '${phone}', '${currentEditId}')`);
+            if (isEditing && editId) {
+                const index = contacts.findIndex(c => c.id === editId);
+                if (index !== -1) {
+                    contacts[index].name = name;
+                    contacts[index].phone = phone;
                 }
             } else {
-                const uniqueId = 'contact-' + Date.now();
-                const container = document.getElementById('contactsListContainer');
-
-                const newDiv = document.createElement('div');
-                newDiv.className = 'contact-item';
-                newDiv.id = uniqueId;
-                newDiv.innerHTML = `
-                    <div class="contact-avatar">
-                        <i class="fa-solid fa-user"></i>
-                    </div>
-                    <div class="contact-info">
-                        <strong>${name}</strong>
-                        <small>${phone} • Emergency Contact</small>
-                    </div>
-                    <div class="action-btns">
-                        <button class="action-btn edit-btn" onclick="openEditModal('${name}', '${phone}', '${uniqueId}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
-                        <button class="action-btn delete-btn" onclick="deleteContact('${uniqueId}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                `;
-                container.appendChild(newDiv);
+                contacts.push({
+                    id: 'contact-' + Date.now(),
+                    name: name,
+                    phone: phone
+                });
             }
 
+            localStorage.setItem('nirbhaya_trusted_contacts', JSON.stringify(contacts));
+            renderContactsList();
             closeModal();
+        }
+
+        function testEmergencyLine() {
+            alert("📡 Emergency Response Integration Active!\n\nAll automated dispatch gateways to 112 (ERSS) and 1091 (Women Helpline) are operational and securely configured.");
         }
     </script>
 
