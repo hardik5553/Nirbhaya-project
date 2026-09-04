@@ -571,12 +571,14 @@
                     return;
                 }
 
-                // Insert new user record into Supabase database table 'users'
+                // Insert new user record into Supabase database table 'users' with exact schema keys
                 const { error: insertError } = await _supabase
                     .from('users')
                     .insert([
                         { 
+                            fullName: name,
                             email: email, 
+                            phone: phone,
                             password: password 
                         }
                     ]);
