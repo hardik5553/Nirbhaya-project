@@ -662,31 +662,21 @@
 
     </div>
 
-    <!-- SOS COUNTDOWN OVERLAY SCREEN -->
-    <div id="sosCountdownOverlay">
-        <h2>🚨 SOS EMERGENCY ACTIVATED 🚨</h2>
-        <p>Dispatching coordinates and custom SMS to emergency contacts in:</p>
-        <div id="sosTimerDisplay">15</div>
-        <p style="font-size: 14px; max-width: 400px; opacity: 0.9; margin-bottom: 30px;">Voice command or manual trigger
-            detected. Click cancel or say <strong>"SAFE"</strong> if this is a false alarm.</p>
-        <button onclick="cancelSOS()"
-            style="background: white; color: #e11d48; border: none; padding: 16px 45px; border-radius: 40px; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.3); transition: 0.2s;">
-            ❌ CANCEL SOS
-        </button>
-    </div>
+    <!-- Global Multi-Channel SOS Engine -->
+    <script src="global-sos.js"></script>
 
     <!-- Script Section -->
     <script>
 
         // Session Security Guard
-window.addEventListener('DOMContentLoaded', () => {
-    const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
-    
-    if (!activeUser) {
-        alert("⚠️ Unauthorized Access: Please log in first.");
-        window.location.href = "login.html"; // Agar file 'pages' folder ke andar hai toh "../login.html" karein
-    }
-});
+        window.addEventListener('DOMContentLoaded', () => {
+            const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
+            
+            if (!activeUser) {
+                alert("⚠️ Unauthorized Access: Please log in first.");
+                window.location.href = "login.html";
+            }
+        });
 
         // Sync Profile Data & Active Logged-in User Details from localStorage
         window.addEventListener('DOMContentLoaded', () => {
@@ -798,46 +788,6 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 2. Strict 15-Sec SOS Countdown & Cancel Engine
-        let sosInterval = null;
-        let countdownValue = 15;
-        let isSOSActive = false;
-
-        function triggerSOSCountdown() {
-            if (isSOSActive) return; // Prevent double trigger
-
-            isSOSActive = true;
-            countdownValue = 15;
-            document.getElementById('sosTimerDisplay').textContent = countdownValue;
-            document.getElementById('sosCountdownOverlay').style.display = 'flex';
-
-            if (sosInterval) clearInterval(sosInterval);
-
-            sosInterval = setInterval(() => {
-                countdownValue--;
-                document.getElementById('sosTimerDisplay').textContent = countdownValue;
-
-                if (countdownValue <= 0) {
-                    clearInterval(sosInterval);
-                    isSOSActive = false;
-                    document.getElementById('sosCountdownOverlay').style.display = 'none';
-
-                    const customMsg = localStorage.getItem('nirbhaya_sos_sms') || "Emergency SOS Triggered!";
-                    alert(`🚨 SOS DISPATCHED SUCCESSFULLY!\n\nCustom SMS Sent to Trusted Contacts:\n"${customMsg}"\n\nLocal authorities & emergency services alerted with live GPS coordinates.`);
-                }
-            }, 1000);
-        }
-
-        function cancelSOS() {
-            if (sosInterval) {
-                clearInterval(sosInterval);
-                sosInterval = null;
-            }
-            isSOSActive = false;
-            document.getElementById('sosCountdownOverlay').style.display = 'none';
-            alert("🛡️ SOS Alert successfully deactivated!");
-        }
-
         // 3. Microphone Permission Prompt & Continuous Hands-Free Voice Listener
         function requestMicrophoneAndInitVoiceSOS() {
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -874,13 +824,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
                 // Check for distress keywords
                 if (transcript.includes("help") || transcript.includes("bachao") || transcript.includes("emergency")) {
-                    if (!isSOSActive) {
+                    if (typeof triggerSOSCountdown === 'function') {
                         triggerSOSCountdown();
                     }
                 } 
                 // Check for safety keyword during countdown
                 else if (transcript.includes("safe") || transcript.includes("cancel")) {
-                    if (isSOSActive) {
+                    if (typeof cancelSOS === 'function') {
                         cancelSOS();
                     }
                 }

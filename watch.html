@@ -16,6 +16,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
+    <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -512,7 +513,6 @@
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
-        <!-- Shield Icon linked to Security Center -->
         <div class="brand">
             <a href="security.html" title="Go to Security Center">
                 <i class="fa-solid fa-shield-halved" style="color: #ef476f; font-size: 26px;"></i>
@@ -525,7 +525,6 @@
                 <span>Dashboard</span>
             </a>
 
-            <!-- Location link correctly connected to pages/track-location.html -->
             <a href="pages/track-location.html">
                 <i class="fa-solid fa-location-dot"></i>
                 <span>Location</span>
@@ -574,7 +573,6 @@
         <!-- TOPBAR -->
         <header class="topbar">
             <div class="logo-area">
-                <!-- Custom Logo Image -->
                 <img src="assets/images/nir2.jpeg" alt="NIRBHAYA Logo" class="app-logo"
                     onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100'">
                 <div>
@@ -589,7 +587,6 @@
                     <span class="badge">3</span>
                 </div>
 
-                <!-- User Profile with Interactive Dropdown Menu -->
                 <div class="user-dropdown-container" id="userDropdownToggle">
                     <div class="user">
                         <img id="topbarUserImg" src="aqw.jpeg" alt="Profile"
@@ -642,7 +639,6 @@
 
                     <h3 style="font-size: 14px; margin-top: 20px; margin-bottom: 10px; color: #475569;">Available Watch Models (Click to Connect/Disconnect):</h3>
 
-                    <!-- 6 Dummy Smart Watch Models Grid -->
                     <div class="models-grid">
                         <div class="model-item" id="model-0" onclick="selectWatch(0, 'AI Guardian Pro', 'AIG-WS-4587')">
                             <i class="fa-solid fa-watch-smart"></i>
@@ -724,31 +720,21 @@
 
     </main>
 
-    <!-- SOS COUNTDOWN OVERLAY SCREEN -->
-    <div id="sosCountdownOverlay">
-        <h2>🚨 SOS EMERGENCY ACTIVATED 🚨</h2>
-        <p>Dispatching coordinates and custom SMS to emergency contacts in:</p>
-        <div id="sosTimerDisplay">15</div>
-        <p style="font-size: 14px; max-width: 400px; opacity: 0.9; margin-bottom: 30px;">If this was a false alarm,
-            click the cancel button immediately below before the countdown hits zero.</p>
-        <button onclick="cancelSOS()"
-            style="background: white; color: #e11d48; border: none; padding: 16px 45px; border-radius: 40px; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.3); transition: 0.2s;">
-            ❌ CANCEL SOS
-        </button>
-    </div>
+    <!-- SOS Countdown Overlay is handled dynamically by global-sos.js -->
 
-    <!-- Script for Dynamic Watch Selection & Connection Toggle -->
+    <!-- Global Multi-Channel SOS Engine -->
+    <script src="global-sos.js"></script>
+
     <script>
-
         // Session Security Guard
-window.addEventListener('DOMContentLoaded', () => {
-    const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
-    
-    if (!activeUser) {
-        alert("⚠️ Unauthorized Access: Please log in first.");
-        window.location.href = "login.html"; // Agar file 'pages' folder ke andar hai toh "../login.html" karein
-    }
-});
+        window.addEventListener('DOMContentLoaded', () => {
+            const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
+            
+            if (!activeUser) {
+                alert("⚠️ Unauthorized Access: Please log in first.");
+                window.location.href = "login.html";
+            }
+        });
 
         // Sync Profile Data & Active Logged-in User Details from localStorage
         window.addEventListener('DOMContentLoaded', () => {
@@ -783,11 +769,7 @@ window.addEventListener('DOMContentLoaded', () => {
         // Logout logic
         function handleLogout(event) {
             if (event) event.preventDefault();
-            localStorage.removeItem('nirbhaya_current_user_email');
-            localStorage.removeItem('nirbhaya_username');
-            localStorage.removeItem('nirbhaya_user_email');
-            localStorage.removeItem('nirbhaya_userdp');
-            localStorage.removeItem('nirbhaya_userphone');
+            localStorage.clear();
             window.location.href = "login.html";
         }
 
@@ -806,39 +788,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     dropdownMenu.classList.remove('show');
                 }
             });
-        }
-
-        /* =========================
-           STRICT 15-SEC SOS COUNTDOWN & CANCEL ENGINE
-        ========================= */
-        let sosInterval = null;
-        let countdownValue = 15;
-
-        function triggerSOSCountdown() {
-            countdownValue = 15;
-            document.getElementById('sosTimerDisplay').textContent = countdownValue;
-            document.getElementById('sosCountdownOverlay').style.display = 'flex';
-
-            sosInterval = setInterval(() => {
-                countdownValue--;
-                document.getElementById('sosTimerDisplay').textContent = countdownValue;
-
-                if (countdownValue <= 0) {
-                    clearInterval(sosInterval);
-                    document.getElementById('sosCountdownOverlay').style.display = 'none';
-
-                    const customMsg = localStorage.getItem('nirbhaya_sos_sms') || "Emergency SOS Triggered!";
-                    alert(`🚨 SOS DISPATCHED SUCCESSFULLY!\n\nCustom SMS Sent to Trusted Contacts:\n"${customMsg}"\n\nLocal authorities & emergency services alerted with live GPS coordinates.`);
-                }
-            }, 1000);
-        }
-
-        function cancelSOS() {
-            if (sosInterval) {
-                clearInterval(sosInterval);
-            }
-            document.getElementById('sosCountdownOverlay').style.display = 'none';
-            alert("🛡️ SOS Alert successfully cancelled.");
         }
 
         // Watch Pairing & Disconnection Logic

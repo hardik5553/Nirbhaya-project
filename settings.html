@@ -376,7 +376,6 @@
             width: 18px;
         }
 
-        /* Password Input Wrapper with Eye Button */
         .password-input-wrapper {
             position: relative;
             width: 55%;
@@ -411,7 +410,6 @@
             color: #0f172a;
         }
 
-        /* General Form Inputs */
         .setting-input {
             width: 55%;
             padding: 8px 10px;
@@ -431,7 +429,6 @@
             cursor: not-allowed;
         }
 
-        /* DP Upload Styling */
         .dp-preview-container {
             display: flex;
             align-items: center;
@@ -446,7 +443,6 @@
             border: 2px solid #cbd5e1;
         }
 
-        /* Toggle Switch */
         .toggle {
             width: 38px;
             height: 20px;
@@ -510,9 +506,6 @@
             letter-spacing: 2px;
         }
 
-        /* =========================
-           FOOTER
-        ========================= */
         footer {
             text-align: center;
             padding: 25px;
@@ -821,18 +814,8 @@
 
     </main>
 
-    <!-- SOS COUNTDOWN OVERLAY SCREEN -->
-    <div id="sosCountdownOverlay">
-        <h2>🚨 SOS EMERGENCY ACTIVATED 🚨</h2>
-        <p>Dispatching coordinates and custom SMS to emergency contacts in:</p>
-        <div id="sosTimerDisplay">15</div>
-        <p style="font-size: 14px; max-width: 400px; opacity: 0.9; margin-bottom: 30px;">If this was a false alarm,
-            click the cancel button immediately below before the countdown hits zero.</p>
-        <button onclick="cancelSOS()"
-            style="background: white; color: #e11d48; border: none; padding: 16px 45px; border-radius: 40px; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.3); transition: 0.2s;">
-            ❌ CANCEL SOS
-        </button>
-    </div>
+    <!-- Global Multi-Channel SOS Engine -->
+    <script src="global-sos.js"></script>
 
     <!-- Scripting for Profile, Toggle, Database Password Sync & Eye Show/Hide Feature -->
     <script>
@@ -928,39 +911,6 @@
             }
         }
 
-        /* =========================
-           STRICT 15-SEC SOS COUNTDOWN & CANCEL ENGINE
-        ========================= */
-        let sosInterval = null;
-        let countdownValue = 15;
-
-        function triggerSOSCountdown() {
-            countdownValue = 15;
-            document.getElementById('sosTimerDisplay').textContent = countdownValue;
-            document.getElementById('sosCountdownOverlay').style.display = 'flex';
-
-            sosInterval = setInterval(() => {
-                countdownValue--;
-                document.getElementById('sosTimerDisplay').textContent = countdownValue;
-
-                if (countdownValue <= 0) {
-                    clearInterval(sosInterval);
-                    document.getElementById('sosCountdownOverlay').style.display = 'none';
-
-                    const customMsg = localStorage.getItem('nirbhaya_sos_sms') || "Emergency SOS Triggered!";
-                    alert(`🚨 SOS DISPATCHED SUCCESSFULLY!\n\nCustom SMS Sent to Trusted Contacts:\n"${customMsg}"\n\nLocal authorities & emergency services alerted with live GPS coordinates.`);
-                }
-            }, 1000);
-        }
-
-        function cancelSOS() {
-            if (sosInterval) {
-                clearInterval(sosInterval);
-            }
-            document.getElementById('sosCountdownOverlay').style.display = 'none';
-            alert("🛡️ SOS Alert successfully cancelled.");
-        }
-
         // Toggle Switch Styling Interaction
         function toggleSwitch(element) {
             if (element.style.background === "rgb(203, 213, 225)") {
@@ -984,30 +934,69 @@
             }
         }
 
-        // Save Profile Details & Sync across pages via localStorage
-        function saveProfileDetails() {
+        // Save Profile Details & Sync to Supabase Database
+        async function saveProfileDetails() {
             const name = document.getElementById('userNameInput').value.trim();
             const phone = document.getElementById('userPhoneInput').value.trim();
             const address = document.getElementById('userAddressInput').value.trim();
+            const activeEmail = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
 
-            if (!name || !phone || !address) {
-                alert("⚠️ Please fill out all profile fields before saving.");
+            if (!name || !phone) {
+                alert("⚠️ Please fill out your Full Name and Phone Number.");
                 return;
             }
 
-            localStorage.setItem('nirbhaya_username', name);
-            localStorage.setItem('nirbhaya_userphone', phone);
-            if (tempDpBase64) {
+            if (!activeEmail) {
+                alert("⚠️ Session expired. Please log in again.");
+                window.location.href = "login.html";
+                return;
+            }
+
+            const supabaseUrl = 'https://qrufisohvrceqappvhye.supabase.co';
+            const supabaseKey = 'sb_publishable_ROZgpJvsMd2Qg-Bm5PVCwg_MiV1aBQG';
+            const supabaseClient = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+
+            if (!supabaseClient) {
+                alert("❌ Database client connection error.");
+                return;
+            }
+
+            let updatePayload = {
+                fullName: name,
+                phone: phone
+            };
+
+            if (tempDpBase64 && tempDpBase64.trim() !== "") {
+                updatePayload.user_dp = tempDpBase64;
                 localStorage.setItem('nirbhaya_userdp', tempDpBase64);
             }
 
-            document.getElementById('topbarUserName').textContent = `Hi, ${name}`;
-            document.getElementById('dropdownUserName').textContent = name;
-            if (tempDpBase64) {
-                document.getElementById('topbarUserImg').src = tempDpBase64;
-            }
+            try {
+                const { error } = await supabaseClient
+                    .from('users')
+                    .update(updatePayload)
+                    .eq('email', activeEmail);
 
-            alert(`✅ Profile Updated Successfully!\n\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\n\nChanges are now reflected across all pages.`);
+                if (error) {
+                    throw error;
+                }
+
+                localStorage.setItem('nirbhaya_username', name);
+                localStorage.setItem('nirbhaya_userphone', phone);
+
+                document.getElementById('topbarUserName').textContent = `Hi, ${name}`;
+                document.getElementById('dropdownUserName').textContent = name;
+                
+                if (tempDpBase64 && document.getElementById('topbarUserImg')) {
+                    document.getElementById('topbarUserImg').src = tempDpBase64;
+                }
+
+                alert(`✅ Profile Details & DP successfully saved to Database!\n\nName: ${name}\nPhone: ${phone}`);
+
+            } catch (err) {
+                console.error("Database Profile Update Error:", err.message);
+                alert("❌ Failed to save profile to database: " + err.message);
+            }
         }
 
         // Supabase Database Connected Password Update Logic
@@ -1043,21 +1032,17 @@
                 return;
             }
 
-            // Correct Supabase URL and Key Integration
             const supabaseUrl = 'https://qrufisohvrceqappvhye.supabase.co';
             const supabaseKey = 'sb_publishable_ROZgpJvsMd2Qg-Bm5PVCwg_MiV1aBQG';
             const supabaseClient = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
 
-            if (!supabaseClient && typeof _supabase === 'undefined') {
-                alert("❌ Database connection error. Supabase client not found.");
+            if (!supabaseClient) {
+                alert("❌ Database connection error.");
                 return;
             }
 
-            const activeSupabase = window._supabase || supabaseClient;
-
             try {
-                // 1. Verify old password from 'users' table
-                const { data: userRecords, error: fetchError } = await activeSupabase
+                const { data: userRecords, error: fetchError } = await supabaseClient
                     .from('users')
                     .select('*')
                     .eq('email', activeEmail);
@@ -1073,8 +1058,7 @@
                     return;
                 }
 
-                // 2. Update new password in 'users' table directly
-                const { error: updateError } = await activeSupabase
+                const { error: updateError } = await supabaseClient
                     .from('users')
                     .update({ password: newPwd })
                     .eq('email', activeEmail);
@@ -1085,12 +1069,10 @@
 
                 alert("🔒 Success: Password updated successfully in database! Please log in with your new password.");
 
-                // Clear fields
                 document.getElementById('oldPwd').value = "";
                 document.getElementById('newPwd').value = "";
                 document.getElementById('confirmPwd').value = "";
 
-                // Clear session and redirect to login page
                 localStorage.clear();
                 window.location.href = "login.html";
 
@@ -1100,7 +1082,6 @@
             }
         }
 
-        // Save General Safety Preferences Logic
         function saveGeneralPreferences() {
             alert("⚙️ General Safety Preferences Saved Successfully!");
         }

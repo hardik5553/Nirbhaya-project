@@ -324,7 +324,6 @@
             color: #1e293b;
         }
 
-        /* Destination Search Bar Styling */
         .destination-search-box {
             display: flex;
             gap: 10px;
@@ -409,31 +408,6 @@
             width: 100%;
             height: 100%;
             border: none;
-        }
-
-        /* SOS Countdown Overlay Styling */
-        #sosCountdownOverlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: rgba(225, 29, 72, 0.95);
-            z-index: 99999;
-            color: white;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-        }
-
-        #sosTimerDisplay {
-            font-size: 6rem;
-            font-weight: 800;
-            margin: 20px 0;
-            letter-spacing: 2px;
         }
 
         /* =========================
@@ -591,7 +565,6 @@
             <div class="map-section" id="mapSection">
                 <h2>Live GPS Coordinates & Navigation</h2>
 
-                <!-- Destination Search Bar -->
                 <div class="destination-search-box">
                     <input type="text" id="destinationInput"
                         placeholder="🔍 Search destination (e.g., Central Station, Delhi, Mumbai)...">
@@ -618,30 +591,21 @@
 
     </main>
 
-    <div id="sosCountdownOverlay">
-        <h2>🚨 SOS EMERGENCY ACTIVATED 🚨</h2>
-        <p>Dispatching coordinates and custom SMS to emergency contacts in:</p>
-        <div id="sosTimerDisplay">15</div>
-        <p style="font-size: 14px; max-width: 400px; opacity: 0.9; margin-bottom: 30px;">If this was a false alarm,
-            click the cancel button immediately below before the countdown hits zero.</p>
-        <button onclick="cancelSOS()"
-            style="background: white; color: #e11d48; border: none; padding: 16px 45px; border-radius: 40px; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.3); transition: 0.2s;">
-            ❌ CANCEL SOS
-        </button>
-    </div>
+    <!-- Global Multi-Channel SOS Engine Script -->
+    <script src="../global-sos.js"></script>
 
     <!-- GEOLOCATION & EXACT PIN MAPPING SCRIPT -->
     <script>
-
         // Session Security Guard
-window.addEventListener('DOMContentLoaded', () => {
-    const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
-    
-    if (!activeUser) {
-        alert("⚠️ Unauthorized Access: Please log in first.");
-        window.location.href = "../login.html"; // Agar file 'pages' folder ke andar hai toh "../login.html" karein
-    }
-});
+        window.addEventListener('DOMContentLoaded', () => {
+            const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
+            
+            if (!activeUser) {
+                alert("⚠️ Unauthorized Access: Please log in first.");
+                window.location.href = "../login.html";
+            }
+        });
+
         let watchId = null;
 
         window.addEventListener("DOMContentLoaded", () => {
@@ -668,11 +632,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (topbarImg) topbarImg.src = '../aqw.jpeg';
             }
 
-            // Immediately request and track accurate live location
             startStrictLiveLocation();
         });
 
-        // Strict Live Location Detection Engine
         function startStrictLiveLocation() {
             const latSpan = document.getElementById("latitude");
             const lonSpan = document.getElementById("longitude");
@@ -688,7 +650,6 @@ window.addEventListener('DOMContentLoaded', () => {
             statusSpan.textContent = "Requesting live GPS permissions...";
             statusSpan.style.color = "#f59e0b";
 
-            // Success Callback
             const handleSuccess = (position) => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
@@ -704,15 +665,13 @@ window.addEventListener('DOMContentLoaded', () => {
                 mapIframe.src = `https://maps.google.com/maps?q=${lat},${lon}&hl=en&z=17&output=embed`;
             };
 
-            // Error Callback with Adaptive Fallback (GPS satellite -> Network cell/Wi-Fi)
             const handleError = (error) => {
-                console.warn("High accuracy geolocation timed out or failed, falling back to standard network triangulation:", error.message);
+                console.warn("High accuracy geolocation timed out or failed:", error.message);
                 
-                // Retry with standard accuracy (avoids browser timeout on laptops/Wi-Fi)
                 navigator.geolocation.getCurrentPosition(
                     handleSuccess,
                     (finalErr) => {
-                        let errorMsg = "❌ Location permission denied. Please allow location access in your browser address bar.";
+                        let errorMsg = "❌ Location permission denied. Please allow location access.";
                         if (finalErr.code === finalErr.POSITION_UNAVAILABLE) {
                             errorMsg = "❌ GPS signal unavailable. Please ensure device location is turned ON.";
                         } else if (finalErr.code === finalErr.TIMEOUT) {
@@ -727,14 +686,12 @@ window.addEventListener('DOMContentLoaded', () => {
                 );
             };
 
-            // 1. Initial Quick Fetch (High Accuracy)
             navigator.geolocation.getCurrentPosition(handleSuccess, handleError, {
                 enableHighAccuracy: true,
                 timeout: 10000,
                 maximumAge: 0
             });
 
-            // 2. Continuous Watch Position for real movement tracking
             if (watchId !== null) navigator.geolocation.clearWatch(watchId);
             watchId = navigator.geolocation.watchPosition(handleSuccess, (e) => console.log("Watch tracking update:", e.message), {
                 enableHighAccuracy: true,
@@ -743,7 +700,6 @@ window.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Destination Search & Google Maps Routing Feature
         function searchDestinationRoute() {
             const destinationQuery = document.getElementById('destinationInput').value.trim();
             const routeStatus = document.getElementById('routeStatusText');
@@ -762,18 +718,12 @@ window.addEventListener('DOMContentLoaded', () => {
             mapIframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(destinationQuery)}&hl=en&z=14&output=embed`;
         }
 
-        // Logout logic
         function handleLogout(event) {
             if (event) event.preventDefault();
-            localStorage.removeItem('nirbhaya_current_user_email');
-            localStorage.removeItem('nirbhaya_username');
-            localStorage.removeItem('nirbhaya_user_email');
-            localStorage.removeItem('nirbhaya_userdp');
-            localStorage.removeItem('nirbhaya_userphone');
+            localStorage.clear();
             window.location.href = "../login.html";
         }
 
-        // User Profile Dropdown Toggle Script
         const dropdownToggle = document.getElementById('userDropdownToggle');
         const dropdownMenu = document.getElementById('userDropdownMenu');
 
@@ -788,39 +738,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     dropdownMenu.classList.remove('show');
                 }
             });
-        }
-
-        /* =========================
-           STRICT 15-SEC SOS COUNTDOWN & CANCEL ENGINE
-        ========================= */
-        let sosInterval = null;
-        let countdownValue = 15;
-
-        function triggerSOSCountdown() {
-            countdownValue = 15;
-            document.getElementById('sosTimerDisplay').textContent = countdownValue;
-            document.getElementById('sosCountdownOverlay').style.display = 'flex';
-
-            sosInterval = setInterval(() => {
-                countdownValue--;
-                document.getElementById('sosTimerDisplay').textContent = countdownValue;
-
-                if (countdownValue <= 0) {
-                    clearInterval(sosInterval);
-                    document.getElementById('sosCountdownOverlay').style.display = 'none';
-
-                    const customMsg = localStorage.getItem('nirbhaya_sos_sms') || "Emergency SOS Triggered!";
-                    alert(`🚨 SOS DISPATCHED SUCCESSFULLY!\n\nCustom SMS Sent to Trusted Contacts:\n"${customMsg}"\n\nLocal authorities & emergency services alerted with live GPS coordinates.`);
-                }
-            }, 1000);
-        }
-
-        function cancelSOS() {
-            if (sosInterval) {
-                clearInterval(sosInterval);
-            }
-            document.getElementById('sosCountdownOverlay').style.display = 'none';
-            alert("🛡️ SOS Alert successfully cancelled.");
         }
     </script>
 

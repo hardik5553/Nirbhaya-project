@@ -414,14 +414,6 @@
             transition: 0.2s;
         }
 
-        .edit-btn {
-            color: #2563eb;
-        }
-
-        .edit-btn:hover {
-            background: #eff6ff;
-        }
-
         .delete-btn {
             color: #ef3340;
         }
@@ -612,7 +604,6 @@
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
-        <!-- Shield Icon linked to security.html -->
         <div class="brand">
             <a href="security.html" title="Go to Security Center">
                 <i class="fa-solid fa-shield-halved" style="color: #ef476f; font-size: 26px;"></i>
@@ -624,44 +615,30 @@
                 <i class="fa-solid fa-border-all"></i>
                 <span>Dashboard</span>
             </a>
-
-            <!-- Location page link -->
             <a href="pages/track-location.html">
                 <i class="fa-solid fa-location-dot"></i>
                 <span>Location</span>
             </a>
-
-            <!-- Alerts page link -->
             <a href="alerts.html">
                 <i class="fa-solid fa-bell"></i>
                 <span>Alerts</span>
             </a>
-
-            <!-- Watch page link -->
             <a href="watch.html">
                 <i class="fa-solid fa-clock"></i>
                 <span>Watch</span>
             </a>
-
-            <!-- Security page link -->
             <a href="security.html">
                 <i class="fa-solid fa-shield-halved"></i>
                 <span>Security</span>
             </a>
-
-            <!-- Contacts page active link -->
             <a href="contacts.html" class="active">
                 <i class="fa-solid fa-users"></i>
                 <span>Contacts</span>
             </a>
-
-            <!-- History page link -->
             <a href="history.html">
                 <i class="fa-solid fa-clock-rotate-left"></i>
                 <span>History</span>
             </a>
-
-            <!-- Settings page link -->
             <a href="settings.html">
                 <i class="fa-solid fa-gear"></i>
                 <span>Settings</span>
@@ -680,7 +657,6 @@
         <!-- TOPBAR -->
         <header class="topbar">
             <div class="logo-area">
-                <!-- Custom Logo Image -->
                 <img src="assets/images/nir2.jpeg" alt="NIRBHAYA Logo" class="app-logo"
                     onerror="this.src='nir2.jpeg'">
                 <div>
@@ -695,7 +671,6 @@
                     <span class="badge">3</span>
                 </div>
 
-                <!-- User Profile with Interactive Dropdown Menu -->
                 <div class="user-dropdown-container" id="userDropdownToggle">
                     <div class="user">
                         <img id="topbarUserImg" src="aqw.jpeg" alt="Profile"
@@ -734,7 +709,7 @@
 
             <div class="contacts-grid">
 
-                <!-- Primary Guardians Card (Fully Dynamic) -->
+                <!-- Primary Guardians Card (Supabase Connected) -->
                 <div class="contact-card">
                     <div>
                         <div class="card-heading">
@@ -744,9 +719,8 @@
                             <h3>Primary Guardians</h3>
                         </div>
 
-                        <!-- Dynamic Container -->
                         <div id="contactsListContainer">
-                            <!-- Populated via renderContactsList() -->
+                            <!-- Populated via Supabase -->
                         </div>
                     </div>
 
@@ -755,7 +729,7 @@
                     </button>
                 </div>
 
-                <!-- Verified Emergency Services Card (Official Infrastructure) -->
+                <!-- Verified Emergency Services Card -->
                 <div class="contact-card">
                     <div>
                         <div class="card-heading">
@@ -823,18 +797,17 @@
         <p style="font-size: 14px; max-width: 400px; opacity: 0.9; margin-bottom: 30px;">If this was a false alarm,
             click the cancel button immediately below before the countdown hits zero.</p>
         <button onclick="cancelSOS()"
-            style="background: white; color: #e11d48; border: none; padding: 16px 45px; border-radius: 40px; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.3); transition: 0.2s;">
+            style="background: white; color: #e11d48; border: none; padding: 16px 45px; border-radius: 40px; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
             ❌ CANCEL SOS
         </button>
     </div>
 
-    <!-- Add/Edit Contact Modal -->
+    <!-- Add Contact Modal -->
     <div class="modal-overlay" id="contactModal">
         <div class="modal-content">
             <h3 id="modalTitle">Add Trusted Guardian</h3>
-            <input type="hidden" id="editContactId">
             <label style="font-size: 12px; font-weight: 600; color: #475569;">Guardian Name / Relation</label>
-            <input type="text" id="modalNameInput" class="modal-input" placeholder="e.g. Sister, Brother, Guardian">
+            <input type="text" id="modalNameInput" class="modal-input" placeholder="e.g. Mom, Dad, Sister">
             <label style="font-size: 12px; font-weight: 600; color: #475569;">Phone Number</label>
             <input type="tel" id="modalPhoneInput" class="modal-input" placeholder="e.g. +91 98765 43210">
             <div class="modal-actions">
@@ -844,20 +817,25 @@
         </div>
     </div>
 
+    <!-- Scripting with Correct Supabase Credentials & Database Dispatch -->
     <script>
+        // Supabase Client Initialization with Real Project URL & Anon Key
+        const supabaseUrl = 'https://qrufisohvrceqappvhye.supabase.co';
+        const supabaseKey = 'sb_publishable_ROZgpJvsMd2Qg-Bm5PVCwg_MiV1aBQG';
+        const _supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         // Session Security Guard
-window.addEventListener('DOMContentLoaded', () => {
-    const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
-    
-    if (!activeUser) {
-        alert("⚠️ Unauthorized Access: Please log in first.");
-        window.location.href = "login.html"; // Agar file 'pages' folder ke andar hai toh "../login.html" karein
-    }
-});
-
-        // Sync Profile Data & Active Logged-in User Details from localStorage
         window.addEventListener('DOMContentLoaded', () => {
+            const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
+            
+            if (!activeUser) {
+                alert("⚠️ Unauthorized Access: Please log in first.");
+                window.location.href = "login.html";
+            }
+        });
+
+        // Load User Profile Data & Fetch Contacts from Supabase on Load
+        window.addEventListener('DOMContentLoaded', async () => {
             const savedName = localStorage.getItem('nirbhaya_username');
             const savedDp = localStorage.getItem('nirbhaya_userdp');
             const savedEmail = localStorage.getItem('nirbhaya_user_email') || localStorage.getItem('nirbhaya_current_user_email');
@@ -885,9 +863,35 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (topbarImg) topbarImg.src = 'aqw.jpeg';
             }
 
-            // Render persistent emergency contacts
-            renderContactsList();
+            // Fetch contacts from Supabase database
+            await fetchContactsFromSupabase();
         });
+
+        // Fetch Contacts from Supabase Database Table
+        async function fetchContactsFromSupabase() {
+            const userEmail = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
+            if (!userEmail) return;
+
+            const { data, error } = await _supabase
+                .from('contacts')
+                .select('*')
+                .eq('user_email', userEmail);
+
+            if (error) {
+                console.error("Error fetching contacts:", error.message);
+                return;
+            }
+
+            const formattedContacts = data.map(c => ({
+                id: c.id.toString(),
+                name: c.contact_name,
+                phone: c.phone,
+                relation: c.relation || 'Guardian'
+            }));
+
+            localStorage.setItem('nirbhaya_trusted_contacts', JSON.stringify(formattedContacts));
+            renderContactsList();
+        }
 
         // Dynamic Contacts Rendering Engine
         function renderContactsList() {
@@ -915,9 +919,6 @@ window.addEventListener('DOMContentLoaded', () => {
                         <small>${escapeHTML(contact.phone)} • Verified Guardian</small>
                     </div>
                     <div class="action-btns">
-                        <button class="action-btn edit-btn" onclick="openEditModal('${contact.id}')" title="Edit">
-                            <i class="fa-solid fa-pen"></i>
-                        </button>
                         <button class="action-btn delete-btn" onclick="deleteContact('${contact.id}')" title="Delete">
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -936,11 +937,7 @@ window.addEventListener('DOMContentLoaded', () => {
         // Logout logic
         function handleLogout(event) {
             if (event) event.preventDefault();
-            localStorage.removeItem('nirbhaya_current_user_email');
-            localStorage.removeItem('nirbhaya_username');
-            localStorage.removeItem('nirbhaya_user_email');
-            localStorage.removeItem('nirbhaya_userdp');
-            localStorage.removeItem('nirbhaya_userphone');
+            localStorage.clear();
             window.location.href = "login.html";
         }
 
@@ -962,7 +959,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         /* =========================
-           STRICT 15-SEC SOS COUNTDOWN & CANCEL ENGINE
+           STRICT 15-SEC SOS COUNTDOWN & DATABASE CONTACT DISPATCH
         ========================= */
         let sosInterval = null;
         let countdownValue = 15;
@@ -972,7 +969,7 @@ window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('sosTimerDisplay').textContent = countdownValue;
             document.getElementById('sosCountdownOverlay').style.display = 'flex';
 
-            sosInterval = setInterval(() => {
+            sosInterval = setInterval(async () => {
                 countdownValue--;
                 document.getElementById('sosTimerDisplay').textContent = countdownValue;
 
@@ -980,8 +977,8 @@ window.addEventListener('DOMContentLoaded', () => {
                     clearInterval(sosInterval);
                     document.getElementById('sosCountdownOverlay').style.display = 'none';
 
-                    const customMsg = localStorage.getItem('nirbhaya_sos_sms') || "Emergency SOS Triggered!";
-                    alert(`🚨 SOS DISPATCHED SUCCESSFULLY!\n\nCustom SMS Sent to Trusted Contacts:\n"${customMsg}"\n\nLocal authorities & emergency services alerted with live GPS coordinates.`);
+                    // Dispatch SOS with Supabase Database Contacts
+                    await dispatchSOSToDatabaseContacts();
                 }
             }, 1000);
         }
@@ -994,39 +991,72 @@ window.addEventListener('DOMContentLoaded', () => {
             alert("🛡️ SOS Alert successfully cancelled.");
         }
 
-        // Contact Delete Logic
-        function deleteContact(contactId) {
+        // Actual SOS Dispatch to Database Contacts via WhatsApp/SMS Scheme
+        async function dispatchSOSToDatabaseContacts() {
+            const userEmail = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
+            const customMsg = localStorage.getItem('nirbhaya_sos_sms') || "🚨 EMERGENCY! I need immediate help. Track my live location via NIRBHAYA.";
+
+            if (!userEmail) {
+                alert("Session expired. Please log in.");
+                return;
+            }
+
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const mapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
+                    const fullMessage = `${customMsg} My GPS Location: ${mapsLink}`;
+
+                    // Fetch contacts fresh from Supabase database
+                    const { data: contacts, error } = await _supabase
+                        .from('contacts')
+                        .select('*')
+                        .eq('user_email', userEmail);
+
+                    if (error || !contacts || contacts.length === 0) {
+                        alert("⚠️ SOS Triggered! No emergency contacts found in Supabase database.");
+                        return;
+                    }
+
+                    // Pick primary contact and open WhatsApp message link
+                    let primaryContact = contacts[0];
+                    let cleanPhone = primaryContact.phone.replace(/[^0-9]/g, '');
+                    const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(fullMessage)}`;
+
+                    alert(`🚨 SOS DISPATCHED TO DATABASE CONTACT!\n\nAlerting Primary Guardian: ${primaryContact.contact_name} (${primaryContact.phone})\n\nClick OK to open messaging gateway.`);
+                    window.open(whatsappUrl, '_blank');
+
+                }, (error) => {
+                    alert("❌ GPS Location access denied. Unable to send coordinates.");
+                }, { enableHighAccuracy: true });
+            } else {
+                alert("❌ Geolocation not supported on this browser.");
+            }
+        }
+
+        // Contact Delete Logic with Supabase Sync
+        async function deleteContact(contactId) {
             if (confirm("Are you sure you want to remove this guardian from your emergency dispatch network?")) {
-                let contacts = JSON.parse(localStorage.getItem('nirbhaya_trusted_contacts')) || [];
-                contacts = contacts.filter(c => c.id !== contactId);
-                localStorage.setItem('nirbhaya_trusted_contacts', JSON.stringify(contacts));
-                renderContactsList();
+                const { error } = await _supabase
+                    .from('contacts')
+                    .delete()
+                    .eq('id', contactId);
+
+                if (error) {
+                    alert("❌ Failed to delete contact: " + error.message);
+                    return;
+                }
+
+                await fetchContactsFromSupabase();
+                alert("✅ Contact deleted successfully!");
             }
         }
 
         // Modal Controls
-        let isEditing = false;
-
         function openAddModal() {
-            isEditing = false;
-            document.getElementById('modalTitle').textContent = "Add Trusted Guardian";
-            document.getElementById('editContactId').value = "";
             document.getElementById('modalNameInput').value = "";
             document.getElementById('modalPhoneInput').value = "";
-            document.getElementById('contactModal').style.display = 'flex';
-        }
-
-        function openEditModal(contactId) {
-            const contacts = JSON.parse(localStorage.getItem('nirbhaya_trusted_contacts')) || [];
-            const contact = contacts.find(c => c.id === contactId);
-
-            if (!contact) return;
-
-            isEditing = true;
-            document.getElementById('modalTitle').textContent = "Edit Guardian Details";
-            document.getElementById('editContactId').value = contact.id;
-            document.getElementById('modalNameInput').value = contact.name;
-            document.getElementById('modalPhoneInput').value = contact.phone;
             document.getElementById('contactModal').style.display = 'flex';
         }
 
@@ -1034,35 +1064,37 @@ window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('contactModal').style.display = 'none';
         }
 
-        function saveContact() {
+        // Save Contact to Supabase Database
+        async function saveContact() {
             const name = document.getElementById('modalNameInput').value.trim();
             const phone = document.getElementById('modalPhoneInput').value.trim();
-            const editId = document.getElementById('editContactId').value;
+            const userEmail = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
 
             if (!name || !phone) {
                 alert("⚠️ Please fill in both Name and Phone number.");
                 return;
             }
 
-            let contacts = JSON.parse(localStorage.getItem('nirbhaya_trusted_contacts')) || [];
-
-            if (isEditing && editId) {
-                const index = contacts.findIndex(c => c.id === editId);
-                if (index !== -1) {
-                    contacts[index].name = name;
-                    contacts[index].phone = phone;
-                }
-            } else {
-                contacts.push({
-                    id: 'contact-' + Date.now(),
-                    name: name,
-                    phone: phone
-                });
+            if (!userEmail) {
+                alert("⚠️ User session not found. Please log in again.");
+                return;
             }
 
-            localStorage.setItem('nirbhaya_trusted_contacts', JSON.stringify(contacts));
-            renderContactsList();
+            // Insert into Supabase 'contacts' table
+            const { data, error } = await _supabase
+                .from('contacts')
+                .insert([
+                    { user_email: userEmail, contact_name: name, phone: phone, relation: 'Guardian' }
+                ]);
+
+            if (error) {
+                alert("❌ Failed to save contact to database: " + error.message);
+                return;
+            }
+
+            alert("✅ Guardian successfully saved to Supabase database!");
             closeModal();
+            await fetchContactsFromSupabase();
         }
 
         function testEmergencyLine() {

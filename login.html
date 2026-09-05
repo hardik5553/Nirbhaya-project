@@ -186,10 +186,7 @@
             <div class="auth-header">
 
                 <div class="shield-logo">
-
-        
                     <img src="assets/images/logo.png"  height = 100px alt="Nirbhaya Logo" class="shield">
-
                 </div>
 
                 <h1>NIRBHAYA</h1>
@@ -320,7 +317,7 @@
 
     <!-- Script for Official Validation & Supabase Authentication Integration -->
     <script>
-      
+     
 
         // Initialize Supabase Client
         const supabaseUrl = 'https://qrufisohvrceqappvhye.supabase.co';
@@ -392,7 +389,11 @@
                 if (foundUser.phone) {
                     localStorage.setItem('nirbhaya_userphone', foundUser.phone);
                 }
-                if (foundUser.dp) {
+                
+                // Fetch and store user DP from database table column 'user_dp'
+                if (foundUser.user_dp) {
+                    localStorage.setItem('nirbhaya_userdp', foundUser.user_dp);
+                } else if (foundUser.dp) {
                     localStorage.setItem('nirbhaya_userdp', foundUser.dp);
                 } else {
                     localStorage.removeItem('nirbhaya_userdp');
@@ -479,7 +480,10 @@
                         if (foundUser.phone) {
                             localStorage.setItem('nirbhaya_userphone', foundUser.phone);
                         }
-                        if (foundUser.dp) {
+                        
+                        if (foundUser.user_dp) {
+                            localStorage.setItem('nirbhaya_userdp', foundUser.user_dp);
+                        } else if (foundUser.dp) {
                             localStorage.setItem('nirbhaya_userdp', foundUser.dp);
                         }
 

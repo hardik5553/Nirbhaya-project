@@ -387,31 +387,6 @@
             font-weight: 600;
         }
 
-        /* SOS Countdown Overlay Styling */
-        #sosCountdownOverlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: rgba(225, 29, 72, 0.95);
-            z-index: 99999;
-            color: white;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-        }
-
-        #sosTimerDisplay {
-            font-size: 6rem;
-            font-weight: 800;
-            margin: 20px 0;
-            letter-spacing: 2px;
-        }
-
         /* =========================
            FOOTER
         ========================= */
@@ -646,30 +621,19 @@
 
     </main>
 
-    <!-- SOS COUNTDOWN OVERLAY SCREEN -->
-    <div id="sosCountdownOverlay">
-        <h2>🚨 SOS EMERGENCY ACTIVATED 🚨</h2>
-        <p>Dispatching coordinates and custom SMS to emergency contacts in:</p>
-        <div id="sosTimerDisplay">15</div>
-        <p style="font-size: 14px; max-width: 400px; opacity: 0.9; margin-bottom: 30px;">If this was a false alarm,
-            click the cancel button immediately below before the countdown hits zero.</p>
-        <button onclick="cancelSOS()"
-            style="background: white; color: #e11d48; border: none; padding: 16px 45px; border-radius: 40px; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.3); transition: 0.2s;">
-            ❌ CANCEL SOS
-        </button>
-    </div>
+    <!-- Global Multi-Channel SOS Engine -->
+    <script src="global-sos.js"></script>
 
     <script>
-
         // Session Security Guard
-window.addEventListener('DOMContentLoaded', () => {
-    const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
-    
-    if (!activeUser) {
-        alert("⚠️ Unauthorized Access: Please log in first.");
-        window.location.href = "login.html"; // Agar file 'pages' folder ke andar hai toh "../login.html" karein
-    }
-});
+        window.addEventListener('DOMContentLoaded', () => {
+            const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
+            
+            if (!activeUser) {
+                alert("⚠️ Unauthorized Access: Please log in first.");
+                window.location.href = "login.html";
+            }
+        });
 
         // Sync Profile Data & Active Logged-in User Details from localStorage
         window.addEventListener('DOMContentLoaded', () => {
@@ -727,39 +691,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     dropdownMenu.classList.remove('show');
                 }
             });
-        }
-
-        /* =========================
-           STRICT 15-SEC SOS COUNTDOWN & CANCEL ENGINE
-        ========================= */
-        let sosInterval = null;
-        let countdownValue = 15;
-
-        function triggerSOSCountdown() {
-            countdownValue = 15;
-            document.getElementById('sosTimerDisplay').textContent = countdownValue;
-            document.getElementById('sosCountdownOverlay').style.display = 'flex';
-
-            sosInterval = setInterval(() => {
-                countdownValue--;
-                document.getElementById('sosTimerDisplay').textContent = countdownValue;
-
-                if (countdownValue <= 0) {
-                    clearInterval(sosInterval);
-                    document.getElementById('sosCountdownOverlay').style.display = 'none';
-
-                    const customMsg = localStorage.getItem('nirbhaya_sos_sms') || "Emergency SOS Triggered!";
-                    alert(`🚨 SOS DISPATCHED SUCCESSFULLY!\n\nCustom SMS Sent to Trusted Contacts:\n"${customMsg}"\n\nLocal authorities & emergency services alerted with live GPS coordinates.`);
-                }
-            }, 1000);
-        }
-
-        function cancelSOS() {
-            if (sosInterval) {
-                clearInterval(sosInterval);
-            }
-            document.getElementById('sosCountdownOverlay').style.display = 'none';
-            alert("🛡️ SOS Alert successfully cancelled.");
         }
     </script>
 

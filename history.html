@@ -162,7 +162,6 @@
             gap: 12px;
         }
 
-        /* Custom Logo Image Styles */
         .app-logo {
             height: 48px;
             width: 48px;
@@ -451,7 +450,6 @@
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
-        <!-- Shield Icon linked to security.html -->
         <div class="brand">
             <a href="security.html" title="Go to Security Center">
                 <i class="fa-solid fa-shield-halved" style="color: #ef476f; font-size: 26px;"></i>
@@ -464,43 +462,36 @@
                 <span>Dashboard</span>
             </a>
 
-            <!-- Location page link -->
             <a href="pages/track-location.html">
                 <i class="fa-solid fa-location-dot"></i>
                 <span>Location</span>
             </a>
 
-            <!-- Alerts page link -->
             <a href="alerts.html">
                 <i class="fa-solid fa-bell"></i>
                 <span>Alerts</span>
             </a>
 
-            <!-- Watch page link -->
             <a href="watch.html">
                 <i class="fa-solid fa-clock"></i>
                 <span>Watch</span>
             </a>
 
-            <!-- Security page link -->
             <a href="security.html">
                 <i class="fa-solid fa-shield-halved"></i>
                 <span>Security</span>
             </a>
 
-            <!-- Contacts page link -->
             <a href="contacts.html">
                 <i class="fa-solid fa-users"></i>
                 <span>Contacts</span>
             </a>
 
-            <!-- History page active link -->
             <a href="history.html" class="active">
                 <i class="fa-solid fa-clock-rotate-left"></i>
                 <span>History</span>
             </a>
 
-            <!-- Settings page link -->
             <a href="settings.html">
                 <i class="fa-solid fa-gear"></i>
                 <span>Settings</span>
@@ -519,7 +510,6 @@
         <!-- TOPBAR -->
         <header class="topbar">
             <div class="logo-area">
-                <!-- Custom Logo Image -->
                 <img src="assets/images/nir2.jpeg" alt="NIRBHAYA Logo" class="app-logo"
                     onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100'">
                 <div>
@@ -534,7 +524,6 @@
                     <span class="badge">3</span>
                 </div>
 
-                <!-- User Profile with Interactive Dropdown Menu -->
                 <div class="user-dropdown-container" id="userDropdownToggle">
                     <div class="user">
                         <img id="topbarUserImg" src="aqw.jpeg" alt="Profile"
@@ -575,8 +564,6 @@
                 <h2>Recent Logs</h2>
 
                 <div class="history-list">
-
-                    <!-- Evidence Locker & Audio Simulation Log Item -->
                     <div class="history-item">
                         <div class="history-left">
                             <div class="history-icon" style="background: #e0e7ff; color: #4f46e5;">
@@ -658,32 +645,31 @@
 
     </main>
 
-    <!-- SOS COUNTDOWN OVERLAY SCREEN -->
+    <!-- SOS COUNTDOWN OVERLAY SCREEN CONTAINER -->
     <div id="sosCountdownOverlay">
         <h2>🚨 SOS EMERGENCY ACTIVATED 🚨</h2>
-        <p>Dispatching coordinates and custom SMS to emergency contacts in:</p>
+        <p>Dispatching coordinates and custom SMS/WhatsApp to emergency contacts in:</p>
         <div id="sosTimerDisplay">15</div>
-        <p style="font-size: 14px; max-width: 400px; opacity: 0.9; margin-bottom: 30px;">If this was a false alarm,
-            click the cancel button immediately below before the countdown hits zero.</p>
+        <p style="font-size: 14px; max-width: 400px; opacity: 0.9; margin-bottom: 30px;">If this was a false alarm, click the cancel button immediately below before the countdown hits zero.</p>
         <button onclick="cancelSOS()"
-            style="background: white; color: #e11d48; border: none; padding: 16px 45px; border-radius: 40px; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.3); transition: 0.2s;">
+            style="background: white; color: #e11d48; border: none; padding: 16px 45px; border-radius: 40px; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
             ❌ CANCEL SOS
         </button>
     </div>
 
-    <!-- Script Section -->
-    <script>
-        // Session Security Guard
-window.addEventListener('DOMContentLoaded', () => {
-    const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
-    
-    if (!activeUser) {
-        alert("⚠️ Unauthorized Access: Please log in first.");
-        window.location.href = "login.html"; // Agar file 'pages' folder ke andar hai toh "../login.html" karein
-    }
-});
+    <!-- Global Multi-Channel SOS Engine -->
+    <script src="global-sos.js"></script>
 
-        // Sync Profile Data & Active Logged-in User Details from localStorage
+    <!-- Page Specific Script -->
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
+            if (!activeUser) {
+                alert("⚠️ Unauthorized Access: Please log in first.");
+                window.location.href = "login.html";
+            }
+        });
+
         window.addEventListener('DOMContentLoaded', () => {
             const savedName = localStorage.getItem('nirbhaya_username');
             const savedDp = localStorage.getItem('nirbhaya_userdp');
@@ -713,18 +699,12 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Logout logic
         function handleLogout(event) {
             if (event) event.preventDefault();
-            localStorage.removeItem('nirbhaya_current_user_email');
-            localStorage.removeItem('nirbhaya_username');
-            localStorage.removeItem('nirbhaya_user_email');
-            localStorage.removeItem('nirbhaya_userdp');
-            localStorage.removeItem('nirbhaya_userphone');
+            localStorage.clear();
             window.location.href = "login.html";
         }
 
-        // User Profile Dropdown Toggle Script
         const dropdownToggle = document.getElementById('userDropdownToggle');
         const dropdownMenu = document.getElementById('userDropdownMenu');
 
@@ -739,39 +719,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     dropdownMenu.classList.remove('show');
                 }
             });
-        }
-
-        /* =========================
-           STRICT 15-SEC SOS COUNTDOWN & CANCEL ENGINE
-        ========================= */
-        let sosInterval = null;
-        let countdownValue = 15;
-
-        function triggerSOSCountdown() {
-            countdownValue = 15;
-            document.getElementById('sosTimerDisplay').textContent = countdownValue;
-            document.getElementById('sosCountdownOverlay').style.display = 'flex';
-
-            sosInterval = setInterval(() => {
-                countdownValue--;
-                document.getElementById('sosTimerDisplay').textContent = countdownValue;
-
-                if (countdownValue <= 0) {
-                    clearInterval(sosInterval);
-                    document.getElementById('sosCountdownOverlay').style.display = 'none';
-
-                    const customMsg = localStorage.getItem('nirbhaya_sos_sms') || "Emergency SOS Triggered!";
-                    alert(`🚨 SOS DISPATCHED SUCCESSFULLY!\n\nCustom SMS Sent to Trusted Contacts:\n"${customMsg}"\n\nLocal authorities & emergency services alerted with live GPS coordinates.`);
-                }
-            }, 1000);
-        }
-
-        function cancelSOS() {
-            if (sosInterval) {
-                clearInterval(sosInterval);
-            }
-            document.getElementById('sosCountdownOverlay').style.display = 'none';
-            alert("🛡️ SOS Alert successfully cancelled.");
         }
     </script>
 
