@@ -34,7 +34,7 @@
 
         /* =========================
            SIDEBAR
-        ========================= */
+        ======================== */
 
         .sidebar {
             position: fixed;
@@ -161,7 +161,7 @@
 
         /* =========================
            MAIN
-        ========================= */
+        ======================== */
 
         .main {
             margin-left: 105px;
@@ -171,7 +171,7 @@
 
         /* =========================
            TOPBAR
-        ========================= */
+        ======================== */
 
         .topbar {
             height: 80px;
@@ -331,7 +331,7 @@
 
         /* =========================
            CONTENT
-        ========================= */
+        ======================== */
 
         .content {
             padding: 35px;
@@ -354,7 +354,7 @@
 
         /* =========================
            SECURITY HEADER
-        ========================= */
+        ======================== */
 
         .security-header {
             display: grid;
@@ -460,7 +460,7 @@
 
         /* =========================
            SECURE STATUS
-        ========================= */
+        ======================== */
 
         .secure-card {
             background: linear-gradient(135deg,
@@ -554,7 +554,7 @@
 
         /* =========================
            CARDS
-        ========================= */
+        ======================== */
 
         .cards {
             display: grid;
@@ -661,7 +661,7 @@
 
         /* =========================
            BUTTON
-        ========================= */
+        ======================== */
 
         .card-btn {
             width: 100%;
@@ -713,7 +713,7 @@
 
         /* =========================
            TOGGLE
-        ========================= */
+        ======================== */
 
         .toggle {
             width: 38px;
@@ -747,7 +747,7 @@
 
         /* =========================
            DANGER STATUS
-        ========================= */
+        ======================== */
 
         .safe-box {
             background: #dcfce7;
@@ -778,7 +778,7 @@
 
         /* =========================
            CONTACTS
-        ========================= */
+        ======================== */
 
         .contact {
             display: flex;
@@ -787,6 +787,11 @@
             gap: 12px;
 
             padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .contact:last-of-type {
+            border-bottom: none;
         }
 
         .contact-avatar {
@@ -837,7 +842,7 @@
 
         /* =========================
            SECURITY TIPS
-        ========================= */
+        ======================== */
 
         .tips {
             margin-top: 25px;
@@ -897,7 +902,7 @@
 
         /* =========================
            FOOTER
-        ========================= */
+        ======================== */
 
         footer {
             text-align: center;
@@ -912,7 +917,7 @@
 
         /* =========================
            MODALS & COUNTDOWN OVERLAYS
-        ========================= */
+        ======================== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -960,12 +965,10 @@
             border-left-color: #f97316;
         }
 
-        /* SOS Countdown Overlay handled by global-sos.js */
-
 
         /* =========================
            RESPONSIVE
-        ========================= */
+        ======================== */
 
         @media(max-width: 1100px) {
 
@@ -1052,10 +1055,8 @@
 
         <nav class="menu">
 
-         
-
-          <a href="dashboard.html">
-         <i class="fa-solid fa-border-all"></i>
+         <a href="dashboard.html">
+          <i class="fa-solid fa-border-all"></i>
     <span>Dashboard</span>
         </a>
 
@@ -1748,7 +1749,7 @@
 
 
 
-                <!-- TRUSTED CONTACTS -->
+                <!-- 6. TRUSTED CONTACTS -->
 
                 <div class="card">
 
@@ -1760,60 +1761,16 @@
 
                         </div>
 
-                        <h3>Trusted Contacts</h3>
+                        <h3>6. Trusted Contacts</h3>
 
                     </div>
 
-
-                    <div class="contact">
-
-                        <div class="contact-avatar">
-
-                            <i class="fa-solid fa-user"></i>
-
+                    <!-- Dynamic Container for Supabase / LocalStorage Contacts -->
+                    <div id="securityContactsList">
+                        <div style="text-align: center; padding: 15px; color: #64748b; font-size: 13px;">
+                            Loading trusted contacts...
                         </div>
-
-                        <div class="contact-info">
-
-                            <strong>Mom</strong>
-
-                            <small>
-                                Emergency Contact
-                            </small>
-
-                        </div>
-
-                        <span class="verified">
-                            Verified
-                        </span>
-
                     </div>
-
-
-                    <div class="contact">
-
-                        <div class="contact-avatar">
-
-                            <i class="fa-solid fa-user"></i>
-
-                        </div>
-
-                        <div class="contact-info">
-
-                            <strong>Dad</strong>
-
-                            <small>
-                                Emergency Contact
-                            </small>
-
-                        </div>
-
-                        <span class="verified">
-                            Verified
-                        </span>
-
-                    </div>
-
 
                     <button class="card-btn" onclick="location.href='contacts.html'">
 
@@ -1953,8 +1910,8 @@
             }
         });
 
-        // Load saved user profile data from localStorage (Name, DP & Email synchronization)
-        window.addEventListener('DOMContentLoaded', () => {
+        // Load saved user profile data and dynamic Supabase/LocalStorage contacts
+        window.addEventListener('DOMContentLoaded', async () => {
             const savedName = localStorage.getItem('nirbhaya_username');
             const savedDp = localStorage.getItem('nirbhaya_userdp');
             const savedEmail = localStorage.getItem('nirbhaya_user_email') || localStorage.getItem('nirbhaya_current_user_email');
@@ -1987,16 +1944,78 @@
                 const sosSmsMessage = document.getElementById('sosSmsMessage');
                 if (sosSmsMessage) sosSmsMessage.value = savedSms;
             }
+
+            // Load Dynamic Contacts from Supabase / LocalStorage
+            await loadSecurityContacts(savedEmail);
         });
+
+        // Dynamic Contacts Loader for Security Page
+        async function loadSecurityContacts(userEmail) {
+            const container = document.getElementById('securityContactsList');
+            if (!container) return;
+
+            let contacts = [];
+
+            // 1. Try fetching from Supabase database
+            const supabaseUrl = 'https://qrufisohvrceqappvhye.supabase.co';
+            const supabaseKey = 'sb_publishable_ROZgpJvsMd2Qg-Bm5PVCwg_MiV1aBQG';
+            const supabaseClient = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+
+            if (supabaseClient && userEmail) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('contacts')
+                        .select('*')
+                        .eq('user_email', userEmail);
+
+                    if (!error && data && data.length > 0) {
+                        contacts = data;
+                    }
+                } catch (err) {
+                    console.warn("Supabase fetch error, checking local storage.");
+                }
+            }
+
+            // 2. Fallback to LocalStorage if Supabase returned nothing
+            if (contacts.length === 0) {
+                const localContacts = JSON.parse(localStorage.getItem('nirbhaya_trusted_contacts')) || [];
+                contacts = localContacts;
+            }
+
+            // 3. Render Contacts or Empty State with "Add Now" option
+            if (contacts.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 15px; color: #64748b; font-size: 13px;">
+                        ⚠️ No emergency contacts added yet.<br>
+                        <a href="contacts.html" style="color: #2563eb; font-weight: 600; text-decoration: underline;">+ Add Contact Now</a>
+                    </div>
+                `;
+            } else {
+                let html = "";
+                contacts.forEach(c => {
+                    const name = c.contact_name || c.name || "Guardian";
+                    const phone = c.phone || "";
+                    html += `
+                        <div class="contact">
+                            <div class="contact-avatar">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <div class="contact-info">
+                                <strong>${name}</strong>
+                                <small>${phone || 'Emergency Contact'}</small>
+                            </div>
+                            <span class="verified">Verified</span>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+        }
 
         // Logout logic
         function handleLogout(event) {
             if (event) event.preventDefault();
-            localStorage.removeItem('nirbhaya_current_user_email');
-            localStorage.removeItem('nirbhaya_username');
-            localStorage.removeItem('nirbhaya_user_email');
-            localStorage.removeItem('nirbhaya_userdp');
-            localStorage.removeItem('nirbhaya_userphone');
+            localStorage.clear();
             window.location.href = "login.html";
         }
 
@@ -2013,7 +2032,7 @@
 
         /* =========================
            USER DROPDOWN TOGGLE SCRIPT
-        ========================= */
+        ======================== */
         const dropdownToggle = document.getElementById('userDropdownToggle');
         const dropdownMenu = document.getElementById('userDropdownMenu');
 
@@ -2033,7 +2052,7 @@
 
         /* =========================
            1. WATCH CONNECT / DISCONNECT LOGIC
-        ========================= */
+        ======================== */
         let isWatchConnected = true;
         function toggleWatchConnection() {
             isWatchConnected = !isWatchConnected;
@@ -2063,7 +2082,7 @@
 
         /* =========================
            BLUETOOTH MESH ALERT TOGGLE
-        ========================= */
+        ======================== */
         let isMeshActive = false;
         function toggleBluetoothMesh() {
             isMeshActive = !isMeshActive;
@@ -2080,7 +2099,7 @@
 
         /* =========================
            2. LIVE LOCATION & TRACKING TOGGLE
-        ========================= */
+        ======================== */
         let isLocationActive = true;
         function toggleLocationTracking() {
             isLocationActive = !isLocationActive;
@@ -2101,7 +2120,7 @@
 
         /* =========================
            3. EMERGENCY TOGGLE STATES
-        ========================= */
+        ======================== */
         function toggleSetting(elementId) {
             const el = document.getElementById(elementId);
             if (el.textContent.trim() === "ON") {
@@ -2116,7 +2135,7 @@
 
         /* =========================
            STEALTH PANIC PIN TRIGGER
-        ========================= */
+        ======================== */
         function triggerStealthPanic() {
             let pin = prompt("🔐 Enter your 4-digit Stealth Panic PIN to trigger silent distress signal:");
             if (pin && pin.length >= 4) {
@@ -2129,7 +2148,7 @@
 
         /* =========================
            POLICE DIGITAL DISPATCH SIMULATOR
-        ========================= */
+        ======================== */
         function simulatePoliceDispatch() {
             const dispatchStatus = document.getElementById('policeDispatchStatus');
             dispatchStatus.textContent = "Dispatched 🚨";
@@ -2140,9 +2159,8 @@
 
         /* =========================
            5. DANGER ZONE PROTECTION OPTIONS (Real Geolocation & Risk Check)
-        ========================= */
+        ======================== */
 
-        // Option 1: View Danger Zone Sub-page Modal Trigger
         function openDangerZoneModal() {
             document.getElementById('dangerModal').style.display = 'flex';
         }
@@ -2151,7 +2169,6 @@
             document.getElementById('dangerModal').style.display = 'none';
         }
 
-        // Option 2: Track Destination & Real Geolocation Risk Check
         function trackDestinationAndCheckSafety() {
             let destination = prompt("🧭 Enter your destination (e.g., Central Station / Office):", "Central Market");
             if (!destination) return;
@@ -2212,7 +2229,7 @@
 
         /* =========================
            FAKE CALL SIMULATOR
-        ========================= */
+        ======================== */
         function triggerFakeCall() {
             document.getElementById('fakeCallScreen').style.display = 'block';
         }
@@ -2224,7 +2241,7 @@
 
         /* =========================
            DEVICE DETAILS
-        ========================= */
+        ======================== */
 
         function deviceDetails() {
             alert(
