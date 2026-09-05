@@ -307,6 +307,21 @@
                 return;
             }
 
+            // Supabase Realtime Listener for Live Updates
+if (_supabase) {
+    _supabase
+        .channel('public:users')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'users' }, payload => {
+            console.log('New user registered live:', payload.new);
+            
+            // Jaise hi naya user aaye, total count update kar do aur table refresh kar lo
+            alert(`🚨 New User Registered: ${payload.new.name || payload.new.email}`);
+            location.reload(); // Page ko auto refresh karke naya data dikha dega
+        })
+        .subscribe();
+}
+
+
             // Fetch Data from Supabase
             if (_supabase) {
                 try {
