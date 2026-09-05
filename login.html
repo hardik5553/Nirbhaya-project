@@ -322,8 +322,11 @@
     <script>
         // Initialize Supabase Client
         const supabaseUrl = 'https://qrufisohvrceqappvhye.supabase.co';
-        const supabaseKey = 'sb_publishable_ROZgpJvsMd2Qg-Bm5PVCwg_MiV1aBQG'; // Replace with your actual publishable key if needed
+        const supabaseKey = 'sb_publishable_ROZgpJvsMd2Qg-Bm5PVCwg_MiV1aBQG'; 
         const _supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Official Admin Email Config
+        const ADMIN_EMAIL = "hardik@nirbhaya.com";
 
         // Password Visibility Toggle
         const togglePassword = document.getElementById('togglePassword');
@@ -351,7 +354,7 @@
                 return;
             }
 
-            // Official Validation 2: Strict Email Format Check (Must contain '@' and '.')
+            // Official Validation 2: Strict Email Format Check
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 alert("❌ Invalid Email Format! Please enter a valid email address containing '@' (e.g., user@example.com).");
@@ -381,7 +384,7 @@
                 const foundUser = users[0];
                 const displayName = foundUser.fullName || foundUser.name || 'User';
 
-                // Set current active session user parameters (Isolated profiles)
+                // Set current active session user parameters
                 localStorage.setItem('nirbhaya_current_user_email', foundUser.email);
                 localStorage.setItem('nirbhaya_username', displayName);
                 if (foundUser.phone) {
@@ -393,8 +396,14 @@
                     localStorage.removeItem('nirbhaya_userdp');
                 }
 
-                alert(`✅ Welcome back, ${displayName}!\n\nLogin Successful. Redirecting to Dashboard...`);
-                window.location.href = "../security.html";
+                // Role-Based Routing Logic (Updated: Normal user goes to security.html)
+                if (foundUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+                    alert(`👑 Welcome Admin, ${displayName}!\n\nLogin Successful. Redirecting to Command Center...`);
+                    window.location.href = "admin.html";
+                } else {
+                    alert(`✅ Welcome back, ${displayName}!\n\nLogin Successful. Redirecting to Security Center...`);
+                    window.location.href = "security.html";
+                }
 
             } catch (err) {
                 console.error('Unexpected error:', err);
@@ -471,11 +480,18 @@
                         if (foundUser.dp) {
                             localStorage.setItem('nirbhaya_userdp', foundUser.dp);
                         }
+
+                        if (foundUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+                            alert("🔓 CAPTCHA Verified Successfully!\n\nWelcome Admin. Redirecting to Command Center...");
+                            closeCaptchaModal();
+                            window.location.href = "admin.html";
+                            return;
+                        }
                     }
 
                     alert("🔓 CAPTCHA Verified Successfully!\n\nYour account has been verified. Logging you in automatically...");
                     closeCaptchaModal();
-                    window.location.href = "dashboard.html";
+                    window.location.href = "security.html";
                 } catch (err) {
                     console.error('Error during captcha validation login:', err);
                     alert("❌ Error completing login process.");
@@ -494,7 +510,6 @@
         const passField = document.getElementById('password');
         const modalInputField = document.getElementById('captchaUserInput');
 
-        // When Enter is pressed in the Email field, jump to Password
         if (emailField) {
             emailField.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') {
@@ -504,7 +519,6 @@
             });
         }
 
-        // When Enter is pressed in the Password field, trigger the Login function
         if (passField) {
             passField.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') {
@@ -514,7 +528,6 @@
             });
         }
 
-        // Allow pressing Enter to verify CAPTCHA inside the modal
         if (modalInputField) {
             modalInputField.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {

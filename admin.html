@@ -219,8 +219,8 @@
                     <i class="fa-solid fa-gauge-high"></i>
                     <span>Admin</span>
                 </a>
-                <a href="dashboard.html">
-                    <i class="fa-solid fa-table-cells-large"></i>
+                <a href="security.html">
+                    <i class="fa-solid fa-shield-alt"></i>
                     <span>User App</span>
                 </a>
             </nav>
@@ -287,7 +287,6 @@
 
     <!-- Supabase Integration & Data Fetch Script -->
     <script>
-        // Configured with your exact Supabase credentials
         const SUPABASE_URL = 'https://qrufisohvrceqappvhye.supabase.co'; 
         const SUPABASE_ANON_KEY = 'sb_publishable_ROZgpJvsMd2Qg-Bm5PVCwg_MiV1aBQG';
         
@@ -296,24 +295,21 @@
             _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         }
 
+        const ADMIN_EMAIL = "hardik@nirbhaya.com";
+
         window.addEventListener('DOMContentLoaded', async () => {
-            // Admin Protection Check
-            const isAdminLoggedIn = localStorage.getItem('nirbhaya_admin_auth');
-            if (!isAdminLoggedIn) {
-                const passKey = prompt("🔒 Enter Admin Security Passkey to Access Command Center:");
-                if (passKey === "hardik5553") {
-                    localStorage.setItem('nirbhaya_admin_auth', 'true');
-                } else {
-                    alert("❌ Unauthorized Access Denied.");
-                    window.location.href = "dashboard.html";
-                    return;
-                }
+            // Secure Role-Based Session Guard Check
+            const activeEmail = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
+            
+            if (!activeEmail || activeEmail.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+                alert("❌ Access Denied: Administrator privileges required.");
+                window.location.href = "login.html";
+                return;
             }
 
             // Fetch Data from Supabase
             if (_supabase) {
                 try {
-                    // Querying standard users or profiles table from your database
                     const { data, error } = await _supabase.from('users').select('*');
                     
                     if (!error && data && data.length > 0) {
@@ -328,7 +324,6 @@
                             </tr>
                         `).join('');
                     } else {
-                        // If 'users' table has no rows or columns differ, load local fallback
                         loadLocalUsersFallback();
                     }
                 } catch (err) {
@@ -342,23 +337,23 @@
 
         function loadLocalUsersFallback() {
             document.getElementById('totalUsersCount').textContent = "1";
-            const currentEmail = localStorage.getItem('nirbhaya_current_user_email') || "admin@nirbhaya.com";
-            const currentName = localStorage.getItem('nirbhaya_username') || "Akrati";
+            const currentEmail = localStorage.getItem('nirbhaya_current_user_email') || ADMIN_EMAIL;
+            const currentName = localStorage.getItem('nirbhaya_username') || "Hardik Soni";
             
             const tbody = document.getElementById('supabaseUsersTableBody');
             tbody.innerHTML = `
                 <tr>
-                    <td>#NB-88421</td>
+                    <td>#ADMIN-01</td>
                     <td><strong>${currentName}</strong> (${currentEmail})</td>
-                    <td><span class="badge-active">Online / Active Session</span></td>
-                    <td>Primary Owner</td>
+                    <td><span class="badge-active">Super Admin Online</span></td>
+                    <td>Administrator</td>
                 </tr>
             `;
         }
 
         function adminLogout() {
-            localStorage.removeItem('nirbhaya_admin_auth');
-            window.location.href = "dashboard.html";
+            localStorage.clear();
+            window.location.href = "login.html";
         }
     </script>
 </body>
