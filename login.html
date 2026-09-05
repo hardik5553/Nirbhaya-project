@@ -320,6 +320,16 @@
 
     <!-- Script for Official Validation & Supabase Authentication Integration -->
     <script>
+        // Session Security Guard
+window.addEventListener('DOMContentLoaded', () => {
+    const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
+    
+    if (!activeUser) {
+        alert("⚠️ Unauthorized Access: Please log in first.");
+        window.location.href = "login.html"; // Agar file 'pages' folder ke andar hai toh "../login.html" karein
+    }
+});
+
         // Initialize Supabase Client
         const supabaseUrl = 'https://qrufisohvrceqappvhye.supabase.co';
         const supabaseKey = 'sb_publishable_ROZgpJvsMd2Qg-Bm5PVCwg_MiV1aBQG'; 

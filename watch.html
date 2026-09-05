@@ -739,6 +739,17 @@
 
     <!-- Script for Dynamic Watch Selection & Connection Toggle -->
     <script>
+
+        // Session Security Guard
+window.addEventListener('DOMContentLoaded', () => {
+    const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
+    
+    if (!activeUser) {
+        alert("⚠️ Unauthorized Access: Please log in first.");
+        window.location.href = "login.html"; // Agar file 'pages' folder ke andar hai toh "../login.html" karein
+    }
+});
+
         // Sync Profile Data & Active Logged-in User Details from localStorage
         window.addEventListener('DOMContentLoaded', () => {
             const savedName = localStorage.getItem('nirbhaya_username');
