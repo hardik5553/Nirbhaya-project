@@ -44,7 +44,6 @@
         .auth-brand-header i {
             font-size: 2.8rem;
             color: #000000;
-            /* Completely black shield icon */
             margin-bottom: 8px;
         }
 
@@ -482,17 +481,6 @@
 
     <!-- Script for Strict Signup & Supabase Integration Flow -->
     <script>
-
-        // Session Security Guard
-window.addEventListener('DOMContentLoaded', () => {
-    const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
-    
-    if (!activeUser) {
-        alert("⚠️ Unauthorized Access: Please log in first.");
-        window.location.href = "login.html"; // Agar file 'pages' folder ke andar hai toh "../login.html" karein
-    }
-});
-
         // Initialize Supabase Client
         const supabaseUrl = 'https://qrufisohvrceqappvhye.supabase.co';
         const supabaseKey = 'sb_publishable_ROZgpJvsMd2Qg-Bm5PVCwg_MiV1aBQG';
@@ -524,6 +512,29 @@ window.addEventListener('DOMContentLoaded', () => {
                 iconElement.classList.add("fa-eye");
             }
         }
+
+        // --- KEYBOARD NAVIGATION (Enter Key Flow) ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const fields = ['name', 'email', 'phone', 'password', 'confirmPassword'];
+            
+            fields.forEach((fieldId, index) => {
+                const input = document.getElementById(fieldId);
+                if (input) {
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault(); // Form submit hone se rokein jab tak aakhri field na ho
+                            if (index < fields.length - 1) {
+                                // Agle input field par focus move karein
+                                document.getElementById(fields[index + 1]).focus();
+                            } else {
+                                // Agar aakhri field (confirmPassword) par hain, toh form submit trigger karein
+                                document.getElementById('signupForm').requestSubmit();
+                            }
+                        }
+                    });
+                }
+            });
+        });
 
         // Official Signup Handling Logic with Supabase Database Integration
         async function handleSignup(event) {
