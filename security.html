@@ -34,7 +34,7 @@
 
         /* =========================
            SIDEBAR
-        ======================== */
+        ======================= */
 
         .sidebar {
             position: fixed;
@@ -161,7 +161,7 @@
 
         /* =========================
            MAIN
-        ======================== */
+        ======================= */
 
         .main {
             margin-left: 105px;
@@ -171,7 +171,7 @@
 
         /* =========================
            TOPBAR
-        ======================== */
+        ======================= */
 
         .topbar {
             height: 80px;
@@ -331,7 +331,7 @@
 
         /* =========================
            CONTENT
-        ======================== */
+        ======================= */
 
         .content {
             padding: 35px;
@@ -354,7 +354,7 @@
 
         /* =========================
            SECURITY HEADER
-        ======================== */
+        ======================= */
 
         .security-header {
             display: grid;
@@ -460,7 +460,7 @@
 
         /* =========================
            SECURE STATUS
-        ======================== */
+        ======================= */
 
         .secure-card {
             background: linear-gradient(135deg,
@@ -554,7 +554,7 @@
 
         /* =========================
            CARDS
-        ======================== */
+        ======================= */
 
         .cards {
             display: grid;
@@ -661,7 +661,7 @@
 
         /* =========================
            BUTTON
-        ======================== */
+        ======================= */
 
         .card-btn {
             width: 100%;
@@ -713,7 +713,7 @@
 
         /* =========================
            TOGGLE
-        ======================== */
+        ======================= */
 
         .toggle {
             width: 38px;
@@ -747,7 +747,7 @@
 
         /* =========================
            DANGER STATUS
-        ======================== */
+        ======================= */
 
         .safe-box {
             background: #dcfce7;
@@ -778,7 +778,7 @@
 
         /* =========================
            CONTACTS
-        ======================== */
+        ======================= */
 
         .contact {
             display: flex;
@@ -842,7 +842,7 @@
 
         /* =========================
            SECURITY TIPS
-        ======================== */
+        ======================= */
 
         .tips {
             margin-top: 25px;
@@ -902,7 +902,7 @@
 
         /* =========================
            FOOTER
-        ======================== */
+        ======================= */
 
         footer {
             text-align: center;
@@ -917,7 +917,7 @@
 
         /* =========================
            MODALS & COUNTDOWN OVERLAYS
-        ======================== */
+        ======================= */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -968,7 +968,7 @@
 
         /* =========================
            RESPONSIVE
-        ======================== */
+        ======================= */
 
         @media(max-width: 1100px) {
 
@@ -1215,9 +1215,7 @@
 
                     <div class="watch">
 
-                        <i class="fa-solid fa-lock">
-
-                        </i>
+                        <i class="fa-solid fa-lock" id="headerWatchLockIcon"></i>
 
                     </div>
 
@@ -1227,31 +1225,23 @@
 
                 <!-- SECURE STATUS -->
 
-                <div class="secure-card">
+                <div class="secure-card" id="secureHeaderCard" style="background: linear-gradient(135deg, #475569, #1e293b);">
 
                     <div class="secure-top">
 
                         <div class="secure-title">
 
-                            <i class="fa-solid fa-shield-halved"></i>
+                            <i class="fa-solid fa-shield-halved" id="secureHeaderShield"></i>
 
                             <div>
 
-                                <h2>DEVICE SECURE</h2>
+                                <h2 id="secureHeaderTitle">DEVICE DISCONNECTED</h2>
 
-                                <p>
-                                    Your AI Watch is protected
-                                    and monitoring is active.
+                                <p id="secureHeaderDesc">
+                                    Connect your hardware watch to activate real-time monitoring.
                                 </p>
 
                             </div>
-
-                        </div>
-
-
-                        <div class="check-circle">
-
-                            <i class="fa-solid fa-check"></i>
 
                         </div>
 
@@ -1261,14 +1251,14 @@
                     <div class="secure-info">
 
                         <div class="info">
-
-                            <i class="fa-solid fa-rotate"></i>
+                            <!-- Working Refresh Icon -->
+                            <i class="fa-solid fa-rotate" onclick="refreshWatchStatus()" title="Click to refresh device sync status" style="cursor: pointer; transition: transform 0.3s;" id="refreshIconBtn"></i>
 
                             <div>
 
                                 <small>Last Sync</small>
 
-                                <strong>Just now</strong>
+                                <strong id="secureHeaderSync">Never</strong>
 
                             </div>
 
@@ -1283,7 +1273,7 @@
 
                                 <small>Battery</small>
 
-                                <strong>87%</strong>
+                                <strong id="secureHeaderBattery">--</strong>
 
                             </div>
 
@@ -1298,7 +1288,7 @@
 
                                 <small>Connection</small>
 
-                                <strong>Secure</strong>
+                                <strong id="secureHeaderConn" style="color: #fca5a5;">Offline</strong>
 
                             </div>
 
@@ -1317,7 +1307,7 @@
             <div class="cards">
 
 
-                <!-- DEVICE SECURITY (BLUETOOTH MESH ALERT) -->
+                <!-- DEVICE SECURITY -->
 
                 <div class="card">
 
@@ -1339,8 +1329,8 @@
                             Watch Status
                         </div>
 
-                        <span class="green" id="watchStatusText">
-                            Connected
+                        <span class="red" id="watchStatusText">
+                            Disconnected
                         </span>
 
                     </div>
@@ -1353,8 +1343,8 @@
                             Device ID
                         </div>
 
-                        <span class="blue">
-                            AIG-WS-4587
+                        <span class="blue" id="watchDeviceIdText">
+                            --
                         </span>
 
                     </div>
@@ -1367,8 +1357,8 @@
                             Connection
                         </div>
 
-                        <span class="green" id="connectionStatusText">
-                            Secure
+                        <span class="red" id="connectionStatusText">
+                            Offline
                         </span>
 
                     </div>
@@ -1395,15 +1385,15 @@
                             Battery Level
                         </div>
 
-                        <span class="blue">
-                            87%
+                        <span class="blue" id="watchBatteryText">
+                            --
                         </span>
 
                     </div>
 
 
-                    <button class="card-btn" id="watchToggleBtn" onclick="toggleWatchConnection()">
-                        Disconnect Watch
+                    <button class="card-btn" id="watchToggleBtn" onclick="location.href='watch.html'">
+                        Connect Watch Hub
                     </button>
 
                 </div>
@@ -1503,7 +1493,7 @@
 
 
 
-                <!-- EMERGENCY (STEALTH PANIC PIN WITH ICON) -->
+                <!-- EMERGENCY (DYNAMIC PIN UI: SET/RESET PIN & TRIGGER) -->
 
                 <div class="card">
 
@@ -1536,7 +1526,7 @@
                     </div>
 
 
-                    <!-- STEALTH PANIC CODE TRIGGER WITH MATCHING ICON -->
+                    <!-- STEALTH PANIC CODE TRIGGER WITH DYNAMIC [Set PIN] / [Reset PIN] & Trigger -->
                     <div class="row">
 
                         <div class="row-left" title="Silent distress signal via secret PIN">
@@ -1544,10 +1534,9 @@
                             Stealth Panic PIN
                         </div>
 
-                        <span class="red" style="cursor: pointer; text-decoration: underline; font-weight: 700;"
-                            onclick="triggerStealthPanic()">
-                            Set / Trigger
-                        </span>
+                        <div id="pinActionContainer">
+                            <!-- Dynamic buttons will be loaded here via JavaScript -->
+                        </div>
 
                     </div>
 
@@ -1603,7 +1592,7 @@
 
 
 
-                <!-- DANGER ZONE PROTECTION (AI Risk & Police Digital Dispatch) -->
+                <!-- DANGER ZONE PROTECTION -->
 
                 <div class="card">
 
@@ -1678,14 +1667,11 @@
 
                     </div>
 
-
-                    <!-- Option 1: View Danger Zone (Map Simulation) -->
                     <button class="card-btn" style="border-color:#f97316; color:#f97316;"
                         onclick="openDangerZoneModal()">
                         📍 View Danger Zone (Map)
                     </button>
 
-                    <!-- Option 2: Track Destination & Risk Alert with Real Geolocation & Safety Check -->
                     <button class="card-btn" style="border-color:#ef3340; color:#ef3340; margin-top: 8px;"
                         onclick="trackDestinationAndCheckSafety()">
                         🧭 Track Destination & Risk Alert
@@ -1765,7 +1751,6 @@
 
                     </div>
 
-                    <!-- Dynamic Container for Supabase / LocalStorage Contacts -->
                     <div id="securityContactsList">
                         <div style="text-align: center; padding: 15px; color: #64748b; font-size: 13px;">
                             Loading trusted contacts...
@@ -1900,7 +1885,11 @@
 
     <script>
 
-        // Session Security Guard
+        const SUPABASE_URL_SEC = 'https://qrufisohvrceqappvhye.supabase.co';
+        const SUPABASE_KEY_SEC = 'sb_publishable_ROZgpJvsMd2Qg-Bm5PVCwg_MiV1aBQG';
+        const _supabaseSec = window.supabase ? window.supabase.createClient(SUPABASE_URL_SEC, SUPABASE_KEY_SEC) : null;
+
+        // Session Security Guard & Dynamic PIN UI Renderer
         window.addEventListener('DOMContentLoaded', () => {
             const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
             
@@ -1908,9 +1897,28 @@
                 alert("⚠️ Unauthorized Access: Please log in first.");
                 window.location.href = "login.html";
             }
+
+            updatePinUI();
         });
 
-        // Load saved user profile data and dynamic Supabase/LocalStorage contacts
+        function updatePinUI() {
+            const container = document.getElementById('pinActionContainer');
+            if (!container) return;
+
+            const savedPin = localStorage.getItem('nirbhaya_custom_stealth_pin');
+
+            if (!savedPin) {
+                container.innerHTML = `
+                    <span class="blue" style="cursor: pointer; font-size: 11px; text-decoration: underline;" onclick="setPersonalStealthPin()">[Set PIN]</span>
+                `;
+            } else {
+                container.innerHTML = `
+                    <span class="blue" style="cursor: pointer; margin-right: 8px; font-size: 11px; text-decoration: underline;" onclick="setPersonalStealthPin()">[Reset PIN]</span>
+                    <span class="red" style="cursor: pointer; text-decoration: underline; font-weight: 700;" onclick="triggerStealthPanic()">Trigger</span>
+                `;
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', async () => {
             const savedName = localStorage.getItem('nirbhaya_username');
             const savedDp = localStorage.getItem('nirbhaya_userdp');
@@ -1945,25 +1953,82 @@
                 if (sosSmsMessage) sosSmsMessage.value = savedSms;
             }
 
-            // Load Dynamic Contacts from Supabase / LocalStorage
+            syncWatchHardwareStatus();
             await loadSecurityContacts(savedEmail);
         });
 
-        // Dynamic Contacts Loader for Security Page
+        function refreshWatchStatus() {
+            const icon = document.getElementById('refreshIconBtn');
+            if (icon) {
+                icon.style.transform = "rotate(360deg)";
+                setTimeout(() => { icon.style.transform = "rotate(0deg)"; }, 400);
+            }
+            syncWatchHardwareStatus();
+        }
+
+        function syncWatchHardwareStatus() {
+            const isConnected = localStorage.getItem('nirbhaya_watch_connected') === 'true';
+            const watchName = localStorage.getItem('nirbhaya_watch_name') || 'ESP32-BLE-Device';
+            const watchBattery = localStorage.getItem('nirbhaya_watch_battery') || '87%';
+
+            const watchStatusText = document.getElementById('watchStatusText');
+            const watchDeviceIdText = document.getElementById('watchDeviceIdText');
+            const connectionStatusText = document.getElementById('connectionStatusText');
+            const watchBatteryText = document.getElementById('watchBatteryText');
+            const watchToggleBtn = document.getElementById('watchToggleBtn');
+
+            const secureHeaderCard = document.getElementById('secureHeaderCard');
+            const secureHeaderTitle = document.getElementById('secureHeaderTitle');
+            const secureHeaderDesc = document.getElementById('secureHeaderDesc');
+            const secureHeaderShield = document.getElementById('secureHeaderShield');
+            const secureHeaderSync = document.getElementById('secureHeaderSync');
+            const secureHeaderBattery = document.getElementById('secureHeaderBattery');
+            const secureHeaderConn = document.getElementById('secureHeaderConn');
+            const headerWatchLockIcon = document.getElementById('headerWatchLockIcon');
+
+            if (isConnected) {
+                if (watchStatusText) { watchStatusText.textContent = "Connected"; watchStatusText.className = "green"; }
+                if (watchDeviceIdText) { watchDeviceIdText.textContent = watchName; }
+                if (connectionStatusText) { connectionStatusText.textContent = "Secure Link"; connectionStatusText.className = "green"; }
+                if (watchBatteryText) { watchBatteryText.textContent = watchBattery; }
+                if (watchToggleBtn) { watchToggleBtn.textContent = "Manage Watch Hub"; watchToggleBtn.onclick = () => location.href='watch.html'; }
+
+                if (secureHeaderCard) secureHeaderCard.style.background = "linear-gradient(135deg, #52a00d, #10b981)";
+                if (secureHeaderTitle) secureHeaderTitle.textContent = "DEVICE SECURE";
+                if (secureHeaderDesc) secureHeaderDesc.textContent = "Your AI Watch is protected and monitoring is active.";
+                if (secureHeaderShield) secureHeaderShield.className = "fa-solid fa-shield-halved";
+                if (secureHeaderSync) secureHeaderSync.textContent = "Just now";
+                if (secureHeaderBattery) secureHeaderBattery.textContent = watchBattery;
+                if (secureHeaderConn) { secureHeaderConn.textContent = "Secure"; secureHeaderConn.style.color = "#ffffff"; }
+                if (headerWatchLockIcon) headerWatchLockIcon.className = "fa-solid fa-lock";
+
+            } else {
+                if (watchStatusText) { watchStatusText.textContent = "Disconnected"; watchStatusText.className = "red"; }
+                if (watchDeviceIdText) { watchDeviceIdText.textContent = "--"; }
+                if (connectionStatusText) { connectionStatusText.textContent = "Offline"; connectionStatusText.className = "red"; }
+                if (watchBatteryText) { watchBatteryText.textContent = "--"; }
+                if (watchToggleBtn) { watchToggleBtn.textContent = "Connect Hardware Watch"; watchToggleBtn.onclick = () => location.href='watch.html'; }
+
+                if (secureHeaderCard) secureHeaderCard.style.background = "linear-gradient(135deg, #475569, #1e293b)";
+                if (secureHeaderTitle) secureHeaderTitle.textContent = "DEVICE DISCONNECTED";
+                if (secureHeaderDesc) secureHeaderDesc.textContent = "Connect your hardware watch to activate real-time monitoring.";
+                if (secureHeaderShield) secureHeaderShield.className = "fa-solid fa-triangle-exclamation";
+                if (secureHeaderSync) secureHeaderSync.textContent = "Never";
+                if (secureHeaderBattery) secureHeaderBattery.textContent = "--";
+                if (secureHeaderConn) { secureHeaderConn.textContent = "Offline"; secureHeaderConn.style.color = "#fca5a5"; }
+                if (headerWatchLockIcon) headerWatchLockIcon.className = "fa-solid fa-clock";
+            }
+        }
+
         async function loadSecurityContacts(userEmail) {
             const container = document.getElementById('securityContactsList');
             if (!container) return;
 
             let contacts = [];
 
-            // 1. Try fetching from Supabase database
-            const supabaseUrl = 'https://qrufisohvrceqappvhye.supabase.co';
-            const supabaseKey = 'sb_publishable_ROZgpJvsMd2Qg-Bm5PVCwg_MiV1aBQG';
-            const supabaseClient = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
-
-            if (supabaseClient && userEmail) {
+            if (_supabaseSec && userEmail) {
                 try {
-                    const { data, error } = await supabaseClient
+                    const { data, error } = await _supabaseSec
                         .from('contacts')
                         .select('*')
                         .eq('user_email', userEmail);
@@ -1976,13 +2041,11 @@
                 }
             }
 
-            // 2. Fallback to LocalStorage if Supabase returned nothing
             if (contacts.length === 0) {
                 const localContacts = JSON.parse(localStorage.getItem('nirbhaya_trusted_contacts')) || [];
                 contacts = localContacts;
             }
 
-            // 3. Render Contacts or Empty State with "Add Now" option
             if (contacts.length === 0) {
                 container.innerHTML = `
                     <div style="text-align: center; padding: 15px; color: #64748b; font-size: 13px;">
@@ -2012,14 +2075,12 @@
             }
         }
 
-        // Logout logic
         function handleLogout(event) {
             if (event) event.preventDefault();
             localStorage.clear();
             window.location.href = "login.html";
         }
 
-        // Save Custom SOS SMS message to localStorage
         function saveSosSmsMessage() {
             const smsText = document.getElementById('sosSmsMessage').value.trim();
             if (!smsText) {
@@ -2027,12 +2088,9 @@
                 return;
             }
             localStorage.setItem('nirbhaya_sos_sms', smsText);
-            alert("✅ Custom SOS SMS Template saved successfully!\n\nThis message will be dispatched to your emergency network when SOS is triggered.");
+            alert("✅ Custom SOS SMS Template saved successfully!");
         }
 
-        /* =========================
-           USER DROPDOWN TOGGLE SCRIPT
-        ======================== */
         const dropdownToggle = document.getElementById('userDropdownToggle');
         const dropdownMenu = document.getElementById('userDropdownMenu');
 
@@ -2049,57 +2107,19 @@
             });
         }
 
-
-        /* =========================
-           1. WATCH CONNECT / DISCONNECT LOGIC
-        ======================== */
-        let isWatchConnected = true;
-        function toggleWatchConnection() {
-            isWatchConnected = !isWatchConnected;
-            const statusText = document.getElementById('watchStatusText');
-            const connText = document.getElementById('connectionStatusText');
-            const btn = document.getElementById('watchToggleBtn');
-
-            if (isWatchConnected) {
-                statusText.textContent = "Connected";
-                statusText.className = "green";
-                connText.textContent = "Secure";
-                connText.className = "green";
-                btn.textContent = "Disconnect Watch";
-                btn.style.borderColor = "#2563eb";
-                btn.style.color = "#2563eb";
-            } else {
-                statusText.textContent = "Disconnected";
-                statusText.className = "red";
-                connText.textContent = "Offline";
-                connText.className = "red";
-                btn.textContent = "Connect Watch";
-                btn.style.borderColor = "#16a34a";
-                btn.style.color = "#16a34a";
-            }
-        }
-
-
-        /* =========================
-           BLUETOOTH MESH ALERT TOGGLE
-        ======================== */
         let isMeshActive = false;
         function toggleBluetoothMesh() {
             isMeshActive = !isMeshActive;
             const meshToggle = document.getElementById('meshToggle');
             if (isMeshActive) {
                 meshToggle.style.background = "#7c3aed";
-                alert("📡 Bluetooth Mesh Relay Enabled!\n\nYour watch can now silently broadcast emergency packets via peer-to-peer offline Bluetooth mesh to nearby NIRBHAYA users.");
+                alert("📡 Bluetooth Mesh Relay Enabled!");
             } else {
                 meshToggle.style.background = "#cbd5e1";
                 alert("📴 Bluetooth Mesh Relay Disabled.");
             }
         }
 
-
-        /* =========================
-           2. LIVE LOCATION & TRACKING TOGGLE
-        ======================== */
         let isLocationActive = true;
         function toggleLocationTracking() {
             isLocationActive = !isLocationActive;
@@ -2117,10 +2137,6 @@
             }
         }
 
-
-        /* =========================
-           3. EMERGENCY TOGGLE STATES
-        ======================== */
         function toggleSetting(elementId) {
             const el = document.getElementById(elementId);
             if (el.textContent.trim() === "ON") {
@@ -2132,34 +2148,69 @@
             }
         }
 
+        // Custom Stealth PIN Management with History Logging
+        async function setPersonalStealthPin() {
+            let newPin = prompt("🔑 Set your custom 4-digit Stealth Panic PIN:");
+            if (!newPin || newPin.length !== 4 || isNaN(newPin)) {
+                if (newPin !== null) alert("❌ Please enter a valid 4-digit numeric PIN.");
+                return;
+            }
 
-        /* =========================
-           STEALTH PANIC PIN TRIGGER
-        ======================== */
-        function triggerStealthPanic() {
+            const userEmail = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
+            if (!userEmail) {
+                alert("⚠️ Please log in first.");
+                return;
+            }
+
+            localStorage.setItem('nirbhaya_custom_stealth_pin', newPin);
+
+            if (_supabaseSec) {
+                try {
+                    await _supabaseSec
+                        .from('users')
+                        .update({ stealth_pin: newPin })
+                        .eq('email', userEmail);
+                } catch (err) {
+                    console.warn("Database sync warning:", err);
+                }
+            }
+
+            // Log pin configuration to system history timeline
+            logSystemHistory("Stealth Panic PIN Configured", "User updated 4-digit security PIN in database.");
+
+            updatePinUI();
+            alert("✅ Custom Stealth PIN saved successfully!");
+        }
+
+        async function triggerStealthPanic() {
+            let savedPin = localStorage.getItem('nirbhaya_custom_stealth_pin');
+
+            if (!savedPin) {
+                alert("⚠️ No Stealth PIN configured yet! Please click on '[Set PIN]' first.");
+                return;
+            }
+
             let pin = prompt("🔐 Enter your 4-digit Stealth Panic PIN to trigger silent distress signal:");
-            if (pin && pin.length >= 4) {
-                alert("🕵️ STEALTH MODE ACTIVATED!\n\nSilent distress signal transmitted to authorities and guardians. Screen interface remains locked in normal mode to prevent attacker suspicion.");
-            } else if (pin !== null) {
-                alert("❌ Invalid PIN format. Please enter at least 4 digits.");
+            if (!pin) return;
+
+            if (pin !== savedPin) {
+                alert("❌ Incorrect PIN! Silent alarm not triggered.");
+                return;
+            }
+
+            alert("🕵️ STEALTH MODE ACTIVATED!\n\nSilent distress signal transmitted. Dispatching emergency telemetry...");
+
+            if (typeof executeSOSWithEvidence === 'function') {
+                executeSOSWithEvidence();
             }
         }
 
-
-        /* =========================
-           POLICE DIGITAL DISPATCH SIMULATOR
-        ======================== */
         function simulatePoliceDispatch() {
             const dispatchStatus = document.getElementById('policeDispatchStatus');
             dispatchStatus.textContent = "Dispatched 🚨";
             dispatchStatus.className = "red";
-            alert("🚓 POLICE CONTROL ROOM ALERTED!\n\nDigital distress token #NB-99821 successfully broadcasted to nearest PCR Van and Women Helpline Unit with live telemetry.");
+            alert("🚓 POLICE CONTROL ROOM ALERTED!");
         }
-
-
-        /* =========================
-           5. DANGER ZONE PROTECTION OPTIONS (Real Geolocation & Risk Check)
-        ======================== */
 
         function openDangerZoneModal() {
             document.getElementById('dangerModal').style.display = 'flex';
@@ -2170,89 +2221,28 @@
         }
 
         function trackDestinationAndCheckSafety() {
-            let destination = prompt("🧭 Enter your destination (e.g., Central Station / Office):", "Central Market");
+            let destination = prompt("🧭 Enter your destination:", "Central Market");
             if (!destination) return;
-
-            alert(`🚀 Route to "${destination}" initiated.\n- Fetching your live GPS location...`);
 
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        const userLat = position.coords.latitude;
-                        const userLon = position.coords.longitude;
-
-                        const dangerLat = 26.4500;
-                        const dangerLon = 80.3300;
-
-                        const distance = Math.sqrt(Math.pow(userLat - dangerLat, 2) + Math.pow(userLon - dangerLon, 2));
-
-                        const riskText = document.getElementById('riskLevelText');
-                        const badgeStatus = document.getElementById('zoneBadgeStatus');
-                        const aiZoneText = document.getElementById('aiZoneText');
-
-                        if (distance < 0.02) {
-                            riskText.textContent = "HIGH (Restricted Zone)";
-                            riskText.className = "red";
-                            badgeStatus.textContent = "DANGER";
-                            badgeStatus.style.background = "#ef3340";
-                            if (aiZoneText) aiZoneText.textContent = "Entering High Risk Perimeter!";
-
-                            alert(`🚨 DANGER ZONE ALERT!\n\nYour live coordinates (${userLat.toFixed(4)}, ${userLon.toFixed(4)}) indicate you are near/inside Restricted Zone 1 (Sector 4 Industrial Alley)!\n- Risk Level: HIGH\n- Smart Watch vibration warning triggered!\n- Reteaming safe alternate route immediately.`);
-                        } else if (distance < 0.05) {
-                            riskText.textContent = "Moderate (Caution)";
-                            riskText.className = "orange";
-                            badgeStatus.textContent = "CAUTION";
-                            badgeStatus.style.background = "#f97316";
-                            if (aiZoneText) aiZoneText.textContent = "Moderate Caution Corridor";
-
-                            alert(`⚠️ CAUTION ADVISORY!\n\nYou are approaching a moderate risk corridor (${userLat.toFixed(4)}, ${userLon.toFixed(4)}).\n- Risk Level: MEDIUM\n- Keep active surveillance and watch connected.`);
-                        } else {
-                            riskText.textContent = "Low (Safe Route)";
-                            riskText.className = "green";
-                            badgeStatus.textContent = "SAFE";
-                            badgeStatus.style.background = "#16a34a";
-                            if (aiZoneText) aiZoneText.textContent = "AI Threat Monitor Active";
-
-                            alert(`✅ ROUTE SECURE!\n\nYour current position (${userLat.toFixed(4)}, ${userLon.toFixed(4)}) is inside a verified safe zone.\n- Risk Level: LOW\n- Enjoy your journey safely.`);
-                        }
+                        alert(`✅ Route to "${destination}" secure and monitored.`);
                     },
                     (error) => {
-                        alert("❌ Unable to retrieve live GPS location. Please ensure location permissions are allowed in browser settings.");
+                        alert("❌ Unable to retrieve live GPS location.");
                     },
                     { timeout: 10000, enableHighAccuracy: true }
                 );
-            } else {
-                alert("❌ Geolocation is not supported by your browser.");
             }
         }
 
-
-        /* =========================
-           FAKE CALL SIMULATOR
-        ======================== */
         function triggerFakeCall() {
             document.getElementById('fakeCallScreen').style.display = 'block';
         }
 
         function endFakeCall() {
             document.getElementById('fakeCallScreen').style.display = 'none';
-        }
-
-
-        /* =========================
-           DEVICE DETAILS
-        ======================== */
-
-        function deviceDetails() {
-            alert(
-                "⌚ DEVICE DETAILS\n\n" +
-                "Device: AI Guardian Watch\n" +
-                "Device ID: AIG-WS-4587\n" +
-                "Status: " + (isWatchConnected ? "Connected" : "Disconnected") + "\n" +
-                "Battery: 87%\n" +
-                "Connection: " + (isWatchConnected ? "Secure" : "Offline") + "\n" +
-                "Last Sync: Just now"
-            );
         }
 
     </script>

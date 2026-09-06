@@ -863,11 +863,9 @@
                 if (topbarImg) topbarImg.src = 'aqw.jpeg';
             }
 
-            // Fetch contacts from Supabase database
             await fetchContactsFromSupabase();
         });
 
-        // Fetch Contacts from Supabase Database Table
         async function fetchContactsFromSupabase() {
             const userEmail = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
             if (!userEmail) return;
@@ -893,7 +891,6 @@
             renderContactsList();
         }
 
-        // Dynamic Contacts Rendering Engine
         function renderContactsList() {
             const container = document.getElementById('contactsListContainer');
             const contacts = JSON.parse(localStorage.getItem('nirbhaya_trusted_contacts')) || [];
@@ -919,7 +916,7 @@
                         <small>${escapeHTML(contact.phone)} • Verified Guardian</small>
                     </div>
                     <div class="action-btns">
-                        <button class="action-btn delete-btn" onclick="deleteContact('${contact.id}')" title="Delete">
+                        <button class="action-btn delete-btn" onclick="deleteContact('${contact.id}', '${escapeHTML(contact.name)}')" title="Delete">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
@@ -927,21 +924,18 @@
             `).join('');
         }
 
-        // Helper to prevent HTML injection
         function escapeHTML(str) {
             return str.replace(/[&<>'"]/g, 
                 tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
             );
         }
 
-        // Logout logic
         function handleLogout(event) {
             if (event) event.preventDefault();
             localStorage.clear();
             window.location.href = "login.html";
         }
 
-        // User Profile Dropdown Toggle
         const dropdownToggle = document.getElementById('userDropdownToggle');
         const dropdownMenu = document.getElementById('userDropdownMenu');
 
@@ -958,9 +952,6 @@
             });
         }
 
-        /* =========================
-           STRICT 15-SEC SOS COUNTDOWN & DATABASE CONTACT DISPATCH
-        ========================= */
         let sosInterval = null;
         let countdownValue = 15;
 
@@ -976,8 +967,6 @@
                 if (countdownValue <= 0) {
                     clearInterval(sosInterval);
                     document.getElementById('sosCountdownOverlay').style.display = 'none';
-
-                    // Dispatch SOS with Supabase Database Contacts
                     await dispatchSOSToDatabaseContacts();
                 }
             }, 1000);
@@ -991,7 +980,6 @@
             alert("🛡️ SOS Alert successfully cancelled.");
         }
 
-        // Actual SOS Dispatch to Database Contacts via WhatsApp/SMS Scheme
         async function dispatchSOSToDatabaseContacts() {
             const userEmail = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
             const customMsg = localStorage.getItem('nirbhaya_sos_sms') || "🚨 EMERGENCY! I need immediate help. Track my live location via NIRBHAYA.";
@@ -1008,7 +996,6 @@
                     const mapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
                     const fullMessage = `${customMsg} My GPS Location: ${mapsLink}`;
 
-                    // Fetch contacts fresh from Supabase database
                     const { data: contacts, error } = await _supabase
                         .from('contacts')
                         .select('*')
@@ -1019,7 +1006,6 @@
                         return;
                     }
 
-                    // Pick primary contact and open WhatsApp message link
                     let primaryContact = contacts[0];
                     let cleanPhone = primaryContact.phone.replace(/[^0-9]/g, '');
                     const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(fullMessage)}`;
@@ -1035,8 +1021,8 @@
             }
         }
 
-        // Contact Delete Logic with Supabase Sync
-        async function deleteContact(contactId) {
+        // Contact Delete Logic with History Logging
+        async function deleteContact(contactId, contactName) {
             if (confirm("Are you sure you want to remove this guardian from your emergency dispatch network?")) {
                 const { error } = await _supabase
                     .from('contacts')
@@ -1048,12 +1034,16 @@
                     return;
                 }
 
+                // Log contact removal event to history timeline
+                if (typeof logSystemHistory === 'function') {
+                    logSystemHistory("Trusted Contact Removed", `Removed guardian "${contactName}" from emergency network.`);
+                }
+
                 await fetchContactsFromSupabase();
                 alert("✅ Contact deleted successfully!");
             }
         }
 
-        // Modal Controls
         function openAddModal() {
             document.getElementById('modalNameInput').value = "";
             document.getElementById('modalPhoneInput').value = "";
@@ -1064,7 +1054,7 @@
             document.getElementById('contactModal').style.display = 'none';
         }
 
-        // Save Contact to Supabase Database
+        // Save Contact to Supabase Database with History Logging
         async function saveContact() {
             const name = document.getElementById('modalNameInput').value.trim();
             const phone = document.getElementById('modalPhoneInput').value.trim();
@@ -1080,7 +1070,6 @@
                 return;
             }
 
-            // Insert into Supabase 'contacts' table
             const { data, error } = await _supabase
                 .from('contacts')
                 .insert([
@@ -1090,6 +1079,11 @@
             if (error) {
                 alert("❌ Failed to save contact to database: " + error.message);
                 return;
+            }
+
+            // Log contact addition event to history timeline
+            if (typeof logSystemHistory === 'function') {
+                logSystemHistory("Trusted Contact Added", `Added new verified guardian "${name}" (${phone}).`);
             }
 
             alert("✅ Guardian successfully saved to Supabase database!");
