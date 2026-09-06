@@ -2,11 +2,8 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <link rel="stylesheet" href="/css/auth.css">
     <link rel="stylesheet" href="/css/global.css">
 
@@ -46,20 +43,14 @@
         .login-btn {
             width: 100%;
             padding: 13px;
-
             margin-top: 20px;
-
             border: none;
             border-radius: 10px;
-
             background: #e63946;
             color: white;
-
             font-size: 16px;
             font-weight: bold;
-
             cursor: pointer;
-
             transition: 0.3s;
         }
 
@@ -171,130 +162,62 @@
             color: white;
         }
     </style>
-
 </head>
-
 
 <body>
 
     <main class="auth-page">
-
         <section class="login-container">
 
             <!-- NIRBHAYA HEADER -->
-
             <div class="auth-header">
-
                 <div class="shield-logo">
-                    <img src="assets/images/logo.png"  height = 100px alt="Nirbhaya Logo" class="shield">
+                    <img src="assets/images/logo.png" height="100px" alt="Nirbhaya Logo" class="shield">
                 </div>
-
                 <h1>NIRBHAYA</h1>
-
-                <p>
-                    Security on your wrist, peace in your mind
-                </p>
-
+                <p>Security on your wrist, peace in your mind</p>
             </div>
 
-
             <!-- LOGIN CARD -->
-
             <div class="login-card">
-
                 <h2>Welcome Back!</h2>
-
-                <p class="subtitle">
-                    Login to continue your safest journey
-                </p>
-
+                <p class="subtitle">Login to continue your safest journey</p>
 
                 <!-- EMAIL -->
-
                 <div class="input-group">
-
-                    <label for="email">
-                        Email Address
-                    </label>
-
+                    <label for="email">Email Address</label>
                     <div class="input-wrapper">
-
-                        <span class="input-icon">
-                            ✉
-                        </span>
-
+                        <span class="input-icon">✉</span>
                         <input type="email" id="email" placeholder="name@example.com" required>
-
                     </div>
-
                 </div>
-
 
                 <!-- PASSWORD -->
-
                 <div class="input-group">
-
-                    <label for="password">
-                        Password
-                    </label>
-
+                    <label for="password">Password</label>
                     <div class="input-wrapper">
-
-                        <span class="input-icon">
-                            🔒
-                        </span>
-
+                        <span class="input-icon">🔒</span>
                         <input type="password" id="password" placeholder="Password" required>
-
-                        <button type="button" class="eye-btn" id="togglePassword">
-
-                            👁
-
-                        </button>
-
+                        <button type="button" class="eye-btn" id="togglePassword">👁</button>
                     </div>
-
                 </div>
-
 
                 <!-- FORGOT PASSWORD -->
-
                 <div class="login-options">
-
-                    <a href="#" id="forgotPasswordLink" onclick="openCaptchaModal(event)">
-                        Forgot Password?
-                    </a>
-
+                    <a href="#" id="forgotPasswordLink" onclick="openCaptchaModal(event)">Forgot Password?</a>
                 </div>
 
-
                 <!-- LOGIN BUTTON -->
-
-                <button type="button" class="login-btn" id="loginBtn" onclick="handleLogin()">
-
-                    Submit
-
-                </button>
-
+                <button type="button" class="login-btn" id="loginBtn" onclick="handleLogin()">Submit</button>
 
                 <!-- SIGN UP -->
-
                 <p class="login-text">
-
-                    Don't have an account?
-
-                    <a href="signup.html">
-                        Sign Up
-                    </a>
-
+                    Don't have an account? <a href="signup.html">Sign Up</a>
                 </p>
-
             </div>
 
         </section>
-
     </main>
-
 
     <!-- CAPTCHA VERIFICATION MODAL FOR FORGOT PASSWORD -->
     <div class="modal-overlay" id="captchaModal">
@@ -304,8 +227,7 @@
 
             <div class="captcha-display" id="captchaCodeText">7492</div>
 
-            <input type="text" id="captchaUserInput" class="modal-input" placeholder="Enter the code above"
-                autocomplete="off">
+            <input type="text" id="captchaUserInput" class="modal-input" placeholder="Enter the code above" autocomplete="off">
 
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeCaptchaModal()">Cancel</button>
@@ -314,17 +236,13 @@
         </div>
     </div>
 
-
     <!-- Script for Official Validation & Supabase Authentication Integration -->
     <script>
-     
-
         // Initialize Supabase Client
         const supabaseUrl = 'https://qrufisohvrceqappvhye.supabase.co';
         const supabaseKey = 'sb_publishable_ROZgpJvsMd2Qg-Bm5PVCwg_MiV1aBQG'; 
         const _supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        // Official Admin Email Config
         const ADMIN_EMAIL = "hardik@nirbhaya.com";
 
         // Password Visibility Toggle
@@ -344,16 +262,15 @@
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
 
+            // .trim().toLowerCase() fixes mobile capitalization bugs
             const email = emailInput.value.trim().toLowerCase();
             const password = passwordInput.value.trim();
 
-            // Official Validation 1: Empty Fields
             if (!email || !password) {
                 alert("⚠️ Please enter both email and password.");
                 return;
             }
 
-            // Official Validation 2: Strict Email Format Check
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 alert("❌ Invalid Email Format! Please enter a valid email address containing '@' (e.g., user@example.com).");
@@ -361,7 +278,6 @@
                 return;
             }
 
-            // Check Supabase database for matching user
             try {
                 const { data: users, error } = await _supabase
                     .from('users')
@@ -383,14 +299,14 @@
                 const foundUser = users[0];
                 const displayName = foundUser.fullName || foundUser.name || 'User';
 
-                // Set current active session user parameters
+                // Set cross-device session identifiers
                 localStorage.setItem('nirbhaya_current_user_email', foundUser.email);
+                localStorage.setItem('nirbhaya_user_email', foundUser.email);
                 localStorage.setItem('nirbhaya_username', displayName);
                 if (foundUser.phone) {
                     localStorage.setItem('nirbhaya_userphone', foundUser.phone);
                 }
                 
-                // Fetch and store user DP from database table column 'user_dp'
                 if (foundUser.user_dp) {
                     localStorage.setItem('nirbhaya_userdp', foundUser.user_dp);
                 } else if (foundUser.dp) {
@@ -399,7 +315,6 @@
                     localStorage.removeItem('nirbhaya_userdp');
                 }
 
-                // Role-Based Routing Logic (Updated: Normal user goes to security.html)
                 if (foundUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
                     alert(`👑 Welcome Admin, ${displayName}!\n\nLogin Successful. Redirecting to Command Center...`);
                     window.location.href = "admin.html";
@@ -476,6 +391,7 @@
                         const displayName = foundUser.fullName || foundUser.name || 'User';
 
                         localStorage.setItem('nirbhaya_current_user_email', foundUser.email);
+                        localStorage.setItem('nirbhaya_user_email', foundUser.email);
                         localStorage.setItem('nirbhaya_username', displayName);
                         if (foundUser.phone) {
                             localStorage.setItem('nirbhaya_userphone', foundUser.phone);
@@ -511,7 +427,6 @@
         }
 
         // --- KEYBOARD NAVIGATION LOGIC ---
-        
         const emailField = document.getElementById('email');
         const passField = document.getElementById('password');
         const modalInputField = document.getElementById('captchaUserInput');
@@ -542,7 +457,6 @@
                 }
             });
         }
-
     </script>
 
 </body>
