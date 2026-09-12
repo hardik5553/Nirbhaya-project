@@ -13,7 +13,6 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         * {
@@ -592,6 +591,8 @@
     </main>
 
     <!-- Global Multi-Channel SOS Engine Script -->
+    <script src="../js/api.js"></script>
+    <script src="../js/location-service.js"></script>
     <script src="../global-sos.js"></script>
 
     <!-- GEOLOCATION & EXACT PIN MAPPING SCRIPT -->
@@ -607,6 +608,7 @@
         });
 
         let watchId = null;
+        let currentRoutePoints = [];
 
         window.addEventListener("DOMContentLoaded", () => {
             const savedName = localStorage.getItem('nirbhaya_username');
@@ -633,6 +635,12 @@
             }
 
             startStrictLiveLocation();
+            const userId = getStoredUserId();
+            if (userId) {
+                getLocationHistory(userId)
+                    .then(history => localStorage.setItem('nirbhaya_location_history', JSON.stringify(history)))
+                    .catch(error => console.warn('Location history unavailable:', error));
+            }
         });
 
         function startStrictLiveLocation() {
@@ -663,7 +671,24 @@
                 statusSpan.style.color = "#16a34a";
 
                 mapIframe.src = `https://maps.google.com/maps?q=${lat},${lon}&hl=en&z=17&output=embed`;
+                currentRoutePoints = [{ latitude: lat, longitude: lon }];
+                checkLocationSafety(lat, lon);
             };
+
+            async function checkLocationSafety(lat, lon) {
+                const userId = getStoredUserId();
+                const checks = await Promise.allSettled([
+                    checkDangerZone(lat, lon),
+                    checkSafetyZone(lat, lon),
+                    evaluateRisk(lat, lon),
+                    findNearbyHelp(lat, lon),
+                    userId ? updateUserLocation(userId, lat, lon) : Promise.resolve(null),
+                    userId ? getCurrentLocation(userId) : Promise.resolve(null)
+                ]);
+                const failed = checks.filter(result => result.status === 'rejected');
+                statusSpan.textContent = failed.length ? `GPS active; ${failed.length} safety checks unavailable` : 'GPS active; safety checks updated';
+                statusSpan.style.color = failed.length ? '#f59e0b' : '#16a34a';
+            }
 
             const handleError = (error) => {
                 console.warn("High accuracy geolocation timed out or failed:", error.message);
@@ -700,7 +725,7 @@
             });
         }
 
-        function searchDestinationRoute() {
+        async function searchDestinationRoute() {
             const destinationQuery = document.getElementById('destinationInput').value.trim();
             const routeStatus = document.getElementById('routeStatusText');
             const mapIframe = document.getElementById('locationMap');
@@ -710,10 +735,30 @@
                 return;
             }
 
-            routeStatus.textContent = `Navigating towards: ${destinationQuery} (Safe Route Verified)`;
+            const userId = getStoredUserId();
+            const latitude = Number.parseFloat(document.getElementById('latitude').textContent);
+            const longitude = Number.parseFloat(document.getElementById('longitude').textContent);
+            const point = Number.isFinite(latitude) && Number.isFinite(longitude)
+                ? { latitude, longitude }
+                : { latitude: 0, longitude: 0 };
+            const routePayload = {
+                userId,
+                plannedRoute: [point],
+                alternativeRoute: [point],
+                currentLatitude: point.latitude,
+                currentLongitude: point.longitude
+            };
+            const [safeRoute, deviation] = await Promise.all([
+                requestSafeRoute(routePayload),
+                userId ? checkRouteDeviation(userId, point.latitude, point.longitude, currentRoutePoints) : Promise.resolve(null)
+            ]).catch(error => {
+                console.warn('Route safety API failed:', error);
+                return [null, null];
+            });
+            routeStatus.textContent = `Navigating towards: ${destinationQuery} (Safety checked)`;
             routeStatus.style.color = "#16a34a";
 
-            alert(`🧭 Route Calculated Successfully!\n- Destination: ${destinationQuery}\n- AI Guardian: Safe corridor selected.\n- Updating map to display destination route...`);
+            alert(`🧭 Route checked successfully!\n- Destination: ${destinationQuery}\n- Safety response: ${JSON.stringify(safeRoute)}\n- Deviation response: ${JSON.stringify(deviation)}`);
 
             mapIframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(destinationQuery)}&hl=en&z=14&output=embed`;
         }

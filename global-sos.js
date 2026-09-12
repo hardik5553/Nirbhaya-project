@@ -1,12 +1,9 @@
-// global-sos.js - Final Clean SOS Engine (Single Dispatch & Private Audio Vault)
-
-const SUPABASE_URL_GLOBAL = 'https://qrufisohvrceqappvhye.supabase.co';
-const SUPABASE_KEY_GLOBAL = 'sb_publishable_ROZgpJvsMd2Qg-Bm5PVCwg_MiV1aBQG';
-const _supabaseGlobal = window.supabase ? window.supabase.createClient(SUPABASE_URL_GLOBAL, SUPABASE_KEY_GLOBAL) : null;
+// global-sos.js - SOS countdown, backend dispatch, and Cloudinary evidence upload
 
 let globalSosInterval = null;
 let globalCountdownValue = 15;
 let isSosExecuting = false; // Prevents double firing
+let activeBackendSosId = null;
 
 function triggerSOSCountdown() {
     if (isSosExecuting) return;
@@ -47,6 +44,11 @@ function triggerSOSCountdown() {
 
 function cancelSOS() {
     if (globalSosInterval) clearInterval(globalSosInterval);
+    if (activeBackendSosId) {
+        apiRequest(`/sos/cancel/${encodeURIComponent(activeBackendSosId)}`, { method: 'POST' })
+            .catch(error => console.warn('Backend SOS cancellation failed:', error));
+        activeBackendSosId = null;
+    }
     isSosExecuting = false;
     const overlay = document.getElementById('sosCountdownOverlay');
     if (overlay) overlay.style.display = 'none';
@@ -57,18 +59,28 @@ async function executeSOSWithEvidence() {
     if (isSosExecuting) return;
     isSosExecuting = true;
 
-    const userEmail = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
+    const userId = getStoredUserId();
     const customMsg = localStorage.getItem('nirbhaya_sos_sms') || "🚨 EMERGENCY! I need immediate help. Track my live location via NIRBHAYA.";
 
-    if (!userEmail) {
+    if (!userId) {
         window.location.href = "../login.html";
         return;
     }
 
     let evidenceUrl = "No Image Captured";
 
+    try {
+        const incident = await apiRequest("/sos/trigger", {
+            method: "POST",
+            body: JSON.stringify({ userId })
+        });
+        activeBackendSosId = incident.id || null;
+    } catch (error) {
+        console.error("SOS incident could not be saved:", error);
+    }
+
     // 1. Start 30-Sec Private Background Audio Vault Recording
-    startBackgroundAudioVault(userEmail);
+    startBackgroundAudioVault(userId);
 
     // 2. Back Camera Snapshot Capture
     try {
@@ -102,21 +114,8 @@ async function executeSOSWithEvidence() {
         video.remove();
 
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.90));
-        if (blob && _supabaseGlobal) {
-            const fileName = `sos_evidence_${Date.now()}.jpg`;
-            const filePath = `${userEmail}/${fileName}`;
-            const { error } = await _supabaseGlobal.storage
-                .from('panic-evidence')
-                .upload(filePath, blob, { contentType: 'image/jpeg', upsert: true });
-
-            if (!error) {
-                const { data: publicUrlData } = _supabaseGlobal.storage
-                    .from('panic-evidence')
-                    .getPublicUrl(filePath);
-                if (publicUrlData && publicUrlData.publicUrl) {
-                    evidenceUrl = publicUrlData.publicUrl;
-                }
-            }
+        if (blob) {
+            evidenceUrl = await uploadEvidence(userId, blob, `sos_evidence_${Date.now()}.jpg`);
         }
     } catch (camErr) {
         console.warn("Back camera capture failed:", camErr);
@@ -128,23 +127,37 @@ async function executeSOSWithEvidence() {
     let mapsLink = "https://www.google.com/maps";
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-            (position) => {
+            async (position) => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
                 mapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
-                proceedWithMessaging(userEmail, customMsg, mapsLink, evidenceUrl);
+                await apiRequest("/location/update", {
+                    method: "POST",
+                    body: JSON.stringify({ userId, lat, lng })
+                }).catch(error => console.warn("Location could not be saved:", error));
+                await updateUserLocation(userId, lat, lng)
+                    .catch(error => console.warn("User location could not be saved:", error));
+                await reportDistress({
+                    userId,
+                    latitude: lat,
+                    longitude: lng,
+                    movementDetected: true,
+                    shakeDetected: false,
+                    fallDetected: false
+                }).catch(error => console.warn("Distress telemetry could not be saved:", error));
+                proceedWithMessaging(userId, customMsg, mapsLink, evidenceUrl);
             },
             () => {
-                proceedWithMessaging(userEmail, customMsg, mapsLink, evidenceUrl);
+                proceedWithMessaging(userId, customMsg, mapsLink, evidenceUrl);
             },
             { timeout: 3000, enableHighAccuracy: false }
         );
     } else {
-        proceedWithMessaging(userEmail, customMsg, mapsLink, evidenceUrl);
+        proceedWithMessaging(userId, customMsg, mapsLink, evidenceUrl);
     }
 }
 
-async function startBackgroundAudioVault(userEmail) {
+async function startBackgroundAudioVault(userId) {
     try {
         const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
         const mediaRecorder = new MediaRecorder(audioStream);
@@ -158,29 +171,9 @@ async function startBackgroundAudioVault(userEmail) {
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
             audioStream.getTracks().forEach(track => track.stop());
 
-            if (audioBlob && _supabaseGlobal) {
-                const audioName = `private_vault_${Date.now()}.webm`;
-                const audioPath = `${userEmail}/${audioName}`;
-                
-                const { error: uploadErr } = await _supabaseGlobal.storage
-                    .from('panic-evidence')
-                    .upload(audioPath, audioBlob, { contentType: 'audio/webm', upsert: true });
-
-                if (!uploadErr) {
-                    const { data: publicAudioData } = _supabaseGlobal.storage
-                        .from('panic-evidence')
-                        .getPublicUrl(audioPath);
-
-                    if (publicAudioData && publicAudioData.publicUrl) {
-                        const audioVaultUrl = publicAudioData.publicUrl;
-
-                        await _supabaseGlobal.from('audio_vault').insert([
-                            { user_email: userEmail, audio_url: audioVaultUrl, created_at: new Date().toISOString() }
-                        ]);
-
-                        logSystemHistory("Automated Audio Evidence Captured (30s)", "Private 30s audio securely saved to cloud vault.");
-                    }
-                }
+            if (audioBlob) {
+                await uploadEvidence(userId, audioBlob, `private_vault_${Date.now()}.webm`);
+                logSystemHistory("Automated Audio Evidence Captured (30s)", "Private 30s audio securely saved to Cloudinary.");
             }
             isSosExecuting = false;
         };
@@ -196,15 +189,15 @@ async function startBackgroundAudioVault(userEmail) {
     }
 }
 
-async function proceedWithMessaging(userEmail, customMsg, mapsLink, evidenceUrl) {
+async function proceedWithMessaging(userId, customMsg, mapsLink, evidenceUrl) {
     const fullMessage = `${customMsg} \n📍 GPS Location: ${mapsLink} \n📸 Evidence Photo: ${evidenceUrl}`;
     let contacts = [];
 
-    if (_supabaseGlobal) {
-        try {
-            const { data, error } = await _supabaseGlobal.from('contacts').select('*').eq('user_email', userEmail);
-            if (!error && data && data.length > 0) contacts = data.map(c => ({ name: c.contact_name, phone: c.phone }));
-        } catch (e) {}
+    try {
+        const data = await apiRequest(`/trusted-contacts/${encodeURIComponent(userId)}`);
+        contacts = data.map(c => ({ name: c.name, phone: c.phoneNumber }));
+    } catch (e) {
+        console.warn("Backend contacts unavailable; using local contacts.", e);
     }
 
     if (contacts.length === 0) {
@@ -214,11 +207,22 @@ async function proceedWithMessaging(userEmail, customMsg, mapsLink, evidenceUrl)
 
     if (contacts.length === 0) contacts = [{ name: "Emergency Dispatch", phone: "112" }];
 
+    const coordinates = mapsLink.match(/q=([^,]+),([^&]+)/);
+    await dispatchSosSms(
+        contacts.map(contact => contact.phone),
+        coordinates ? coordinates[1] : "0",
+        coordinates ? coordinates[2] : "0"
+    )
+        .catch(error => console.warn("Backend SMS dispatch failed:", error));
+
     let primaryContact = contacts[0];
     let cleanPhone = primaryContact.phone.replace(/[^0-9+]/g, '');
 
     const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone.replace('+', '')}&text=${encodeURIComponent(fullMessage)}`;
     const smsUrl = `sms:${cleanPhone}?body=${encodeURIComponent(fullMessage)}`;
+
+    await sendSms(primaryContact.phone, fullMessage, true)
+        .catch(error => console.warn("Backend SMS send failed:", error));
 
     window.open(whatsappUrl, '_blank');
     setTimeout(() => {
@@ -235,4 +239,17 @@ function logSystemHistory(title, description) {
         date: new Date().toLocaleDateString()
     });
     localStorage.setItem('nirbhaya_system_logs', JSON.stringify(history));
+}
+
+async function uploadEvidence(userId, blob, fileName) {
+    const formData = new FormData();
+    formData.append("userId", userId);
+    formData.append("file", blob, fileName);
+    try {
+        const response = await apiRequest("/evidence/upload", { method: "POST", body: formData });
+        return typeof response === "string" ? response : response.url || "Evidence uploaded";
+    } catch (error) {
+        const response = await uploadEvidenceBytes(userId, await blob.arrayBuffer());
+        return typeof response === "string" ? response : response.url || "Evidence uploaded";
+    }
 }

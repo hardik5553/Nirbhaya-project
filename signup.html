@@ -7,14 +7,11 @@
 
     <title>NIRBHAYA - Sign Up</title>
 
-    <link rel="stylesheet" href="../css/global.css">
-    <link rel="stylesheet" href="../css/auth.css">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/auth.css">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Supabase JS Client CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         body {
@@ -374,6 +371,25 @@
                     </div>
                 </div>
 
+                <div class="input-group">
+                    <label for="accountRole">Account Type</label>
+                    <div class="input-field-wrapper">
+                        <i class="fa-solid fa-user-shield field-icon"></i>
+                        <select id="accountRole" style="width: 100%; height: 48px; padding: 12px 40px 12px 42px; font-size: 14px; border: 1px solid #cbd5e1; border-radius: 10px; background: #fff;" onchange="toggleAdminKeyField()">
+                            <option value="USER">Safety User</option>
+                            <option value="ADMIN">Administrator</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group" id="adminKeyGroup" style="display: none;">
+                    <label for="adminRegistrationKey">Administrator Secret Key</label>
+                    <div class="input-field-wrapper">
+                        <i class="fa-solid fa-key field-icon"></i>
+                        <input type="password" id="adminRegistrationKey" placeholder="Enter administrator secret key" autocomplete="off">
+                    </div>
+                </div>
+
                 <!-- Password Field with Toggle Icon -->
                 <div class="input-group">
                     <label for="password">Password</label>
@@ -480,25 +496,18 @@
         </div>
     </div>
 
-    <!-- Script for Strict Signup & Supabase Integration Flow -->
+    <!-- Script for strict signup and backend integration flow -->
     <script>
 
-        // Session Security Guard
-window.addEventListener('DOMContentLoaded', () => {
-    const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
-    
-    if (!activeUser) {
-        alert("⚠️ Unauthorized Access: Please log in first.");
-        window.location.href = "login.html"; // Agar file 'pages' folder ke andar hai toh "../login.html" karein
-    }
-});
-
-        // Initialize Supabase Client
-        const supabaseUrl = 'https://qrufisohvrceqappvhye.supabase.co';
-        const supabaseKey = 'sb_publishable_ROZgpJvsMd2Qg-Bm5PVCwg_MiV1aBQG';
-        const _supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const API_BASE_URL = window.NIRBHAYA_API_BASE_URL || 'https://nirbhaya-app.onrender.com';
 
         const hideTimers = {};
+
+        function toggleAdminKeyField() {
+            const isAdmin = document.getElementById('accountRole').value === 'ADMIN';
+            document.getElementById('adminKeyGroup').style.display = isAdmin ? 'block' : 'none';
+            document.getElementById('adminRegistrationKey').required = isAdmin;
+        }
 
         function togglePasswordVisibility(fieldId, iconElement) {
             const passwordInput = document.getElementById(fieldId);
@@ -525,7 +534,7 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Official Signup Handling Logic with Supabase Database Integration
+        // Signup handling logic with backend database integration
         async function handleSignup(event) {
             event.preventDefault();
 
@@ -533,6 +542,8 @@ window.addEventListener('DOMContentLoaded', () => {
             const emailInput = document.getElementById('email');
             const email = emailInput.value.trim().toLowerCase();
             const phone = document.getElementById('phone').value.trim();
+            const role = document.getElementById('accountRole').value;
+            const adminRegistrationKey = document.getElementById('adminRegistrationKey').value;
             const password = document.getElementById('password').value.trim();
             const confirmPassword = document.getElementById('confirmPassword').value.trim();
             const robotCheck = document.getElementById('robotCheck').checked;
@@ -564,53 +575,16 @@ window.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                // Check if email already registered in Supabase
-                const { data: existingUsers, error: checkError } = await _supabase
-                    .from('users')
-                    .select('*')
-                    .eq('email', email);
-
-                if (checkError) {
-                    console.error('Error checking user existence:', checkError.message);
-                    alert("⚠️ Database error occurred. Please try again.");
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: name, email, phoneNumber: phone, password, role, adminRegistrationKey })
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                    alert(`❌ ${result.message || 'Failed to create account.'}`);
                     return;
                 }
-
-                if (existingUsers && existingUsers.length > 0) {
-                    alert("⚠️ An account with this email already exists! Please log in instead.");
-                    window.location.href = "login.html";
-                    return;
-                }
-
-                // Insert new user record into Supabase database table 'users' with exact schema keys
-                const { error: insertError } = await _supabase
-                    .from('users')
-                    .insert([
-                        { 
-                            fullName: name,
-                            email: email, 
-                            phone: phone,
-                            password: password 
-                        }
-                    ]);
-
-                if (insertError) {
-                    console.error('Supabase insert error:', insertError.message);
-                    alert("❌ Failed to save account to database: " + insertError.message);
-                    return;
-                }
-
-                // Fallback / Backup local storage database entry
-                let users = JSON.parse(localStorage.getItem('nirbhaya_signup_users')) || [];
-                const newUser = {
-                    name: name,
-                    email: email,
-                    phone: phone,
-                    password: password,
-                    dp: "" 
-                };
-                users.push(newUser);
-                localStorage.setItem('nirbhaya_signup_users', JSON.stringify(users));
 
                 alert(`✅ Account Created Successfully for ${name}!\n\nPlease log in using your credentials.`);
                 window.location.href = "login.html"; // Redirects to login page after signup

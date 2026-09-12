@@ -16,7 +16,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/api.js"></script>
 
     <style>
         * {
@@ -709,7 +709,7 @@
 
             <div class="contacts-grid">
 
-                <!-- Primary Guardians Card (Supabase Connected) -->
+                <!-- Primary Guardians Card -->
                 <div class="contact-card">
                     <div>
                         <div class="card-heading">
@@ -720,7 +720,7 @@
                         </div>
 
                         <div id="contactsListContainer">
-                            <!-- Populated via Supabase -->
+                            <!-- Populated via backend -->
                         </div>
                     </div>
 
@@ -817,13 +817,8 @@
         </div>
     </div>
 
-    <!-- Scripting with Correct Supabase Credentials & Database Dispatch -->
+    <!-- Backend data and SOS dispatch -->
     <script>
-        // Supabase Client Initialization with Real Project URL & Anon Key
-        const supabaseUrl = 'https://qrufisohvrceqappvhye.supabase.co';
-        const supabaseKey = 'sb_publishable_ROZgpJvsMd2Qg-Bm5PVCwg_MiV1aBQG';
-        const _supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
         // Session Security Guard
         window.addEventListener('DOMContentLoaded', () => {
             const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
@@ -834,7 +829,7 @@
             }
         });
 
-        // Load User Profile Data & Fetch Contacts from Supabase on Load
+        // Load user profile data and fetch contacts from the backend on load.
         window.addEventListener('DOMContentLoaded', async () => {
             const savedName = localStorage.getItem('nirbhaya_username');
             const savedDp = localStorage.getItem('nirbhaya_userdp');
@@ -863,28 +858,22 @@
                 if (topbarImg) topbarImg.src = 'aqw.jpeg';
             }
 
-            await fetchContactsFromSupabase();
+            await fetchContactsFromBackend();
         });
 
-        async function fetchContactsFromSupabase() {
-            const userEmail = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
-            if (!userEmail) return;
+        async function fetchContactsFromBackend() {
+            const userId = getStoredUserId();
+            if (!userId) return;
 
-            const { data, error } = await _supabase
-                .from('contacts')
-                .select('*')
-                .eq('user_email', userEmail);
-
-            if (error) {
-                console.error("Error fetching contacts:", error.message);
-                return;
-            }
-
+            const data = await apiRequest(`/trusted-contacts/${encodeURIComponent(userId)}`);
+            getEmergencyContacts(userId)
+                .then(emergencyContacts => localStorage.setItem('nirbhaya_emergency_contacts', JSON.stringify(emergencyContacts)))
+                .catch(error => console.warn('Emergency contacts unavailable:', error));
             const formattedContacts = data.map(c => ({
-                id: c.id.toString(),
-                name: c.contact_name,
-                phone: c.phone,
-                relation: c.relation || 'Guardian'
+                id: c.id,
+                name: c.name,
+                phone: c.phoneNumber,
+                relation: c.relationship || 'Guardian'
             }));
 
             localStorage.setItem('nirbhaya_trusted_contacts', JSON.stringify(formattedContacts));
@@ -918,6 +907,9 @@
                     <div class="action-btns">
                         <button class="action-btn delete-btn" onclick="deleteContact('${contact.id}', '${escapeHTML(contact.name)}')" title="Delete">
                             <i class="fa-solid fa-trash"></i>
+                        </button>
+                        <button class="action-btn" onclick="editContact('${contact.id}', '${escapeHTML(contact.name)}', '${escapeHTML(contact.phone)}', '${escapeHTML(contact.relation)}')" title="Edit">
+                            <i class="fa-solid fa-pen"></i>
                         </button>
                     </div>
                 </div>
@@ -996,21 +988,18 @@
                     const mapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
                     const fullMessage = `${customMsg} My GPS Location: ${mapsLink}`;
 
-                    const { data: contacts, error } = await _supabase
-                        .from('contacts')
-                        .select('*')
-                        .eq('user_email', userEmail);
+                    const contacts = await apiRequest(`/trusted-contacts/${encodeURIComponent(getStoredUserId())}`);
 
-                    if (error || !contacts || contacts.length === 0) {
-                        alert("⚠️ SOS Triggered! No emergency contacts found in Supabase database.");
+                    if (!contacts || contacts.length === 0) {
+                        alert("⚠️ SOS Triggered! No emergency contacts found in the backend.");
                         return;
                     }
 
                     let primaryContact = contacts[0];
-                    let cleanPhone = primaryContact.phone.replace(/[^0-9]/g, '');
+                    let cleanPhone = primaryContact.phoneNumber.replace(/[^0-9]/g, '');
                     const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(fullMessage)}`;
 
-                    alert(`🚨 SOS DISPATCHED TO DATABASE CONTACT!\n\nAlerting Primary Guardian: ${primaryContact.contact_name} (${primaryContact.phone})\n\nClick OK to open messaging gateway.`);
+                    alert(`🚨 SOS DISPATCHED TO DATABASE CONTACT!\n\nAlerting Primary Guardian: ${primaryContact.name} (${primaryContact.phoneNumber})\n\nClick OK to open messaging gateway.`);
                     window.open(whatsappUrl, '_blank');
 
                 }, (error) => {
@@ -1024,22 +1013,14 @@
         // Contact Delete Logic with History Logging
         async function deleteContact(contactId, contactName) {
             if (confirm("Are you sure you want to remove this guardian from your emergency dispatch network?")) {
-                const { error } = await _supabase
-                    .from('contacts')
-                    .delete()
-                    .eq('id', contactId);
-
-                if (error) {
-                    alert("❌ Failed to delete contact: " + error.message);
-                    return;
-                }
+                await apiRequest(`/trusted-contacts/delete/${encodeURIComponent(contactId)}`, { method: "DELETE" });
 
                 // Log contact removal event to history timeline
                 if (typeof logSystemHistory === 'function') {
                     logSystemHistory("Trusted Contact Removed", `Removed guardian "${contactName}" from emergency network.`);
                 }
 
-                await fetchContactsFromSupabase();
+                await fetchContactsFromBackend();
                 alert("✅ Contact deleted successfully!");
             }
         }
@@ -1054,41 +1035,49 @@
             document.getElementById('contactModal').style.display = 'none';
         }
 
-        // Save Contact to Supabase Database with History Logging
+        // Save contact through the backend.
         async function saveContact() {
             const name = document.getElementById('modalNameInput').value.trim();
             const phone = document.getElementById('modalPhoneInput').value.trim();
-            const userEmail = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
+            const userId = getStoredUserId();
 
             if (!name || !phone) {
                 alert("⚠️ Please fill in both Name and Phone number.");
                 return;
             }
 
-            if (!userEmail) {
+            if (!userId) {
                 alert("⚠️ User session not found. Please log in again.");
                 return;
             }
 
-            const { data, error } = await _supabase
-                .from('contacts')
-                .insert([
-                    { user_email: userEmail, contact_name: name, phone: phone, relation: 'Guardian' }
-                ]);
-
-            if (error) {
-                alert("❌ Failed to save contact to database: " + error.message);
-                return;
-            }
+            await apiRequest("/trusted-contacts/add", {
+                method: "POST",
+                body: JSON.stringify({ userId, name, phoneNumber: phone, relationship: "Guardian" })
+            });
+            await addEmergencyContact(userId, name, phone)
+                .catch(error => console.warn('Legacy emergency contact sync failed:', error));
 
             // Log contact addition event to history timeline
             if (typeof logSystemHistory === 'function') {
                 logSystemHistory("Trusted Contact Added", `Added new verified guardian "${name}" (${phone}).`);
             }
 
-            alert("✅ Guardian successfully saved to Supabase database!");
+            alert("✅ Guardian successfully saved to the backend!");
             closeModal();
-            await fetchContactsFromSupabase();
+            await fetchContactsFromBackend();
+        }
+
+        async function editContact(contactId, currentName, currentPhone, currentRelation) {
+            const name = prompt('Contact name:', currentName);
+            const phoneNumber = prompt('Phone number:', currentPhone);
+            const relationship = prompt('Relationship:', currentRelation || 'Guardian');
+            const userId = getStoredUserId();
+            if (!name || !phoneNumber || !userId) return;
+
+            await updateTrustedContact(contactId, { userId, name, phoneNumber, relationship });
+            await fetchContactsFromBackend();
+            alert('✅ Contact updated successfully!');
         }
 
         function testEmergencyLine() {

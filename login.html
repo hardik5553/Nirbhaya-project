@@ -7,13 +7,10 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="/css/auth.css">
-    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/global.css">
 
     <title>NIRBHAYA - Login</title>
-
-    <!-- Supabase JS Client CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         /* Login Container */
@@ -129,6 +126,7 @@
             padding: 12px;
             border-radius: 8px;
             margin-bottom: 15px;
+            -webkit-user-select: none;
             user-select: none;
         }
 
@@ -229,6 +227,19 @@
 
                 </div>
 
+                <div class="input-group">
+                    <label for="accountRole">Account Type</label>
+                    <select id="accountRole" onchange="toggleAdminKeyField()" style="width: 100%; height: 48px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px;">
+                        <option value="USER">User</option>
+                        <option value="ADMIN">Administrator</option>
+                    </select>
+                </div>
+
+                <div class="input-group" id="adminKeyGroup" style="display: none;">
+                    <label for="adminRegistrationKey">Administrator Key</label>
+                    <input type="password" id="adminRegistrationKey" placeholder="Enter predefined admin key" autocomplete="off">
+                </div>
+
 
                 <!-- PASSWORD -->
 
@@ -315,17 +326,17 @@
     </div>
 
 
-    <!-- Script for Official Validation & Supabase Authentication Integration -->
+    <!-- Script for backend authentication and local recovery verification -->
     <script>
      
 
-        // Initialize Supabase Client
-        const supabaseUrl = 'https://qrufisohvrceqappvhye.supabase.co';
-        const supabaseKey = 'sb_publishable_ROZgpJvsMd2Qg-Bm5PVCwg_MiV1aBQG'; 
-        const _supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const API_BASE_URL = window.NIRBHAYA_API_BASE_URL || 'https://nirbhaya-app.onrender.com';
 
-        // Official Admin Email Config
-        const ADMIN_EMAIL = "hardik@nirbhaya.com";
+        function toggleAdminKeyField() {
+            const isAdmin = document.getElementById('accountRole').value === 'ADMIN';
+            document.getElementById('adminKeyGroup').style.display = isAdmin ? 'block' : 'none';
+            document.getElementById('adminRegistrationKey').required = isAdmin;
+        }
 
         // Password Visibility Toggle
         const togglePassword = document.getElementById('togglePassword');
@@ -339,13 +350,15 @@
             });
         }
 
-        // Official Login Action with Strict Validation & Supabase Check
+        // Login action with strict validation and backend verification
         async function handleLogin() {
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
 
             const email = emailInput.value.trim().toLowerCase();
             const password = passwordInput.value.trim();
+            const role = document.getElementById('accountRole').value;
+            const adminRegistrationKey = document.getElementById('adminRegistrationKey').value;
 
             // Official Validation 1: Empty Fields
             if (!email || !password) {
@@ -361,46 +374,32 @@
                 return;
             }
 
-            // Check Supabase database for matching user
+            // Authenticate through the Spring Boot API backed by MongoDB.
             try {
-                const { data: users, error } = await _supabase
-                    .from('users')
-                    .select('*')
-                    .eq('email', email)
-                    .eq('password', password);
-
-                if (error) {
-                    console.error('Supabase error:', error.message);
-                    alert("❌ Database connection error. Please try again later.");
+                const response = await fetch(`${API_BASE_URL}/auth/${role === 'ADMIN' ? 'admin-login' : 'login'}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, adminRegistrationKey })
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                    alert(`❌ ${result.message || 'Authentication failed.'}`);
                     return;
                 }
-
-                if (!users || users.length === 0) {
-                    alert("❌ Authentication Failed: Account not found or incorrect credentials!\n\nPlease check your email/password or sign up first.");
-                    return;
-                }
-
-                const foundUser = users[0];
-                const displayName = foundUser.fullName || foundUser.name || 'User';
+                const displayName = result.username || 'User';
 
                 // Set current active session user parameters
-                localStorage.setItem('nirbhaya_current_user_email', foundUser.email);
+                localStorage.setItem('nirbhaya_current_user_email', result.email || email);
+                localStorage.setItem('nirbhaya_user_id', result.userId || '');
+                localStorage.setItem('nirbhaya_role', result.role || 'USER');
+                if (result.adminToken) localStorage.setItem('nirbhaya_admin_token', result.adminToken);
                 localStorage.setItem('nirbhaya_username', displayName);
-                if (foundUser.phone) {
-                    localStorage.setItem('nirbhaya_userphone', foundUser.phone);
-                }
-                
-                // Fetch and store user DP from database table column 'user_dp'
-                if (foundUser.user_dp) {
-                    localStorage.setItem('nirbhaya_userdp', foundUser.user_dp);
-                } else if (foundUser.dp) {
-                    localStorage.setItem('nirbhaya_userdp', foundUser.dp);
-                } else {
-                    localStorage.removeItem('nirbhaya_userdp');
+                if (result.phoneNumber) {
+                    localStorage.setItem('nirbhaya_userphone', result.phoneNumber);
                 }
 
                 // Role-Based Routing Logic (Updated: Normal user goes to security.html)
-                if (foundUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+                if ((result.role || '').toUpperCase() === 'ADMIN') {
                     alert(`👑 Welcome Admin, ${displayName}!\n\nLogin Successful. Redirecting to Command Center...`);
                     window.location.href = "admin.html";
                 } else {
@@ -430,13 +429,9 @@
             }
 
             try {
-                const { data: users, error } = await _supabase
-                    .from('users')
-                    .select('*')
-                    .eq('email', email);
-
-                if (error || !users || users.length === 0) {
-                    alert("❌ No account found with this email address. Please sign up first.");
+                const response = await fetch(`${API_BASE_URL}/auth/recovery-check?email=${encodeURIComponent(email)}`);
+                if (!response.ok) {
+                    alert("❌ Password recovery is not available yet. Please contact support.");
                     return;
                 }
 
@@ -446,7 +441,7 @@
 
                 document.getElementById('captchaModal').style.display = 'flex';
             } catch (err) {
-                console.error('Error checking user:', err);
+                console.error('Error checking recovery endpoint:', err);
                 alert("❌ Error verifying email address.");
             }
         }
@@ -466,38 +461,8 @@
 
             if (userInputValue === generatedCaptcha) {
                 try {
-                    const { data: users, error } = await _supabase
-                        .from('users')
-                        .select('*')
-                        .eq('email', email);
-
-                    if (!error && users && users.length > 0) {
-                        const foundUser = users[0];
-                        const displayName = foundUser.fullName || foundUser.name || 'User';
-
-                        localStorage.setItem('nirbhaya_current_user_email', foundUser.email);
-                        localStorage.setItem('nirbhaya_username', displayName);
-                        if (foundUser.phone) {
-                            localStorage.setItem('nirbhaya_userphone', foundUser.phone);
-                        }
-                        
-                        if (foundUser.user_dp) {
-                            localStorage.setItem('nirbhaya_userdp', foundUser.user_dp);
-                        } else if (foundUser.dp) {
-                            localStorage.setItem('nirbhaya_userdp', foundUser.dp);
-                        }
-
-                        if (foundUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-                            alert("🔓 CAPTCHA Verified Successfully!\n\nWelcome Admin. Redirecting to Command Center...");
-                            closeCaptchaModal();
-                            window.location.href = "admin.html";
-                            return;
-                        }
-                    }
-
-                    alert("🔓 CAPTCHA Verified Successfully!\n\nYour account has been verified. Logging you in automatically...");
+                    alert("🔓 CAPTCHA verified, but automatic login is disabled until a password-reset endpoint is added.");
                     closeCaptchaModal();
-                    window.location.href = "security.html";
                 } catch (err) {
                     console.error('Error during captcha validation login:', err);
                     alert("❌ Error completing login process.");

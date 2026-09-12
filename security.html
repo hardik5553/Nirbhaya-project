@@ -17,7 +17,6 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         * {
@@ -1881,13 +1880,10 @@
 
 
     <!-- Global Multi-Channel SOS Engine -->
+    <script src="js/api.js"></script>
     <script src="global-sos.js"></script>
 
     <script>
-
-        const SUPABASE_URL_SEC = 'https://qrufisohvrceqappvhye.supabase.co';
-        const SUPABASE_KEY_SEC = 'sb_publishable_ROZgpJvsMd2Qg-Bm5PVCwg_MiV1aBQG';
-        const _supabaseSec = window.supabase ? window.supabase.createClient(SUPABASE_URL_SEC, SUPABASE_KEY_SEC) : null;
 
         // Session Security Guard & Dynamic PIN UI Renderer
         window.addEventListener('DOMContentLoaded', () => {
@@ -2025,26 +2021,8 @@
             if (!container) return;
 
             let contacts = [];
-
-            if (_supabaseSec && userEmail) {
-                try {
-                    const { data, error } = await _supabaseSec
-                        .from('contacts')
-                        .select('*')
-                        .eq('user_email', userEmail);
-
-                    if (!error && data && data.length > 0) {
-                        contacts = data;
-                    }
-                } catch (err) {
-                    console.warn("Supabase fetch error, checking local storage.");
-                }
-            }
-
-            if (contacts.length === 0) {
-                const localContacts = JSON.parse(localStorage.getItem('nirbhaya_trusted_contacts')) || [];
-                contacts = localContacts;
-            }
+            try { contacts = await apiRequest(`/trusted-contacts/${encodeURIComponent(getStoredUserId())}`); }
+            catch (err) { console.warn("Backend contacts unavailable.", err); }
 
             if (contacts.length === 0) {
                 container.innerHTML = `
@@ -2056,8 +2034,8 @@
             } else {
                 let html = "";
                 contacts.forEach(c => {
-                    const name = c.contact_name || c.name || "Guardian";
-                    const phone = c.phone || "";
+                    const name = c.name || "Guardian";
+                    const phone = c.phoneNumber || "";
                     html += `
                         <div class="contact">
                             <div class="contact-avatar">
@@ -2164,19 +2142,7 @@
 
             localStorage.setItem('nirbhaya_custom_stealth_pin', newPin);
 
-            if (_supabaseSec) {
-                try {
-                    await _supabaseSec
-                        .from('users')
-                        .update({ stealth_pin: newPin })
-                        .eq('email', userEmail);
-                } catch (err) {
-                    console.warn("Database sync warning:", err);
-                }
-            }
-
-            // Log pin configuration to system history timeline
-            logSystemHistory("Stealth Panic PIN Configured", "User updated 4-digit security PIN in database.");
+            logSystemHistory("Stealth Panic PIN Configured", "User updated 4-digit security PIN.");
 
             updatePinUI();
             alert("✅ Custom Stealth PIN saved successfully!");
@@ -2200,6 +2166,11 @@
 
             alert("🕵️ STEALTH MODE ACTIVATED!\n\nSilent distress signal transmitted. Dispatching emergency telemetry...");
 
+            const userId = getStoredUserId();
+            if (userId) {
+                triggerSilentSos(userId).catch(error => console.warn("Silent SOS API failed:", error));
+            }
+
             if (typeof executeSOSWithEvidence === 'function') {
                 executeSOSWithEvidence();
             }
@@ -2220,14 +2191,23 @@
             document.getElementById('dangerModal').style.display = 'none';
         }
 
-        function trackDestinationAndCheckSafety() {
+        async function trackDestinationAndCheckSafety() {
             let destination = prompt("🧭 Enter your destination:", "Central Market");
             if (!destination) return;
 
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        alert(`✅ Route to "${destination}" secure and monitored.`);
+                    async (position) => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        const [risk, danger] = await Promise.all([
+                            evaluateRisk(latitude, longitude),
+                            checkSafetyZone(latitude, longitude)
+                        ]).catch(error => {
+                            console.warn("Safety checks failed:", error);
+                            return [null, null];
+                        });
+                        alert(`✅ Route to "${destination}" checked.\nRisk: ${JSON.stringify(risk)}\nDanger zone: ${JSON.stringify(danger)}`);
                     },
                     (error) => {
                         alert("❌ Unable to retrieve live GPS location.");
@@ -2237,8 +2217,10 @@
             }
         }
 
-        function triggerFakeCall() {
+        async function triggerFakeCall() {
             document.getElementById('fakeCallScreen').style.display = 'block';
+            const userId = getStoredUserId();
+            if (userId) await logFakeCall(userId, 'Nirbhaya Emergency Call').catch(error => console.warn("Fake-call log failed:", error));
         }
 
         function endFakeCall() {
