@@ -376,7 +376,7 @@
 
             // Authenticate through the Spring Boot API backed by MongoDB.
             try {
-                const response = await fetch(`${API_BASE_URL}/auth/${role === 'ADMIN' ? 'admin-login' : 'login'}`, {
+                const response = await fetch(`${API_BASE_URL}/api/auth/${role === 'ADMIN' ? 'admin-login' : 'login'}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password, adminRegistrationKey })
@@ -429,7 +429,7 @@
             }
 
             try {
-                const response = await fetch(`${API_BASE_URL}/auth/recovery-check?email=${encodeURIComponent(email)}`);
+                const response = await fetch(`${API_BASE_URL}/api/auth/recovery-check?email=${encodeURIComponent(email)}`);
                 if (!response.ok) {
                     alert("❌ Password recovery is not available yet. Please contact support.");
                     return;
