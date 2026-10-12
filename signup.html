@@ -450,6 +450,7 @@
                 </div>
 
                 <!-- Button -->
+                <p id="signupStatus" role="status" aria-live="polite" style="display: none; margin: 0 0 12px;"></p>
                 <button type="submit" class="signup-btn" id="signupBtn">
                     Create Account
                 </button>
@@ -500,8 +501,12 @@
     <script src="js/config.js"></script>
     <script src="js/api.js"></script>
     <script>
-        function getBackendUrl() {
-            return (window.getApiBaseUrl ? window.getApiBaseUrl() : (window.NIRBHAYA_API_BASE_URL || 'https://nirbhaya-app.onrender.com')).replace(/\/+$/, '');
+        function setSignupStatus(message, isError = false) {
+            const status = document.getElementById('signupStatus');
+            if (!status) return;
+            status.textContent = message;
+            status.style.color = isError ? '#b91c1c' : '#475569';
+            status.style.display = message ? 'block' : 'none';
         }
 
         const hideTimers = {};
@@ -554,10 +559,12 @@
             const phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
             const role = document.getElementById('accountRole') ? document.getElementById('accountRole').value : 'USER';
             const adminRegistrationKey = document.getElementById('adminRegistrationKey') ? document.getElementById('adminRegistrationKey').value.trim() : '';
-            const password = document.getElementById('password') ? document.getElementById('password').value.trim() : '';
-            const confirmPassword = document.getElementById('confirmPassword') ? document.getElementById('confirmPassword').value.trim() : '';
+            const password = document.getElementById('password') ? document.getElementById('password').value : '';
+            const confirmPassword = document.getElementById('confirmPassword') ? document.getElementById('confirmPassword').value : '';
             const terms = document.getElementById('terms') ? document.getElementById('terms').checked : false;
             const robotCheck = document.getElementById('robotCheck') ? document.getElementById('robotCheck').checked : false;
+
+            setSignupStatus('');
 
             // 1. Terms & Conditions check
             if (!terms) {
@@ -611,25 +618,17 @@
             const warmUpTimer = setTimeout(() => {
                 if (signupBtn && signupBtn.disabled) {
                     signupBtn.innerHTML = '⏳ Connecting to server (Render waking up)...';
+                    setSignupStatus('Connecting to the server. A sleeping service may take up to a minute to wake.');
                 }
             }, 4000);
 
             try {
-                const baseUrl = getBackendUrl();
-                const response = await fetch(`${baseUrl}/api/auth/register`, {
+                await apiRequest('/auth/register', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: name, email, phoneNumber: phone, password, role, adminRegistrationKey })
                 });
 
                 clearTimeout(warmUpTimer);
-
-                const result = await response.json().catch(() => ({ message: 'Unexpected server response.' }));
-
-                if (!response.ok) {
-                    alert(`❌ ${result.message || 'Failed to create account.'}`);
-                    return;
-                }
 
                 alert(`✅ Account Created Successfully for ${name}!\n\nPlease log in using your credentials.`);
                 window.location.href = "login.html";
@@ -637,7 +636,7 @@
             } catch (err) {
                 clearTimeout(warmUpTimer);
                 console.error('Unexpected error during signup:', err);
-                alert("❌ Connection Error: Unable to connect to the backend server.\n\nRender instances may take up to 45 seconds to spin up if sleeping. Please try again in a moment.");
+                setSignupStatus(err.message || 'Unable to create your account. Please try again.', true);
             } finally {
                 if (signupBtn) {
                     signupBtn.disabled = false;

@@ -304,6 +304,16 @@
             return true;
         }
 
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, character => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[character]);
+        }
+
         async function loadAudioVaultFromDatabase(userEmail) {
             const container = document.getElementById('audioVaultListContainer');
             if (!container) return;
@@ -328,8 +338,8 @@
                 const localVault = JSON.parse(localStorage.getItem('nirbhaya_local_audio_vault') || '[]');
                 if (Array.isArray(localVault)) {
                     localVault.forEach(item => {
-                        // Deduplicate if already present by audioUrl
-                        if (!records.some(r => r.audioUrl === item.audioUrl || r.id === item.id)) {
+                        if (!records.some(r => r.audioUrl === item.audioUrl || r.id === item.id ||
+                            (r.fileName === item.fileName && r.userId === item.userId))) {
                             records.push(item);
                         }
                     });
@@ -338,6 +348,7 @@
                 console.warn("Local audio vault cache reading error:", localErr);
             }
 
+            records = records.filter(item => /^https?:\/\//i.test(item.audioUrl || ''));
             if (!records || records.length === 0) {
                 container.innerHTML = `
                     <div style="text-align: center; padding: 20px; color: #64748b;">
@@ -355,9 +366,9 @@
             let html = "";
             records.forEach(item => {
                 const formattedDate = item.createdAt ? new Date(item.createdAt).toLocaleString() : 'Recent Recording';
-                const audioUrl = item.audioUrl || '';
-                const fileName = item.fileName || 'evidence_recording.webm';
-                const recordId = item.id || '';
+                const audioUrl = escapeHtml(item.audioUrl || '');
+                const fileName = escapeHtml(item.fileName || 'evidence_recording.webm');
+                const recordId = String(item.id || '').replace(/[^a-zA-Z0-9_-]/g, '');
 
                 html += `
                     <div class="log-item" style="flex-direction: column; align-items: stretch; gap: 12px; padding: 16px 0;">
@@ -383,11 +394,7 @@
                                 <span style="font-size: 11px; color: #6b21a8; font-weight: 600;">Secure Playback</span>
                             </div>
 
-                            <audio class="audio-player-elem" controls preload="metadata">
-                                <source src="${audioUrl}" type="audio/webm">
-                                <source src="${audioUrl}" type="audio/wav">
-                                <source src="${audioUrl}" type="audio/mp4">
-                                <source src="${audioUrl}" type="audio/mpeg">
+                            <audio class="audio-player-elem" src="${audioUrl}" controls preload="metadata">
                                 Your browser does not support the audio player.
                             </audio>
 

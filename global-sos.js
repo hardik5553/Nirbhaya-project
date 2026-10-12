@@ -158,9 +158,20 @@ async function executeSOSWithEvidence() {
 }
 
 async function startBackgroundAudioVault(userId) {
+    let audioStream;
     try {
-        const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        const mediaRecorder = new MediaRecorder(audioStream);
+        if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+            throw new Error("This browser does not support audio recording.");
+        }
+
+        audioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        const mimeType = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"]
+            .find(type => typeof MediaRecorder.isTypeSupported !== "function" || MediaRecorder.isTypeSupported(type));
+        const mediaRecorder = mimeType
+            ? new MediaRecorder(audioStream, { mimeType })
+            : new MediaRecorder(audioStream);
+        const recordedMimeType = mediaRecorder.mimeType || mimeType || "application/octet-stream";
+        const extension = recordedMimeType.includes("mp4") ? "m4a" : recordedMimeType.includes("ogg") ? "ogg" : "webm";
         let audioChunks = [];
 
         mediaRecorder.ondataavailable = (event) => {
@@ -168,15 +179,17 @@ async function startBackgroundAudioVault(userId) {
         };
 
         mediaRecorder.onstop = async () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            const audioBlob = new Blob(audioChunks, { type: recordedMimeType });
             audioStream.getTracks().forEach(track => track.stop());
 
-            if (audioBlob) {
+            try {
+                if (audioBlob.size === 0) {
+                    throw new Error("The recording was empty.");
+                }
                 const userEmail = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email') || '';
-                const fileName = `private_vault_${Date.now()}.webm`;
+                const fileName = `private_vault_${Date.now()}.${extension}`;
                 const uploadedUrl = await uploadEvidence(userId, audioBlob, fileName, userEmail);
 
-                // Store in local audio vault as immediate cache
                 try {
                     let localVault = JSON.parse(localStorage.getItem('nirbhaya_local_audio_vault') || '[]');
                     localVault.unshift({
@@ -193,8 +206,12 @@ async function startBackgroundAudioVault(userId) {
                 }
 
                 logSystemHistory("Automated Audio Evidence Captured (30s)", "Private 30s audio securely uploaded and saved to Supabase vault.");
+            } catch (error) {
+                console.error("The SOS audio recording could not be saved:", error);
+                logSystemHistory("SOS Audio Evidence Upload Failed", "The recording could not be saved to the private audio vault.");
+            } finally {
+                isSosExecuting = false;
             }
-            isSosExecuting = false;
         };
 
         mediaRecorder.start();
@@ -203,6 +220,7 @@ async function startBackgroundAudioVault(userId) {
         }, 30000);
 
     } catch (err) {
+        audioStream?.getTracks().forEach(track => track.stop());
         console.warn("Background audio recording error:", err);
         isSosExecuting = false;
     }
@@ -238,15 +256,10 @@ async function proceedWithMessaging(userId, customMsg, mapsLink, evidenceUrl) {
     let cleanPhone = primaryContact.phone.replace(/[^0-9+]/g, '');
 
     const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone.replace('+', '')}&text=${encodeURIComponent(fullMessage)}`;
-    const smsUrl = `sms:${cleanPhone}?body=${encodeURIComponent(fullMessage)}`;
-
     await sendSms(primaryContact.phone, fullMessage, true)
         .catch(error => console.warn("Backend SMS send failed:", error));
 
     window.open(whatsappUrl, '_blank');
-    setTimeout(() => {
-        window.location.href = smsUrl;
-    }, 800);
 }
 
 function logSystemHistory(title, description) {
@@ -267,14 +280,22 @@ async function uploadEvidence(userId, blob, fileName, userEmail = '') {
     if (userEmail) formData.append("userEmail", userEmail);
     try {
         const response = await apiRequest("/evidence/upload", { method: "POST", body: formData });
-        return typeof response === "string" ? response : (response.audioUrl || response.url || "Evidence uploaded");
+        const audioUrl = typeof response === "string" ? response : (response.audioUrl || response.url);
+        if (typeof audioUrl !== "string" || !/^https?:\/\//i.test(audioUrl)) {
+            throw new Error("The server did not return a playable evidence URL.");
+        }
+        return audioUrl;
     } catch (error) {
         try {
-            const response = await uploadEvidenceBytes(userId, await blob.arrayBuffer());
-            return typeof response === "string" ? response : (response.audioUrl || response.url || "Evidence uploaded");
+            const response = await uploadEvidenceBytes(userId, await blob.arrayBuffer(), fileName, blob.type, userEmail);
+            const audioUrl = typeof response === "string" ? response : (response.audioUrl || response.url);
+            if (typeof audioUrl !== "string" || !/^https?:\/\//i.test(audioUrl)) {
+                throw new Error("The server did not return a playable evidence URL.");
+            }
+            return audioUrl;
         } catch (byteErr) {
-            console.error("Evidence upload failed:", byteErr);
-            return "Evidence capture stored locally";
+            console.error("Evidence upload failed:", error, byteErr);
+            throw byteErr;
         }
     }
 }

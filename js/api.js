@@ -1,13 +1,13 @@
 // frontend/js/api.js - Centralized API Service Layer
 
-function getApiBaseUrl() {
-    if (typeof window !== "undefined" && window.getApiBaseUrl) {
-        return window.getApiBaseUrl();
+function resolveApiBaseUrl() {
+    if (typeof window !== "undefined" && window.getNirbhayaApiBaseUrl) {
+        return window.getNirbhayaApiBaseUrl();
     }
     if (typeof window !== "undefined" && window.NIRBHAYA_API_BASE_URL) {
         return window.NIRBHAYA_API_BASE_URL;
     }
-    return "https://nirbhaya-app.onrender.com";
+    return "";
 }
 
 function normalizeApiPath(path) {
@@ -19,7 +19,7 @@ function normalizeApiPath(path) {
 }
 
 async function apiRequest(path, options = {}) {
-    const baseUrl = getApiBaseUrl().replace(/\/+$/, "");
+    const baseUrl = resolveApiBaseUrl().replace(/\/+$/, "");
     const fullPath = normalizeApiPath(path);
     const requestOptions = { ...options };
     const headers = new Headers(requestOptions.headers || {});
@@ -30,18 +30,36 @@ async function apiRequest(path, options = {}) {
 
     requestOptions.headers = headers;
 
-    const response = await fetch(`${baseUrl}${fullPath}`, requestOptions);
-    const contentType = response.headers.get("content-type") || "";
-    const body = contentType.includes("application/json")
-        ? await response.json()
-        : await response.text();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 120000);
+    requestOptions.signal = requestOptions.signal || controller.signal;
 
-    if (!response.ok) {
-        const message = body && typeof body === "object" ? body.message : body;
-        throw new Error(message || `Request failed with status ${response.status}`);
+    try {
+        const response = await fetch(`${baseUrl}${fullPath}`, requestOptions);
+        const contentType = response.headers.get("content-type") || "";
+        const body = contentType.includes("application/json")
+            ? await response.json()
+            : await response.text();
+
+        if (!response.ok) {
+            const message = body && typeof body === "object"
+                ? (body.message || body.detail || body.error)
+                : body;
+            throw new Error(message || `Request failed with status ${response.status}`);
+        }
+
+        return body;
+    } catch (error) {
+        if (controller.signal.aborted) {
+            throw new Error("The server took too long to respond. Please try again.");
+        }
+        if (error instanceof TypeError) {
+            throw new Error("Unable to reach the server. Check your connection and try again.");
+        }
+        throw error;
+    } finally {
+        clearTimeout(timeoutId);
     }
-
-    return body;
 }
 
 function getStoredUser() {
@@ -67,10 +85,12 @@ function storeAuthenticatedUser(user) {
 }
 
 // Category 2 API helpers. Pages use these helpers so contracts stay consistent.
-async function uploadEvidenceBytes(userId, bytes) {
-    return apiRequest(`/api/evidence/upload-bytes?userId=${encodeURIComponent(userId)}`, {
+async function uploadEvidenceBytes(userId, bytes, fileName, contentType, userEmail) {
+    const query = new URLSearchParams({ userId, fileName });
+    if (userEmail) query.set("userEmail", userEmail);
+    return apiRequest(`/api/evidence/upload-bytes?${query}`, {
         method: "POST",
-        headers: { "Content-Type": "application/octet-stream" },
+        headers: { "Content-Type": contentType || "application/octet-stream" },
         body: bytes
     });
 }
