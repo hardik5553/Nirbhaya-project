@@ -1,6 +1,26 @@
-const NIRBHAYA_API_BASE_URL = window.NIRBHAYA_API_BASE_URL || "https://nirbhaya-app.onrender.com";
+// frontend/js/api.js - Centralized API Service Layer
+
+function getApiBaseUrl() {
+    if (typeof window !== "undefined" && window.getApiBaseUrl) {
+        return window.getApiBaseUrl();
+    }
+    if (typeof window !== "undefined" && window.NIRBHAYA_API_BASE_URL) {
+        return window.NIRBHAYA_API_BASE_URL;
+    }
+    return "https://nirbhaya-app.onrender.com";
+}
+
+function normalizeApiPath(path) {
+    if (!path.startsWith("/")) path = "/" + path;
+    if (!path.startsWith("/api/")) {
+        path = "/api" + path;
+    }
+    return path;
+}
 
 async function apiRequest(path, options = {}) {
+    const baseUrl = getApiBaseUrl().replace(/\/+$/, "");
+    const fullPath = normalizeApiPath(path);
     const requestOptions = { ...options };
     const headers = new Headers(requestOptions.headers || {});
 
@@ -10,7 +30,7 @@ async function apiRequest(path, options = {}) {
 
     requestOptions.headers = headers;
 
-    const response = await fetch(`${NIRBHAYA_API_BASE_URL}${path}`, requestOptions);
+    const response = await fetch(`${baseUrl}${fullPath}`, requestOptions);
     const contentType = response.headers.get("content-type") || "";
     const body = contentType.includes("application/json")
         ? await response.json()
@@ -42,107 +62,122 @@ function storeAuthenticatedUser(user) {
     }
     if (user.username) localStorage.setItem("nirbhaya_username", user.username);
     if (user.phoneNumber) localStorage.setItem("nirbhaya_userphone", user.phoneNumber);
+    if (user.role) localStorage.setItem("nirbhaya_role", user.role);
+    if (user.adminToken) localStorage.setItem("nirbhaya_admin_token", user.adminToken);
 }
 
-// Category 2 API helpers. Pages use these helpers so query and JSON contracts stay consistent.
+// Category 2 API helpers. Pages use these helpers so contracts stay consistent.
 async function uploadEvidenceBytes(userId, bytes) {
-    return apiRequest(`/evidence/upload-bytes?userId=${encodeURIComponent(userId)}`, {
+    return apiRequest(`/api/evidence/upload-bytes?userId=${encodeURIComponent(userId)}`, {
         method: "POST",
         headers: { "Content-Type": "application/octet-stream" },
         body: bytes
     });
 }
 
+// Audio Evidence Vault API helpers
+async function getAudioVaultHistory(userId, email) {
+    let query = [];
+    if (userId) query.push(`userId=${encodeURIComponent(userId)}`);
+    if (email) query.push(`email=${encodeURIComponent(email)}`);
+    const qs = query.length ? `?${query.join("&")}` : "";
+    return apiRequest(`/api/evidence/vault${qs}`);
+}
+
+async function deleteAudioVaultRecordApi(id) {
+    return apiRequest(`/api/evidence/vault/${encodeURIComponent(id)}`, { method: "DELETE" });
+}
+
 async function checkDangerZone(lat, lng) {
-    return apiRequest(`/danger-zone/check?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}`);
+    return apiRequest(`/api/danger-zone/check?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}`);
 }
 
 async function addDangerZone(payload) {
-    return apiRequest("/danger-zone/add", { method: "POST", body: JSON.stringify(payload) });
+    return apiRequest("/api/danger-zone/add", { method: "POST", body: JSON.stringify(payload) });
 }
 
 async function getCrimeHeatmap() {
-    return apiRequest("/safety/crime-heatmap");
+    return apiRequest("/api/safety/crime-heatmap");
 }
 
 async function getLiveSosMap() {
-    return apiRequest("/safety/live-sos-map");
+    return apiRequest("/api/safety/live-sos-map");
 }
 
 async function addEmergencyContact(userId, name, phoneNumber) {
-    return apiRequest(`/emergency-contacts/add/${encodeURIComponent(userId)}?name=${encodeURIComponent(name)}&phoneNumber=${encodeURIComponent(phoneNumber)}`, { method: "POST" });
+    return apiRequest(`/api/emergency-contacts/add/${encodeURIComponent(userId)}?name=${encodeURIComponent(name)}&phoneNumber=${encodeURIComponent(phoneNumber)}`, { method: "POST" });
 }
 
 async function getEmergencyContacts(userId) {
-    return apiRequest(`/emergency-contacts/${encodeURIComponent(userId)}`);
+    return apiRequest(`/api/emergency-contacts/${encodeURIComponent(userId)}`);
 }
 
 async function logFakeCall(userId, callerName) {
-    return apiRequest(`/fake-call/log/${encodeURIComponent(userId)}?callerName=${encodeURIComponent(callerName)}`, { method: "POST" });
+    return apiRequest(`/api/fake-call/log/${encodeURIComponent(userId)}?callerName=${encodeURIComponent(callerName)}`, { method: "POST" });
 }
 
 async function getIncidentAnalytics(userId) {
-    return apiRequest(`/analytics/${encodeURIComponent(userId)}`);
+    return apiRequest(`/api/analytics/${encodeURIComponent(userId)}`);
 }
 
 async function getLocationHistory(userId) {
-    return apiRequest(`/location/history/${encodeURIComponent(userId)}`);
+    return apiRequest(`/api/location/history/${encodeURIComponent(userId)}`);
 }
 
 async function getCurrentLocation(userId) {
-    return apiRequest(`/location/${encodeURIComponent(userId)}`);
+    return apiRequest(`/api/location/${encodeURIComponent(userId)}`);
 }
 
 async function updateUserLocation(userId, latitude, longitude) {
-    return apiRequest(`/location/update/${encodeURIComponent(userId)}?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}`, { method: "POST" });
+    return apiRequest(`/api/location/update/${encodeURIComponent(userId)}?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}`, { method: "POST" });
 }
 
 async function evaluateRisk(latitude, longitude) {
-    return apiRequest(`/risk/evaluate?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}`);
+    return apiRequest(`/api/risk/evaluate?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}`);
 }
 
 async function requestSafeRoute(payload) {
-    return apiRequest("/safety/safe-route", { method: "POST", body: JSON.stringify(payload) });
+    return apiRequest("/api/safety/safe-route", { method: "POST", body: JSON.stringify(payload) });
 }
 
 async function checkRouteDeviation(userId, latitude, longitude, plannedRoute = []) {
-    return apiRequest(`/safety/route-deviation/${encodeURIComponent(userId)}?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}`);
+    return apiRequest(`/api/safety/route-deviation/${encodeURIComponent(userId)}?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}`);
 }
 
 async function checkSafetyZone(latitude, longitude) {
-    return apiRequest(`/safety/danger-zone-check?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}`);
+    return apiRequest(`/api/safety/danger-zone-check?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}`);
 }
 
 async function findNearbyHelp(latitude, longitude) {
-    return apiRequest(`/safety/nearby-help?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}`);
+    return apiRequest(`/api/safety/nearby-help?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}`);
 }
 
 async function reportDistress(payload) {
-    return apiRequest("/safety/distress", { method: "POST", body: JSON.stringify(payload) });
+    return apiRequest("/api/safety/distress", { method: "POST", body: JSON.stringify(payload) });
 }
 
 async function sendSms(phoneNumber, message, isOfflineFallback = false) {
-    return apiRequest(`/sms/send?phoneNumber=${encodeURIComponent(phoneNumber)}&message=${encodeURIComponent(message)}&isOfflineFallback=${isOfflineFallback}`, { method: "POST" });
+    return apiRequest(`/api/sms/send?phoneNumber=${encodeURIComponent(phoneNumber)}&message=${encodeURIComponent(message)}&isOfflineFallback=${isOfflineFallback}`, { method: "POST" });
 }
 
 async function dispatchSosSms(phoneNumbers, latitude, longitude) {
     const params = new URLSearchParams({ latitude: String(latitude), longitude: String(longitude) });
     phoneNumbers.forEach(phoneNumber => params.append("phoneNumbers", phoneNumber));
-    return apiRequest(`/sms/dispatch-sos?${params.toString()}`, { method: "POST" });
+    return apiRequest(`/api/sms/dispatch-sos?${params.toString()}`, { method: "POST" });
 }
 
 async function triggerSilentSos(userId) {
-    return apiRequest("/sos/silent-trigger", { method: "POST", body: JSON.stringify({ userId }) });
+    return apiRequest("/api/sos/silent-trigger", { method: "POST", body: JSON.stringify({ userId }) });
 }
 
 async function getSosHistory(userId) {
-    return apiRequest(`/sos/history/${encodeURIComponent(userId)}`);
+    return apiRequest(`/api/sos/history/${encodeURIComponent(userId)}`);
 }
 
 async function getAllTrustedContacts() {
-    return apiRequest("/trusted-contacts/all");
+    return apiRequest("/api/trusted-contacts/all");
 }
 
 async function updateTrustedContact(id, payload) {
-    return apiRequest(`/trusted-contacts/update/${encodeURIComponent(id)}`, { method: "PUT", body: JSON.stringify(payload) });
+    return apiRequest(`/api/trusted-contacts/update/${encodeURIComponent(id)}`, { method: "PUT", body: JSON.stringify(payload) });
 }

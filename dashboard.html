@@ -480,6 +480,9 @@
                             <a href="settings.html" class="dropdown-item">
                                 <i class="fa-solid fa-gear"></i> Account Settings
                             </a>
+                            <a href="history.html" class="dropdown-item">
+                                <i class="fa-solid fa-clock-rotate-left"></i> Activity & Audio Vault
+                            </a>
                             <div class="dropdown-divider"></div>
                             <a href="login.html" class="dropdown-item" style="color: #ef3340;" onclick="handleLogout(event)">
                                 <i class="fa-solid fa-right-from-bracket"></i> Logout
@@ -653,6 +656,23 @@
 
                     </div>
 
+                    <!-- Audio Vault & Activity History Quick Card -->
+                    <div class="card col-12" style="background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%); border-left: 4px solid #7c3aed;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                            <div>
+                                <h3 style="color: #6b21a8; margin-bottom: 5px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-solid fa-microphone-lines"></i> System Logs & Audio Vault
+                                </h3>
+                                <p style="font-size: 0.85rem; color: #64748b; margin: 0;">
+                                    Review private 30-sec emergency SOS audio recordings, device telemetry logs, and dispatch history.
+                                </p>
+                            </div>
+                            <a href="history.html" style="background: #7c3aed; color: white; text-decoration: none; padding: 10px 22px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.25);">
+                                <i class="fa-solid fa-clock-rotate-left"></i> View Full History & Audio
+                            </a>
+                        </div>
+                    </div>
+
                 </div>
 
             </main>
@@ -662,6 +682,7 @@
     </div>
 
     <!-- Global Multi-Channel SOS Engine -->
+    <script src="js/config.js"></script>
     <script src="js/api.js"></script>
     <script src="global-sos.js"></script>
 

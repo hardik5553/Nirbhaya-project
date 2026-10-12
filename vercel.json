@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "routes": [
+    { "src": "/login", "dest": "/login.html" },
+    { "src": "/signup", "dest": "/signup.html" },
+    { "src": "/history", "dest": "/history.html" },
+    { "src": "/dashboard", "dest": "/dashboard.html" },
+    { "src": "/security", "dest": "/security.html" },
+    { "src": "/contacts", "dest": "/contacts.html" },
+    { "src": "/alerts", "dest": "/alerts.html" },
+    { "src": "/watch", "dest": "/watch.html" },
+    { "src": "/settings", "dest": "/settings.html" },
+    { "src": "/admin", "dest": "/admin.html" },
+    {
+      "src": "/(.*)",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With"
+      },
+      "continue": true
+    }
+  ]
+}

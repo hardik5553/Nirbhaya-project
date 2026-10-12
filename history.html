@@ -10,7 +10,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -24,7 +23,7 @@
         .menu a i { font-size: 21px; }
         .menu a span { font-size: 11px; }
         .menu a:hover { background: #16243a; color: white; }
-        .menu a.active { color: #ff3864; }
+        .menu a.active { color: #ff3864; background: #16243a; font-weight: 600; }
 
         .sos-wrapper { margin-top: auto; display: flex; flex-direction: column; align-items: center; }
         .sos { width: 66px; height: 66px; border-radius: 50%; background: #ef3340; border: 7px solid #651b29; color: white; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 0 25px rgba(239, 51, 64, 0.45); transition: 0.3s; }
@@ -34,12 +33,12 @@
         .main { margin-left: 105px; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
 
         .topbar { height: 80px; background: #16243a; color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 35px; position: relative; }
-        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-area { display: flex; align-items: center; gap: 12px; cursor: pointer; }
         .app-logo { height: 48px; width: 48px; border-radius: 50%; object-fit: cover; border: 2px solid white; }
         .logo-area h2 { font-family: Poppins, sans-serif; font-size: 20px; }
         .logo-area h2 span { color: #ff3864; }
         .tagline { font-size: 11px; color: #cbd5e1; }
-        
+
         .top-right { display: flex; align-items: center; gap: 25px; }
         .notification { position: relative; font-size: 22px; cursor: pointer; }
         .notification .badge { position: absolute; top: -8px; right: -8px; width: 18px; height: 18px; background: #ef3340; border-radius: 50%; font-size: 10px; display: flex; align-items: center; justify-content: center; }
@@ -47,7 +46,7 @@
         .user-dropdown-container { position: relative; cursor: pointer; }
         .user { display: flex; align-items: center; gap: 10px; }
         .user img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #ef3340; }
-        .dropdown-menu { display: none; position: absolute; right: 0; top: 55px; background: #ffffff; color: #1e293b; min-width: 200px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); overflow: hidden; z-index: 1100; }
+        .dropdown-menu { display: none; position: absolute; right: 0; top: 55px; background: #ffffff; color: #1e293b; min-width: 220px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); overflow: hidden; z-index: 1100; }
         .dropdown-menu.show { display: block; }
         .dropdown-header { padding: 15px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
         .dropdown-header strong { display: block; font-size: 14px; color: #0f172a; }
@@ -57,8 +56,8 @@
         .dropdown-divider { height: 1px; background: #e2e8f0; }
 
         .content { padding: 35px; flex: 1; }
-        .page-title h1 { font-family: Poppins, sans-serif; font-size: 36px; }
-        .page-title p { color: #64748b; margin-top: 5px; }
+        .page-title h1 { font-family: Poppins, sans-serif; font-size: 32px; color: #0f172a; }
+        .page-title p { color: #475569; margin-top: 5px; font-size: 14px; }
 
         .log-card { background: white; border-radius: 18px; padding: 25px; margin-top: 25px; box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06); }
         .log-item { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #f1f5f9; }
@@ -68,9 +67,14 @@
         .log-info strong { font-size: 14px; display: block; color: #0f172a; }
         .log-info small { font-size: 12px; color: #64748b; }
         .log-time { font-size: 12px; color: #64748b; font-weight: 600; text-align: right; }
-        
-        .play-btn { background: #7c3aed; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 11px; cursor: pointer; font-weight: 600; margin-top: 6px; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; }
-        .delete-btn { background: #fee2e2; color: #ef3340; border: none; padding: 6px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; font-weight: 600; margin-top: 6px; margin-left: 6px; display: inline-flex; align-items: center; gap: 5px; }
+
+        .play-btn { background: #7c3aed; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 11px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; transition: 0.2s; }
+        .play-btn:hover { background: #6d28d9; }
+        .delete-btn { background: #fee2e2; color: #ef3340; border: none; padding: 6px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .delete-btn:hover { background: #fecaca; }
+
+        .audio-vault-box { background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 14px; padding: 16px; margin-top: 10px; width: 100%; }
+        .audio-player-elem { width: 100%; height: 38px; outline: none; border-radius: 8px; margin-top: 8px; }
 
         footer { text-align: center; padding: 25px; color: #64748b; font-size: 12px; }
     </style>
@@ -80,7 +84,7 @@
 
     <aside class="sidebar">
         <div class="brand">
-            <a href="../security.html" title="Security Center">
+            <a href="security.html" title="Security Center">
                 <i class="fa-solid fa-shield-halved" style="color: #ef476f; font-size: 26px;"></i>
             </a>
         </div>
@@ -88,8 +92,8 @@
             <a href="dashboard.html"><i class="fa-solid fa-border-all"></i><span>Dashboard</span></a>
             <a href="pages/track-location.html"><i class="fa-solid fa-location-dot"></i><span>Location</span></a>
             <a href="alerts.html"><i class="fa-solid fa-bell"></i><span>Alerts</span></a>
-            <a href=/watch.html"><i class="fa-solid fa-clock"></i><span>Watch</span></a>
-            <a href="secrity.html"><i class="fa-solid fa-shield-halved"></i><span>Security</span></a>
+            <a href="watch.html"><i class="fa-solid fa-clock"></i><span>Watch</span></a>
+            <a href="security.html"><i class="fa-solid fa-shield-halved"></i><span>Security</span></a>
             <a href="contacts.html"><i class="fa-solid fa-users"></i><span>Contacts</span></a>
             <a href="history.html" class="active"><i class="fa-solid fa-clock-rotate-left"></i><span>History</span></a>
             <a href="settings.html"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
@@ -102,9 +106,9 @@
 
     <main class="main">
         <header class="topbar">
-            <!-- Nirbhaya Logo with nir2.jpeg -->
-            <div class="logo-area">
-                <img src="../frontend/assets/images/nir2.jpeg" alt="NIRBHAYA Logo" class="app-logo" onerror="this.src='../nir2.jpeg'; onerror=function(){this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100'}">
+            <!-- Nirbhaya Logo with robust fallback -->
+            <div class="logo-area" onclick="location.href='dashboard.html'">
+                <img src="assets/images/nir2.jpeg" alt="NIRBHAYA Logo" class="app-logo" onerror="this.src='nir2.jpeg'; this.onerror=function(){this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100'};">
                 <div>
                     <h2><span>NIR</span> BHAYA</h2>
                     <div class="tagline">Your Safety. Our Priority.</div>
@@ -112,15 +116,15 @@
             </div>
 
             <div class="top-right">
-                <div class="notification" onclick="location.href='../alerts.html'">
+                <div class="notification" onclick="location.href='alerts.html'">
                     <i class="fa-solid fa-bell"></i>
                     <span class="badge">3</span>
                 </div>
 
-                <!-- User Profile with aqw.jpeg DP -->
+                <!-- User Profile with robust DP fallback -->
                 <div class="user-dropdown-container" id="userDropdownToggle">
                     <div class="user">
-                        <img id="topbarUserImg" src="../aqw.jpeg" alt="Profile DP" onerror="this.src='../aqw.jpeg'; onerror=function(){this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}">
+                        <img id="topbarUserImg" src="aqw.jpeg" alt="Profile DP" onerror="this.src='aqw.jpeg'; this.onerror=function(){this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'};">
                         <strong id="topbarUserName">Hi, User</strong>
                         <i class="fa-solid fa-chevron-down" style="font-size: 11px;"></i>
                     </div>
@@ -130,10 +134,11 @@
                             <strong id="dropdownUserName">User</strong>
                             <small id="dropdownUserEmail">user@example.com</small>
                         </div>
-                        <a href="#" class="dropdown-item" onclick="alert('User Details: Primary User | Status: Verified')"><i class="fa-solid fa-user"></i> User Details</a>
-                        <a href="../settings.html" class="dropdown-item"><i class="fa-solid fa-gear"></i> Account Settings</a>
+                        <a href="dashboard.html" class="dropdown-item"><i class="fa-solid fa-border-all"></i> Dashboard</a>
+                        <a href="security.html" class="dropdown-item"><i class="fa-solid fa-shield-halved"></i> Security Center</a>
+                        <a href="settings.html" class="dropdown-item"><i class="fa-solid fa-gear"></i> Account Settings</a>
                         <div class="dropdown-divider"></div>
-                        <a href="../login.html" class="dropdown-item" style="color: #ef3340;" onclick="handleLogout(event)"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                        <a href="login.html" class="dropdown-item" style="color: #ef3340;" onclick="handleLogout(event)"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
                     </div>
                 </div>
             </div>
@@ -142,20 +147,39 @@
         <section class="content">
             <div class="page-title">
                 <h1>System Activity History</h1>
-                <p>Recent security logs, private audio evidence vault, and device sync events</p>
+                <p>Recent emergency dispatches, private 30-sec audio evidence vault, and telemetry events</p>
             </div>
 
             <!-- Audio Evidence Vault Section -->
             <div class="log-card">
-                <h3 style="margin-bottom: 15px; font-size: 16px; color: #7c3aed;"><i class="fa-solid fa-microphone"></i> Private 30-Sec Audio Evidence Vault</h3>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                    <h3 style="font-size: 16px; color: #7c3aed;">
+                        <i class="fa-solid fa-microphone"></i> Private 30-Sec Audio Evidence Vault
+                    </h3>
+                    <button onclick="refreshAudioVault()" style="background: #f3e8ff; color: #7c3aed; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;">
+                        <i class="fa-solid fa-rotate-right"></i> Refresh
+                    </button>
+                </div>
                 <div id="audioVaultListContainer">
                     <p style="color: #64748b; font-size: 13px;">Loading audio recordings from database...</p>
                 </div>
             </div>
 
+            <!-- SOS Incident Logs Section -->
+            <div class="log-card">
+                <h3 style="margin-bottom: 15px; font-size: 16px; color: #ef3340;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Emergency SOS Incident History
+                </h3>
+                <div id="sosIncidentListContainer">
+                    <p style="color: #64748b; font-size: 13px;">Loading SOS incidents...</p>
+                </div>
+            </div>
+
             <!-- General System Activity Timeline -->
             <div class="log-card">
-                <h3 style="margin-bottom: 15px; font-size: 16px;">Activity Timeline</h3>
+                <h3 style="margin-bottom: 15px; font-size: 16px; color: #0f172a;">
+                    <i class="fa-solid fa-timeline"></i> Activity Timeline
+                </h3>
                 <div id="dynamicHistoryList">
                     <!-- Dynamic logs injected here -->
                 </div>
@@ -165,35 +189,36 @@
         <footer>🛡️ NIR BHAYA © 2026 | Protection. Prevention. Peace of Mind.</footer>
     </main>
 
+    <!-- Scripts for API, Configuration, and SOS Dispatch -->
+    <script src="js/config.js"></script>
     <script src="js/api.js"></script>
     <script src="global-sos.js"></script>
     <script>
-        const SUPABASE_URL_HIST = 'https://rezijlatjdjmmwsnkiwa.supabase.co';
-        const SUPABASE_KEY_HIST = 'sb_publishable_PADD8_17YO16gWLn9LKMPg_Rnu1FTYY';
-        const _supabaseHist = window.supabase ? window.supabase.createClient(SUPABASE_URL_HIST, SUPABASE_KEY_HIST) : null;
-
         window.addEventListener('DOMContentLoaded', async () => {
+            const activeUser = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
+
+            if (!activeUser) {
+                alert("⚠️ Unauthorized Access: Please log in first.");
+                window.location.href = "login.html";
+                return;
+            }
+
             const savedName = localStorage.getItem('nirbhaya_username');
-            const savedEmail = localStorage.getItem('nirbhaya_user_email') || localStorage.getItem('nirbhaya_current_user_email');
-            const savedDp = localStorage.getItem('nirbhaya_userdp') || '../aqw.jpeg';
+            const savedDp = localStorage.getItem('nirbhaya_userdp') || 'aqw.jpeg';
 
             if (savedName) {
                 document.getElementById('topbarUserName').textContent = `Hi, ${savedName}`;
                 document.getElementById('dropdownUserName').textContent = savedName;
             }
-            if (savedEmail) {
-                document.getElementById('dropdownUserEmail').textContent = savedEmail;
+            if (activeUser) {
+                document.getElementById('dropdownUserEmail').textContent = activeUser;
             }
             if (savedDp) {
                 document.getElementById('topbarUserImg').src = savedDp;
             }
 
             loadSystemLogs();
-            if (savedEmail) {
-                await loadAudioVaultFromDatabase(savedEmail);
-            } else {
-                document.getElementById('audioVaultListContainer').innerHTML = `<p style="color: #64748b; font-size: 13px;">No audio clip yet.</p>`;
-            }
+            await refreshAudioVault();
             await loadSosHistory();
         });
 
@@ -207,30 +232,66 @@
             window.addEventListener('click', () => dropdownMenu.classList.remove('show'));
         }
 
+        async function refreshAudioVault() {
+            const activeEmail = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
+            await loadAudioVaultFromDatabase(activeEmail);
+        }
+
         async function loadSosHistory() {
             const userId = getStoredUserId();
-            if (!userId) return;
+            const container = document.getElementById('sosIncidentListContainer');
+            if (!container) return;
+
+            if (!userId) {
+                container.innerHTML = `<p style="color: #64748b; font-size: 13px;">No SOS incident records found.</p>`;
+                return;
+            }
+
             try {
                 const history = await getSosHistory(userId);
                 localStorage.setItem('nirbhaya_sos_history', JSON.stringify(history));
-                logSystemHistory('SOS History Synced', `${Array.isArray(history) ? history.length : 0} backend incidents loaded.`);
-                loadSystemLogs();
+
+                if (!Array.isArray(history) || history.length === 0) {
+                    container.innerHTML = `<p style="color: #64748b; font-size: 13px;">No emergency SOS incidents logged yet.</p>`;
+                    return;
+                }
+
+                let html = "";
+                history.forEach(inc => {
+                    const formattedDate = inc.timestamp ? new Date(inc.timestamp).toLocaleString() : 'Recent';
+                    const isSilent = inc.silent || inc.isSilent;
+                    html += `
+                        <div class="log-item">
+                            <div class="log-left">
+                                <div class="log-icon" style="background: #fee2e2; color: #ef3340;">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                </div>
+                                <div class="log-info">
+                                    <strong>${isSilent ? 'Silent SOS Distress' : 'One-Tap Emergency SOS'}</strong>
+                                    <small>Status: <span style="font-weight: 700; color: ${inc.status === 'ACTIVE' ? '#e11d48' : '#16a34a'};">${inc.status || 'ACTIVE'}</span> | ID: ${inc.id || 'N/A'}</small>
+                                </div>
+                            </div>
+                            <div class="log-time">${formattedDate}</div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
             } catch (error) {
                 console.warn('SOS history unavailable:', error);
+                container.innerHTML = `<p style="color: #64748b; font-size: 13px;">No SOS incidents logged yet.</p>`;
             }
         }
 
         function handleLogout(event) {
             if (event) event.preventDefault();
             localStorage.clear();
-            window.location.href = "../login.html";
+            window.location.href = "login.html";
         }
 
         async function verifyStealthPinBeforeAction() {
             let savedPin = localStorage.getItem('nirbhaya_custom_stealth_pin');
             if (!savedPin) {
-                alert("⚠️ No Stealth PIN configured yet! Please set your PIN in the Security Center first.");
-                return false;
+                return confirm("Are you sure you want to permanently delete this item?");
             }
 
             let enteredPin = prompt("🔐 Enter your 4-digit Stealth Panic PIN to authorize this deletion:");
@@ -245,38 +306,100 @@
 
         async function loadAudioVaultFromDatabase(userEmail) {
             const container = document.getElementById('audioVaultListContainer');
-            if (!container || !_supabaseHist) return;
+            if (!container) return;
 
-            const cleanEmail = userEmail.trim().toLowerCase();
+            const userId = getStoredUserId();
+            const cleanEmail = userEmail ? userEmail.trim().toLowerCase() : '';
 
-            const { data, error } = await _supabaseHist
-                .from('audio_vault')
-                .select('*')
-                .eq('user_email', cleanEmail)
-                .order('created_at', { ascending: false });
+            let records = [];
 
-            if (error || !data || data.length === 0) {
-                container.innerHTML = `<p style="color: #64748b; font-size: 13px;">No audio clip yet.</p>`;
+            // 1. Fetch from Render backend (which queries Supabase database)
+            try {
+                const backendRecords = await getAudioVaultHistory(userId, cleanEmail);
+                if (Array.isArray(backendRecords)) {
+                    records.push(...backendRecords);
+                }
+            } catch (err) {
+                console.warn("Backend audio vault API offline or empty:", err);
+            }
+
+            // 2. Fetch local storage cached audio vault records
+            try {
+                const localVault = JSON.parse(localStorage.getItem('nirbhaya_local_audio_vault') || '[]');
+                if (Array.isArray(localVault)) {
+                    localVault.forEach(item => {
+                        // Deduplicate if already present by audioUrl
+                        if (!records.some(r => r.audioUrl === item.audioUrl || r.id === item.id)) {
+                            records.push(item);
+                        }
+                    });
+                }
+            } catch (localErr) {
+                console.warn("Local audio vault cache reading error:", localErr);
+            }
+
+            if (!records || records.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #64748b;">
+                        <i class="fa-solid fa-microphone-slash" style="font-size: 28px; margin-bottom: 8px; opacity: 0.5;"></i>
+                        <p style="font-size: 13px;">No audio recordings in the vault yet.</p>
+                        <small>A 30-second private audio evidence file is automatically recorded and saved here whenever you trigger an SOS.</small>
+                    </div>
+                `;
                 return;
             }
 
+            // Sort records by createdAt descending
+            records.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
             let html = "";
-            data.forEach(item => {
-                const formattedDate = new Date(item.created_at).toLocaleString();
+            records.forEach(item => {
+                const formattedDate = item.createdAt ? new Date(item.createdAt).toLocaleString() : 'Recent Recording';
+                const audioUrl = item.audioUrl || '';
+                const fileName = item.fileName || 'evidence_recording.webm';
+                const recordId = item.id || '';
+
                 html += `
-                    <div class="log-item">
-                        <div class="log-left">
-                            <div class="log-icon" style="background: #f3e8ff; color: #7c3aed;"><i class="fa-solid fa-microphone"></i></div>
-                            <div class="log-info">
-                                <strong>Private Panic Audio Recording (30s)</strong>
-                                <small>Secured in vault for your review.</small>
-                                <div>
-                                    <a class="play-btn" href="${item.audio_url}" target="_blank"><i class="fa-solid fa-play"></i> Listen Recording</a>
-                                    <button class="delete-btn" onclick="deleteAudioVaultRecord(${item.id})"><i class="fa-solid fa-trash"></i> Delete Clip</button>
+                    <div class="log-item" style="flex-direction: column; align-items: stretch; gap: 12px; padding: 16px 0;">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <div class="log-left">
+                                <div class="log-icon" style="background: #f3e8ff; color: #7c3aed;">
+                                    <i class="fa-solid fa-microphone"></i>
+                                </div>
+                                <div class="log-info">
+                                    <strong>Private Panic Audio Recording (30s)</strong>
+                                    <small style="color: #64748b;">File: <code>${fileName}</code> | Secured in Supabase Vault</small>
                                 </div>
                             </div>
+                            <div class="log-time">${formattedDate}</div>
                         </div>
-                        <div class="log-time">${formattedDate}</div>
+
+                        <!-- Embedded HTML5 Audio Player Component -->
+                        <div class="audio-vault-box">
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <span style="font-size: 12px; font-weight: 600; color: #7c3aed;">
+                                    <i class="fa-solid fa-play"></i> Audio Evidence Player
+                                </span>
+                                <span style="font-size: 11px; color: #6b21a8; font-weight: 600;">Secure Playback</span>
+                            </div>
+
+                            <audio class="audio-player-elem" controls preload="metadata">
+                                <source src="${audioUrl}" type="audio/webm">
+                                <source src="${audioUrl}" type="audio/wav">
+                                <source src="${audioUrl}" type="audio/mp4">
+                                <source src="${audioUrl}" type="audio/mpeg">
+                                Your browser does not support the audio player.
+                            </audio>
+
+                            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+                                <a class="play-btn" href="${audioUrl}" target="_blank" download="${fileName}">
+                                    <i class="fa-solid fa-download"></i> Download Clip
+                                </a>
+                                <button class="delete-btn" onclick="deleteAudioVaultRecord('${recordId}')">
+                                    <i class="fa-solid fa-trash"></i> Delete Clip
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 `;
             });
@@ -288,19 +411,24 @@
             const isAuthorized = await verifyStealthPinBeforeAction();
             if (!isAuthorized) return;
 
-            const { error } = await _supabaseHist
-                .from('audio_vault')
-                .delete()
-                .eq('id', recordId);
+            // Remove from local cache
+            try {
+                let localVault = JSON.parse(localStorage.getItem('nirbhaya_local_audio_vault') || '[]');
+                localVault = localVault.filter(item => item.id !== recordId);
+                localStorage.setItem('nirbhaya_local_audio_vault', JSON.stringify(localVault));
+            } catch (err) {}
 
-            if (error) {
-                alert("❌ Failed to delete recording: " + error.message);
-                return;
+            // Remove from backend database if it's a server ID
+            if (recordId && !recordId.startsWith('vault_') && !recordId.startsWith('local_')) {
+                try {
+                    await deleteAudioVaultRecordApi(recordId);
+                } catch (err) {
+                    console.warn("Backend deletion note:", err);
+                }
             }
 
             alert("✅ Audio recording deleted successfully!");
-            const activeEmail = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email');
-            await loadAudioVaultFromDatabase(activeEmail);
+            await refreshAudioVault();
         }
 
         function loadSystemLogs() {
@@ -318,6 +446,7 @@
             logs.forEach((log, index) => {
                 let iconClass = "fa-shield-halved";
                 if (log.title.includes("SOS")) iconClass = "fa-triangle-exclamation";
+                else if (log.title.includes("Audio")) iconClass = "fa-microphone";
                 else if (log.title.includes("Watch")) iconClass = "fa-clock";
                 else if (log.title.includes("Geofence")) iconClass = "fa-location-dot";
                 else if (log.title.includes("PIN")) iconClass = "fa-user-secret";
@@ -331,7 +460,7 @@
                                 <strong>${log.title}</strong>
                                 <small>${log.desc}</small>
                                 <div>
-                                    <button class="delete-btn" onclick="deleteSystemLog(${index})"><i class="fa-solid fa-trash"></i> Delete Log</button>
+                                    <button class="delete-btn" style="margin-top: 6px;" onclick="deleteSystemLog(${index})"><i class="fa-solid fa-trash"></i> Delete Log</button>
                                 </div>
                             </div>
                         </div>

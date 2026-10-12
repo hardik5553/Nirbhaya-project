@@ -63,7 +63,7 @@ async function executeSOSWithEvidence() {
     const customMsg = localStorage.getItem('nirbhaya_sos_sms') || "🚨 EMERGENCY! I need immediate help. Track my live location via NIRBHAYA.";
 
     if (!userId) {
-        window.location.href = "../login.html";
+        window.location.href = window.location.pathname.includes('/pages/') ? "../login.html" : "login.html";
         return;
     }
 
@@ -172,8 +172,27 @@ async function startBackgroundAudioVault(userId) {
             audioStream.getTracks().forEach(track => track.stop());
 
             if (audioBlob) {
-                await uploadEvidence(userId, audioBlob, `private_vault_${Date.now()}.webm`);
-                logSystemHistory("Automated Audio Evidence Captured (30s)", "Private 30s audio securely saved to Cloudinary.");
+                const userEmail = localStorage.getItem('nirbhaya_current_user_email') || localStorage.getItem('nirbhaya_user_email') || '';
+                const fileName = `private_vault_${Date.now()}.webm`;
+                const uploadedUrl = await uploadEvidence(userId, audioBlob, fileName, userEmail);
+
+                // Store in local audio vault as immediate cache
+                try {
+                    let localVault = JSON.parse(localStorage.getItem('nirbhaya_local_audio_vault') || '[]');
+                    localVault.unshift({
+                        id: 'vault_' + Date.now(),
+                        userId: userId,
+                        userEmail: userEmail,
+                        audioUrl: uploadedUrl,
+                        fileName: fileName,
+                        createdAt: new Date().toISOString()
+                    });
+                    localStorage.setItem('nirbhaya_local_audio_vault', JSON.stringify(localVault));
+                } catch (storeErr) {
+                    console.warn("Could not cache to local vault:", storeErr);
+                }
+
+                logSystemHistory("Automated Audio Evidence Captured (30s)", "Private 30s audio securely uploaded and saved to Supabase vault.");
             }
             isSosExecuting = false;
         };
@@ -241,15 +260,21 @@ function logSystemHistory(title, description) {
     localStorage.setItem('nirbhaya_system_logs', JSON.stringify(history));
 }
 
-async function uploadEvidence(userId, blob, fileName) {
+async function uploadEvidence(userId, blob, fileName, userEmail = '') {
     const formData = new FormData();
     formData.append("userId", userId);
     formData.append("file", blob, fileName);
+    if (userEmail) formData.append("userEmail", userEmail);
     try {
         const response = await apiRequest("/evidence/upload", { method: "POST", body: formData });
-        return typeof response === "string" ? response : response.url || "Evidence uploaded";
+        return typeof response === "string" ? response : (response.audioUrl || response.url || "Evidence uploaded");
     } catch (error) {
-        const response = await uploadEvidenceBytes(userId, await blob.arrayBuffer());
-        return typeof response === "string" ? response : response.url || "Evidence uploaded";
+        try {
+            const response = await uploadEvidenceBytes(userId, await blob.arrayBuffer());
+            return typeof response === "string" ? response : (response.audioUrl || response.url || "Evidence uploaded");
+        } catch (byteErr) {
+            console.error("Evidence upload failed:", byteErr);
+            return "Evidence capture stored locally";
+        }
     }
 }

@@ -450,7 +450,7 @@
                 </div>
 
                 <!-- Button -->
-                <button type="submit" class="signup-btn">
+                <button type="submit" class="signup-btn" id="signupBtn">
                     Create Account
                 </button>
 
@@ -496,17 +496,22 @@
         </div>
     </div>
 
-    <!-- Script for strict signup and backend integration flow -->
+    <!-- Scripts for runtime configuration and API integration -->
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
     <script>
-
-        const API_BASE_URL = window.NIRBHAYA_API_BASE_URL || 'https://nirbhaya-app.onrender.com';
+        function getBackendUrl() {
+            return (window.getApiBaseUrl ? window.getApiBaseUrl() : (window.NIRBHAYA_API_BASE_URL || 'https://nirbhaya-app.onrender.com')).replace(/\/+$/, '');
+        }
 
         const hideTimers = {};
 
         function toggleAdminKeyField() {
             const isAdmin = document.getElementById('accountRole').value === 'ADMIN';
-            document.getElementById('adminKeyGroup').style.display = isAdmin ? 'block' : 'none';
-            document.getElementById('adminRegistrationKey').required = isAdmin;
+            const adminGroup = document.getElementById('adminKeyGroup');
+            const adminKeyInput = document.getElementById('adminRegistrationKey');
+            if (adminGroup) adminGroup.style.display = isAdmin ? 'block' : 'none';
+            if (adminKeyInput) adminKeyInput.required = isAdmin;
         }
 
         function togglePasswordVisibility(fieldId, iconElement) {
@@ -536,67 +541,113 @@
 
         // Signup handling logic with backend database integration
         async function handleSignup(event) {
-            event.preventDefault();
+            if (event && event.preventDefault) {
+                event.preventDefault();
+            }
 
-            const name = document.getElementById('name').value.trim();
+            const signupBtn = document.getElementById('signupBtn');
+            const originalBtnHtml = signupBtn ? signupBtn.innerHTML : 'Create Account';
+
+            const name = document.getElementById('name') ? document.getElementById('name').value.trim() : '';
             const emailInput = document.getElementById('email');
-            const email = emailInput.value.trim().toLowerCase();
-            const phone = document.getElementById('phone').value.trim();
-            const role = document.getElementById('accountRole').value;
-            const adminRegistrationKey = document.getElementById('adminRegistrationKey').value;
-            const password = document.getElementById('password').value.trim();
-            const confirmPassword = document.getElementById('confirmPassword').value.trim();
-            const robotCheck = document.getElementById('robotCheck').checked;
+            const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+            const phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
+            const role = document.getElementById('accountRole') ? document.getElementById('accountRole').value : 'USER';
+            const adminRegistrationKey = document.getElementById('adminRegistrationKey') ? document.getElementById('adminRegistrationKey').value.trim() : '';
+            const password = document.getElementById('password') ? document.getElementById('password').value.trim() : '';
+            const confirmPassword = document.getElementById('confirmPassword') ? document.getElementById('confirmPassword').value.trim() : '';
+            const terms = document.getElementById('terms') ? document.getElementById('terms').checked : false;
+            const robotCheck = document.getElementById('robotCheck') ? document.getElementById('robotCheck').checked : false;
 
-            // 1. Strict Email Format Check (Must contain '@' and '.')
+            // 1. Terms & Conditions check
+            if (!terms) {
+                alert("⚠️ Please accept the Terms & Conditions & Permissions to continue.");
+                document.getElementById('terms')?.focus();
+                return;
+            }
+
+            // 2. Captcha Robot Check Verification
+            if (!robotCheck) {
+                alert("⚠️ Please verify that you are not a robot by checking the CAPTCHA box.");
+                document.getElementById('robotCheck')?.focus();
+                return;
+            }
+
+            // 3. Strict Email Format Check
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 alert("❌ Invalid Email Format! Please enter a valid email address containing '@' (e.g., user@example.com).");
-                emailInput.focus();
+                if (emailInput) emailInput.focus();
                 return;
             }
 
-            // 2. Password Length Check
+            // 4. Password Length Check
             if (password.length < 6) {
                 alert("⚠️ Password must be at least 6 characters long.");
+                document.getElementById('password')?.focus();
                 return;
             }
 
-            // 3. Password Match Check
+            // 5. Password Match Check
             if (password !== confirmPassword) {
                 alert("❌ Passwords do not match! Please re-check.");
+                document.getElementById('confirmPassword')?.focus();
                 return;
             }
 
-            // 4. Captcha Robot Check Verification
-            if (!robotCheck) {
-                alert("⚠️ Please verify that you are not a robot by checking the CAPTCHA box.");
+            // 6. Admin Secret Key Check
+            if (role === 'ADMIN' && !adminRegistrationKey) {
+                alert("⚠️ Please enter your Administrator Secret Key.");
+                document.getElementById('adminRegistrationKey')?.focus();
                 return;
             }
+
+            // Set loading button state
+            if (signupBtn) {
+                signupBtn.disabled = true;
+                signupBtn.innerHTML = '⏳ Creating Account... Please wait';
+            }
+
+            const warmUpTimer = setTimeout(() => {
+                if (signupBtn && signupBtn.disabled) {
+                    signupBtn.innerHTML = '⏳ Connecting to server (Render waking up)...';
+                }
+            }, 4000);
 
             try {
-                const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+                const baseUrl = getBackendUrl();
+                const response = await fetch(`${baseUrl}/api/auth/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: name, email, phoneNumber: phone, password, role, adminRegistrationKey })
                 });
-                const result = await response.json();
+
+                clearTimeout(warmUpTimer);
+
+                const result = await response.json().catch(() => ({ message: 'Unexpected server response.' }));
+
                 if (!response.ok) {
                     alert(`❌ ${result.message || 'Failed to create account.'}`);
                     return;
                 }
 
                 alert(`✅ Account Created Successfully for ${name}!\n\nPlease log in using your credentials.`);
-                window.location.href = "login.html"; // Redirects to login page after signup
+                window.location.href = "login.html";
 
             } catch (err) {
+                clearTimeout(warmUpTimer);
                 console.error('Unexpected error during signup:', err);
-                alert("❌ An unexpected error occurred. Please try again.");
+                alert("❌ Connection Error: Unable to connect to the backend server.\n\nRender instances may take up to 45 seconds to spin up if sleeping. Please try again in a moment.");
+            } finally {
+                if (signupBtn) {
+                    signupBtn.disabled = false;
+                    signupBtn.innerHTML = originalBtnHtml;
+                }
             }
         }
 
         function openTermsModal(event) {
-            event.preventDefault();
+            if (event && event.preventDefault) event.preventDefault();
             document.getElementById('termsModal').style.display = 'flex';
         }
 
@@ -611,7 +662,5 @@
             }
         });
     </script>
-
 </body>
-
 </html>
